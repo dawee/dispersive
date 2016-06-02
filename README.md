@@ -24,6 +24,14 @@ const clickOnStuff = createAction((evt, done) => {
 });
 ```
 
+#### Trigger an Action
+
+```js
+  onMouseClick(evt) {
+    clickOnStuff(evt);
+  }
+```
+
 #### Create a Store
 
 ```js
@@ -33,20 +41,24 @@ class SelectionStore extends Store {
   
   constructor() {
     super();
-
     this.register(clickOnStuff, this.selectStuff);
   }
 
   selectStuff(opts) {
     this.selection = {x: opts.x, y: opts.y}
+    this.emit('change');
   }
 }
 ```
 
-#### Trigger an Action
+#### Listen to Store changes
+
 
 ```js
-  onMouseClick(evt) {
-    clickOnStuff(evt);
-  }
+const selectionStore = new SelectionStore();
+
+selectionStore.on('change', function () {
+  // Update your view/component here
+});
 ```
+
