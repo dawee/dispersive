@@ -4,7 +4,7 @@
   "description": "ES6 Flux lib based on facebook Emitter/Dispatcher",
   "main": "index.js",
   "scripts": {
-    "postinstall": "make build"
+    "postinstall": "babel --presets es2015 lib -q -d ."
   },
   "repository": {
     "type": "git",
