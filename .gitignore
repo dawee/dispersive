@@ -1,1 +1,5 @@
 node_modules
+/action.js
+/store.js
+/dispatcher.js
+
