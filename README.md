@@ -42,3 +42,11 @@ class SelectionStore extends Store {
   }
 }
 ```
+
+#### Trigger an Action
+
+```js
+  onMouseClick(evt) {
+    clickOnStuff(evt);
+  }
+```
