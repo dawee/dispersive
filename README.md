@@ -1,6 +1,6 @@
 # dawee's Flux
 
-ES6 Flux lib based on facebook [Emitter](https://github.com/facebook/emitter)/[Dispatcher](https://github.com/facebook/flux).
+Yet another Flux lib based on facebook [Emitter](https://github.com/facebook/emitter)/[Dispatcher](https://github.com/facebook/flux).
 
 
 ## Installation
@@ -14,9 +14,9 @@ npm install dwflux
 ### Create an Action
 
 ```js
-import {createAction} from 'dwflux/action';
+const Action = require('dwflux/action');
 
-const clickOnStuff = createAction((evt, done) => {
+const clickOnStuff = Action.create((evt, done) => {
   done(null, {
     x: evt.nativeEvent.screenX,
     y: evt.nativeEvent.screenY
@@ -35,7 +35,7 @@ const clickOnStuff = createAction((evt, done) => {
 #### Create a Store
 
 ```js
-import Store from 'dwflux/store';
+const Store = require('dwflux/store');
 
 class SelectionStore extends Store {
   
