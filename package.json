@@ -1,6 +1,6 @@
 {
   "name": "dwflux",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Yet another Flux lib based on facebook Emitter/Dispatcher",
   "main": "index.js",
   "scripts": {
