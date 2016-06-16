@@ -1,7 +1,7 @@
 {
   "name": "dwflux",
-  "version": "0.0.3",
-  "description": "ES6 Flux lib based on facebook Emitter/Dispatcher",
+  "version": "0.0.4",
+  "description": "Yet another Flux lib based on facebook Emitter/Dispatcher",
   "main": "index.js",
   "scripts": {
     "test": "mocha"
