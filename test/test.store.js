@@ -21,8 +21,8 @@ describe('Store', () => {
   it('should emit only once', () => {
     let count1 = 0;
     let count2 = 0;
-    let store1 = new TestStore();
-    let store2 = new TestStore();
+    let store1 = TestStore.create();
+    let store2 = TestStore.create();
 
     store1.on('change', () => count1++);
     store2.on('change', () => count2++);
@@ -32,4 +32,5 @@ describe('Store', () => {
     assert.equal(1, count1);
     assert.equal(1, count2);
   })
+
 })
