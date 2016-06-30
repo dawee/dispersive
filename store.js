@@ -49,7 +49,7 @@ class Store extends EventEmitter {
     this._entries = this._entries || {};
 
     for (const id of Object.keys(this._entries)) {
-      yield this._entries[id];
+      yield this.get(id);
     }
   }
 
