@@ -13,17 +13,14 @@ dispatcher.register((action) => {
 });
 
 
-class Store extends EventEmitter {
+class Store {
 
-  constructor() {
-    super();
-
-    this.on = this.addListener.bind(this);
-    this.trigger = this.emit.bind(this);
-    this.objects = new ObjectsManager();
+  static emitter() {
+    this._emitter = this._emitter || new EventEmitter();
+    return this._emitter;
   }
 
-  bindAction(actionWrapper, handler) {
+  static bindAction(actionWrapper, handler) {
     let actionType = actionWrapper.action.actionType;
 
     if (! (actionType in eventMapping)) {
@@ -32,6 +29,21 @@ class Store extends EventEmitter {
 
     eventMapping[actionType].add(handler.bind(this));
   }
+
+  static initialize() {
+    if (this._initialized) throw "Store.initialize() should be called only once";
+
+    this.objects = new ObjectsManager();
+    this.on = this.emitter().addListener.bind(this);
+    this.trigger = this.emitter().emit.bind(this);
+    this.bindActions();
+    this._initialized = true;
+
+    return this;
+  }
+
+
+  static bindActions() {}
 
 }
 

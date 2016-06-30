@@ -7,41 +7,42 @@ const testAsyncAction = Action.createAsync((trigger) => trigger());
 
 class TestStore extends Store {
 
-  constructor() {
-    super();
+  static bindActions() {
     this.bindAction(testAction, this.onTriggered);
     this.bindAction(testAsyncAction, this.onTriggered);
   }
 
-  onTriggered() {
-    this.emit('change');
+  static onTriggered() {
+    this.trigger('change');
   }
 
 }
 
+TestStore.initialize();
+
 describe('Store', () => {
-  // it('actions should be triggered', () => {
-  //   let count1 = 0;
-  //   let count2 = 0;
-  //   let store1 = new TestStore();
-  //   let store2 = new TestStore();
+  it('actions should be triggered', () => {
+    let count1 = 0;
+    let count2 = 0;
+    let store1 = new TestStore();
+    let store2 = new TestStore();
 
-  //   store1.on('change', () => count1++);
-  //   store2.on('change', () => count2++);
+    store1.on('change', () => count1++);
+    store2.on('change', () => count2++);
 
-  //   testAction();
-  //   testAsyncAction();
+    testAction();
+    testAsyncAction();
     
-  //   assert.equal(2, count1);
-  //   assert.equal(2, count2);
-  // });
+    assert.equal(2, count1);
+    assert.equal(2, count2);
+  });
 
   it('should get entries by id', () => {
     let value = {id: 42, text: 'foobar'};
     let store = new TestStore();
 
-    store.objects.create(value);
-    assert.equal(value, store.objects.get({id: 42}));
+    TestStore.objects.create(value);
+    assert.equal(value, TestStore.objects.get({id: 42}));
   });
 
 })
