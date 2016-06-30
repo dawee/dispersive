@@ -2,7 +2,7 @@ const assert = require('assert');
 const Action = require('../action');
 const Store = require('../store');
 
-const testAction = Action.create();
+const testAction = Action.createAsync((trigger) => trigger({}));
 
 class TestStore extends Store {
 

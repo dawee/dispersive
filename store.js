@@ -18,8 +18,8 @@ class Store extends EventEmitter {
     return this.addListener(eventType, handler);
   }
 
-  bindAction(action, handler) {
-    let actionType = action.actionType;
+  bindAction(actionWrapper, handler) {
+    let actionType = actionWrapper.action.actionType;
 
     if (! (actionType in eventMapping)) eventMapping[actionType] = new Set([]);
 
