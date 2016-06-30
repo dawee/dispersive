@@ -14,44 +14,11 @@ dispatcher.register((action) => {
 
 class Store extends EventEmitter {
 
-  static prepareMapping() {
-    this.mapping = this.mapping || {};
-    this.currentId = this.currentId || {};
-  }
-
-  static get(id) {
-    this.prepareMapping();
-
-    const storeId = id === 'current' ? this.currentId : id;
-
-    return this.mapping[storeId];
-  }
-
-  static create() {
-    this.prepareMapping();
-
-    const store = new this();
-
-    store.id = hat();
-    this.mapping[store.id] = store;
-    this.currentId = store.id;
-
-    return store;
-  }
-
-  static map(func) {
-    this.prepareMapping();
-
-    for (const storeId of Object.keys(this.mapping)) {
-      func(this.mapping[storeId]);
-    }
-  }
-
   on(eventType, handler) {
     return this.addListener(eventType, handler);
   }
 
-  register(action, handler) {
+  bindAction(action, handler) {
     let actionType = action.actionType;
 
     if (! (actionType in eventMapping)) eventMapping[actionType] = new Set([]);
@@ -59,6 +26,36 @@ class Store extends EventEmitter {
     eventMapping[actionType].add(handler.bind(this));
   }
 
+  _getCid() {
+    return this.cid || 'id';
+  }
+
+  get(id) {
+    this._entries = this._entries || {};
+
+    return this._entries[id];
+  }
+
+  add(entry) {
+    this._entries = this._entries || {};
+    this._entries[entry[this._getCid()]] = entry;    
+  }
+
+  remove(entry) {
+    delete this._entries[entry[this._getCid()]];
+  }
+
+  *all() {
+    this._entries = this._entries || {};
+
+    for (const id of Object.keys(this._entries)) {
+      yield this._entries[id];
+    }
+  }
+
+  listAll() {
+    return [...this.all()];
+  }
 }
 
 module.exports = Store;

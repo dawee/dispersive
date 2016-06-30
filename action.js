@@ -18,5 +18,7 @@ exports.create = (handler) => {
   };
 
   wrapper.actionType = actionType;
+  wrapper.handler = handler;
+
   return wrapper;
 };
