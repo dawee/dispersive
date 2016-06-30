@@ -2,13 +2,15 @@ const assert = require('assert');
 const Action = require('../action');
 const Store = require('../store');
 
-const testAction = Action.createAsync((trigger) => trigger({}));
+const testAction = Action.create();
+const testAsyncAction = Action.createAsync((trigger) => trigger());
 
 class TestStore extends Store {
 
   constructor() {
     super();
-    this.bindAction(testAction, this.onTriggered);    
+    this.bindAction(testAction, this.onTriggered);
+    this.bindAction(testAsyncAction, this.onTriggered);
   }
 
   onTriggered() {
@@ -18,7 +20,7 @@ class TestStore extends Store {
 }
 
 describe('Store', () => {
-  it('should emit only once', () => {
+  it('actions should be triggered', () => {
     let count1 = 0;
     let count2 = 0;
     let store1 = new TestStore();
@@ -28,9 +30,10 @@ describe('Store', () => {
     store2.on('change', () => count2++);
 
     testAction();
-
-    assert.equal(1, count1);
-    assert.equal(1, count2);
+    testAsyncAction();
+    
+    assert.equal(2, count1);
+    assert.equal(2, count2);
   });
 
   it('should set/get entries by id', () => {
