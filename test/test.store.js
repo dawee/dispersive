@@ -36,30 +36,12 @@ describe('Store', () => {
     assert.equal(2, count2);
   });
 
-  it('should set/get entries by id', () => {
-    let value = {id: 42};
+  it('should get entries by id', () => {
+    let value = {id: 42, text: 'foobar'};
     let store = new TestStore();
 
-    store.add(value);
-    assert.equal(value, store.get(42));
-  });
-
-  it('should set/get entries with custum cid', () => {
-    let value = {index: 42};
-    let store = new TestStore();
-
-    store.cid = 'index';
-
-    store.add(value);
-    assert.equal(value, store.get(42));
-  });
-
-  it('should retrieve all entries with listAll()', () => {
-    let value = {id: 42};
-    let store = new TestStore();
-
-    store.add(value);
-    assert.deepEqual([value], store.listAll());
+    store.objects.create(value);
+    assert.equal(value, store.objects.get({id: 42}));
   });
 
 })

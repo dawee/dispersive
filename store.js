@@ -1,6 +1,7 @@
 const EventEmitter = require('fbemitter').EventEmitter;
 const dispatcher = require('./dispatcher');
 const hat = require('hat');
+const ObjectsManager = require('./lib/manager');
 
 
 let eventMapping = {};
@@ -14,48 +15,24 @@ dispatcher.register((action) => {
 
 class Store extends EventEmitter {
 
-  on(eventType, handler) {
-    return this.addListener(eventType, handler);
+  constructor() {
+    super();
+
+    this.on = this.addListener.bind(this);
+    this.trigger = this.emit.bind(this);
+    this.objects = new ObjectsManager();
   }
 
   bindAction(actionWrapper, handler) {
     let actionType = actionWrapper.action.actionType;
 
-    if (! (actionType in eventMapping)) eventMapping[actionType] = new Set([]);
+    if (! (actionType in eventMapping)) {
+      eventMapping[actionType] = new Set([]);
+    }
 
     eventMapping[actionType].add(handler.bind(this));
   }
 
-  _getCid() {
-    return this.cid || 'id';
-  }
-
-  get(id) {
-    this._entries = this._entries || {};
-
-    return this._entries[id];
-  }
-
-  add(entry) {
-    this._entries = this._entries || {};
-    this._entries[entry[this._getCid()]] = entry;    
-  }
-
-  remove(entry) {
-    delete this._entries[entry[this._getCid()]];
-  }
-
-  *all() {
-    this._entries = this._entries || {};
-
-    for (const id of Object.keys(this._entries)) {
-      yield this.get(id);
-    }
-  }
-
-  listAll() {
-    return [...this.all()];
-  }
 }
 
 module.exports = Store;
