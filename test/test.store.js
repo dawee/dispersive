@@ -1,17 +1,14 @@
 const assert = require('assert');
 const Dispersive = require('..');
 
-const testAction = Dispersive.Action.create();
-const testAsyncAction = Dispersive.Action.createAsync((trigger) => trigger());
-
-const TestStore = Dispersive.Store.create();
-
-TestStore.triggerChange = (() => TestStore.emitter.trigger('change'));
-TestStore.dispatcher.on(testAction, TestStore.triggerChange);
-TestStore.dispatcher.on(testAsyncAction, TestStore.triggerChange);
-
-
 describe('Store', () => {
+
+  let TestStore;
+
+  beforeEach((done) => {
+    TestStore = Dispersive.Store.create();
+    done();
+  });
 
   it('should get entries by id', () => {
     let value = {id: 42, text: 'foobar'};
