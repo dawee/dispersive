@@ -1,24 +1,24 @@
 {
-  "name": "dwflux",
+  "name": "dispersive",
   "version": "0.0.8",
-  "description": "Yet another Flux lib based on facebook Emitter/Dispatcher",
+  "description": "Storage management inspired by the Flux philosophy",
   "main": "index.js",
   "scripts": {
     "test": "mocha"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dawee/flux.git"
+    "url": "git+https://github.com/dawee/dispersive.git"
   },
   "author": "David Corticchiato",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/dawee/flux/issues"
+    "url": "https://github.com/dawee/dispersive/issues"
   },
   "engines": {
-    "node": ">=6.2.0"
+    "node": ">=6.0.0"
   },
-  "homepage": "https://github.com/dawee/flux#readme",
+  "homepage": "https://github.com/dawee/dispersive#readme",
   "dependencies": {
     "fbemitter": "2.0.2",
     "flux": "2.1.1",
