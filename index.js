@@ -12,3 +12,4 @@ exports.createStore = () => ({
 
 exports.createAction = Action.create;
 exports.createActionGroup = Action.createGroup;
+exports.createDispatcher = () => new Dispatcher();
