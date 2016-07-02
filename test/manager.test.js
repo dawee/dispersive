@@ -2,7 +2,7 @@ const assert = require('assert');
 const Dispersive = require('..');
 const ObjectsManager = require('../lib/manager');
 
-describe('Action', () => {
+describe('ObjectsManager', () => {
 
   it('create a new entry', () => {
     const manager = new ObjectsManager();
