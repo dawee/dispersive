@@ -8,7 +8,7 @@ describe('Action', () => {
 
   it('should trigger immediately after', () => {
     const listener = sinon.spy();
-    const action = Dispersive.Action.create(
+    const action = Dispersive.createAction(
       (value) => ({value})
     );
 
@@ -24,7 +24,7 @@ describe('Action', () => {
       done();
     };
 
-    const action = Dispersive.Action.create(
+    const action = Dispersive.createAction(
       (value) => new Promise((resolve, reject) => resolve({value}))
     );
 
@@ -42,16 +42,16 @@ describe('Action', () => {
       done();
     };
 
-    const action1 = Dispersive.Action.create(
+    const action1 = Dispersive.createAction(
       (value) => new Promise((resolve, reject) => resolve({value}))
     );
 
-    const action2 = Dispersive.Action.create(
+    const action2 = Dispersive.createAction(
       (value) => new Promise((resolve, reject) => resolve({value}))
     );
 
-    const grouped = Dispersive.Action.create((value) => (
-      Dispersive.Action.createGroup()
+    const grouped = Dispersive.createAction((value) => (
+      Dispersive.createActionGroup()
         .chain(action1, [value])
         .chain(action2, [value])
     ));

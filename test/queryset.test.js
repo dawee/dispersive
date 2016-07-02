@@ -5,7 +5,7 @@ const Dispersive = require('..');
 
 describe('QuerySet', () => {
 
-  const Store = Dispersive.Store.create();
+  const Store = Dispersive.createStore();
 
   before((done) => {
     Store.objects.create({name: 'joe', age: 30, job: 'developer'});
