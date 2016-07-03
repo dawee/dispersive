@@ -62,6 +62,19 @@ describe('Action', () => {
     grouped(42);
   });
 
-  it('should trigger action.error when action failed');
+  it('should trigger action.error when action failed', (done) => {
+    const listener = (data) => {
+      assert.equal(42, data.value);
+      done();
+    };    
+
+    const action = Dispersive.createAction(
+      (value) => new Promise((resolve, reject) => reject({value}))
+    );
+
+    Dispatcher.main().on(action.error, listener);
+    action(42);
+  });
+
   it('should trigger action.error when any of the grouped action failed');
 })
