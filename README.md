@@ -48,12 +48,21 @@ class Notebook extends React.Component {
   constructor() {
     super();
 
+
     this.state = {contacts: ContactStore.getAllActive()};
-    ContactStore.emitter.on('change', this.onContactsChange.bind(this));
+    ContactStore.emitter.on('change', this.onContactsChange);
   }
 
   onContactChange() {
     this.setState('change', {contacts: ContactStore.getAllActive()});
+  }
+
+  addContact() {
+    addContactToNotebook(
+      this.refs.name.value,
+      this.refs.age.value,
+      this.refs.phone.value
+    );
   }
 
   render() {
@@ -62,8 +71,14 @@ class Notebook extends React.Component {
     );
 
     return (
-      <div>
+      <div className="contacts-list">
         contacts
+      </div>
+      <div className="contact-creation">
+        <input type="text" ref="name" />
+        <input type="text" ref="age" />
+        <input type="text" ref="phone" />
+        <button onClick={this.addContact}>Add contact</button>
       </div>
     );
   }
