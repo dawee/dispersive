@@ -76,5 +76,33 @@ describe('Action', () => {
     action(42);
   });
 
-  it('should trigger action.error when any of the grouped action failed');
+  it('should trigger action.error when any of the grouped action failed', (done) => {
+    const listener1 = sinon.spy();
+    const listener2 = sinon.spy();
+
+    const listener = (data) => {
+      assert(!listener1.called);
+      assert(!listener2.called);
+      done();
+    };
+
+    const action1 = Dispersive.createAction(
+      (value) => new Promise((resolve, reject) => reject({value}))
+    );
+
+    const action2 = Dispersive.createAction(
+      (value) => new Promise((resolve, reject) => resolve({value}))
+    );
+
+    const grouped = Dispersive.createAction((value) => (
+      Dispersive.createActionGroup()
+        .chain(action1, [value])
+        .chain(action2, [value])
+    ));
+
+    Dispatcher.main().on(action1, listener1);
+    Dispatcher.main().on(action2, listener2);
+    Dispatcher.main().on(grouped.error, listener);
+    grouped(42);    
+  });
 })
