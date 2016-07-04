@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/dawee/dispersive#readme",
   "dependencies": {
-    "clone": "1.0.2",
+    "101": "1.6.0",
     "fbemitter": "2.0.2",
     "flux": "2.1.1",
     "hat": "0.0.3"

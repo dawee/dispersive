@@ -1,15 +1,9 @@
 const Action = require('./lib/action');
-const Emitter = require('./lib/emitter');
 const Dispatcher = require('./lib/dispatcher');
-const ObjectsManager = require('./lib/manager');
+const Store = require('./lib/store');
 
 
-exports.createStore = () => ({
-  emitter: new Emitter(),
-  dispatcher: Dispatcher.main(),
-  objects: new ObjectsManager(),
-});
-
+exports.createStore = (dispatcher) => new Store(dispatcher);
 exports.createAction = Action.create;
 exports.createActionGroup = Action.createGroup;
 exports.createDispatcher = () => new Dispatcher();

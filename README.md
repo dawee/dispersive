@@ -13,6 +13,8 @@ npm install dispersive
 ## Create an Action
 
 ```js
+const Dispersive = require('dispersive');
+
 const addContactToNotebook = Dispersive.createAction(
   (name, age, phone) => ({name, age, phone})
 );
@@ -31,14 +33,15 @@ ContactStore.bindAction(addContactToNotebook, (contact) => {
 ContactStore.get30s = () => ContactStore.filter({age: 30}).all();
 ```
 
+## Listen to store
+
+```js
+ContactStore.on('change', () => myComponent.setState(ContactStore.get30s()));
+```
+
 ## Trigger Action
 
 ```js
 addContactToNotebook('joe', 30, '0786898754');
 ```
 
-## Listen to store
-
-```js
-ContactStore.on('change', () => myComponent.setState(ContactStore.get30s()));
-```
