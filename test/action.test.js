@@ -6,13 +6,15 @@ const Dispatcher = require('../lib/dispatcher');
 
 describe('Action', () => {
 
+  const Store = Dispersive.createStore();
+
   it('should trigger immediately after', () => {
     const listener = sinon.spy();
     const action = Dispersive.createAction(
       (value) => ({value})
     );
 
-    Dispatcher.main().on(action, listener);
+    Store.bindAction(action, listener);
     action(42);
     assert(listener.called);
     assert.equal(42, listener.getCall(0).args[0].value);
@@ -28,7 +30,7 @@ describe('Action', () => {
       (value) => new Promise((resolve, reject) => resolve({value}))
     );
 
-    Dispatcher.main().on(action, listener);
+    Store.bindAction(action, listener);
     action(42);
   });
 
@@ -56,9 +58,9 @@ describe('Action', () => {
         .chain(action2, [value])
     ));
 
-    Dispatcher.main().on(action1, listener1);
-    Dispatcher.main().on(action2, listener2);
-    Dispatcher.main().on(grouped, listener);
+    Store.bindAction(action1, listener1);
+    Store.bindAction(action2, listener2);
+    Store.bindAction(grouped, listener);
     grouped(42);
   });
 
@@ -72,7 +74,7 @@ describe('Action', () => {
       (value) => new Promise((resolve, reject) => reject({value}))
     );
 
-    Dispatcher.main().on(action.error, listener);
+    Store.bindAction(action.error, listener);
     action(42);
   });
 
@@ -100,9 +102,9 @@ describe('Action', () => {
         .chain(action2, [value])
     ));
 
-    Dispatcher.main().on(action1, listener1);
-    Dispatcher.main().on(action2, listener2);
-    Dispatcher.main().on(grouped.error, listener);
+    Store.bindAction(action1, listener1);
+    Store.bindAction(action2, listener2);
+    Store.bindAction(grouped.error, listener);
     grouped(42);    
   });
 })
