@@ -1,11 +1,11 @@
 {
   "name": "dispersive",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Storage management inspired by the Flux philosophy",
   "main": "index.js",
   "scripts": {
     "prepublish": "babel lib --out-dir es5/lib",
-    "test": "mocha"
+    "test": "DISPERSIVE_ECMA=5 mocha"
   },
   "repository": {
     "type": "git",
@@ -26,8 +26,7 @@
     "babel-polyfill": "6.9.1",
     "fbemitter": "2.0.2",
     "flux": "2.1.1",
-    "hat": "0.0.3",
-    "is-browser": "2.0.1"
+    "hat": "0.0.3"
   },
   "devDependencies": {
     "babel-cli": "6.10.1",
