@@ -1,9 +1,10 @@
 {
   "name": "dispersive",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Storage management inspired by the Flux philosophy",
   "main": "index.js",
   "scripts": {
+    "prepublish": "babel lib --out-dir es5/lib",
     "test": "mocha"
   },
   "repository": {
@@ -21,11 +22,17 @@
   "homepage": "https://github.com/dawee/dispersive#readme",
   "dependencies": {
     "101": "1.6.0",
+    "babel-core": "6.10.4",
+    "babel-polyfill": "6.9.1",
     "fbemitter": "2.0.2",
     "flux": "2.1.1",
-    "hat": "0.0.3"
+    "hat": "0.0.3",
+    "is-browser": "2.0.1"
   },
   "devDependencies": {
+    "babel-cli": "6.10.1",
+    "babel-preset-es2015": "6.9.0",
+    "babel-preset-stage-0": "6.5.0",
     "chai": "3.5.0",
     "eslint": "3.0.0",
     "eslint-config-airbnb": "9.0.1",
@@ -34,5 +41,11 @@
     "eslint-plugin-react": "5.2.2",
     "mocha": "2.5.3",
     "sinon": "1.17.4"
+  },
+  "babel": {
+    "presets": [
+      "es2015",
+      "stage-0"
+    ]
   }
 }
