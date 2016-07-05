@@ -1,11 +1,11 @@
 {
   "name": "dispersive",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Storage management inspired by the Flux philosophy",
   "main": "index.js",
   "scripts": {
     "prepublish": "babel lib --out-dir es5/lib",
-    "test": "DISPERSIVE_ECMA=5 mocha"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
