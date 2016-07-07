@@ -66,7 +66,6 @@ describe('Action', () => {
 
   it('should trigger action.error when action failed', (done) => {
     const listener = (data) => {
-      throw new Error('hey')
       assert.equal(42, data.value);
       done();
     };    

@@ -8,13 +8,12 @@ describe('QuerySet', () => {
   const Store = Dispersive.createStore();
 
   before((done) => {
-    Store.create({name: 'joe', age: 30, job: 'developer'});
     Store.create({name: 'jane', age: 40, job: 'developer'});
+    Store.create({name: 'joe', age: 30, job: 'developer'});
     Store.create({name: 'josh', age: 40, job: 'designer'});
     Store.create({name: 'betty', age: 40, job: 'developer'});
     done();
   });
-
 
   it('should filter objects', () => {
     chai.assert.deepEqual([
@@ -31,7 +30,7 @@ describe('QuerySet', () => {
   });
 
   it('should get only first object', () => {
-    chai.assert.deepEqual({name: 'joe', age: 30, job: 'developer'}, Store.first());
+    chai.assert.deepEqual({name: 'jane', age: 40, job: 'developer'}, Store.first());
   });
 
   it('should get an object when threre\'s only one', () => {
@@ -92,6 +91,24 @@ describe('QuerySet', () => {
       {name: 'jane', age: 40, job: 'developer'},
       {name: 'betty', age: 40, job: 'developer'},
     ], excludeDesigner.all());
+  });
+
+  it('should sort by name', () => {
+    chai.assert.deepEqual([
+      {name: 'betty', age: 40, job: 'developer'},
+      {name: 'jane', age: 40, job: 'developer'},
+      {name: 'joe', age: 30, job: 'developer'},
+      {name: 'josh', age: 40, job: 'designer'},
+    ], Store.orderBy('name').all());
+  });
+
+  it('should sort by age', () => {
+    chai.assert.deepEqual([
+      {name: 'joe', age: 30, job: 'developer'},
+      {name: 'jane', age: 40, job: 'developer'},
+      {name: 'josh', age: 40, job: 'designer'},
+      {name: 'betty', age: 40, job: 'developer'},
+    ], Store.orderBy('age').all());
   });
 
 })
