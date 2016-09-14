@@ -5,13 +5,17 @@ const Dispersive = require('..');
 
 describe('QuerySet', () => {
 
-  const Store = Dispersive.createStore();
+  const Teammate = Dispersive.createStoreModel({
+    name: null,
+    age: null,
+    job: null,
+  });
 
   before((done) => {
-    Store.create({name: 'jane', age: 40, job: 'developer'});
-    Store.create({name: 'joe', age: 30, job: 'developer'});
-    Store.create({name: 'josh', age: 40, job: 'designer'});
-    Store.create({name: 'betty', age: 40, job: 'developer'});
+    Teammate.create({name: 'jane', age: 40, job: 'developer'});
+    Teammate.create({name: 'joe', age: 30, job: 'developer'});
+    Teammate.create({name: 'josh', age: 40, job: 'designer'});
+    Teammate.create({name: 'betty', age: 40, job: 'developer'});
     done();
   });
 
@@ -20,28 +24,28 @@ describe('QuerySet', () => {
       {name: 'jane', age: 40, job: 'developer'},
       {name: 'josh', age: 40, job: 'designer'},
       {name: 'betty', age: 40, job: 'developer'},
-    ], Store.filter({age: 40}).all());
+    ], Teammate.objects.filter({age: 40}).all().map(p => p.values()));
   });
 
   it('should exclude objects', () => {
     chai.assert.deepEqual([
       {name: 'joe', age: 30, job: 'developer'},
-    ], Store.exclude({age: 40}).all());
+    ], Teammate.objects.exclude({age: 40}).all().map(p => p.values()));
   });
 
   it('should get only first object', () => {
-    chai.assert.deepEqual({name: 'jane', age: 40, job: 'developer'}, Store.first());
+    chai.assert.deepEqual({name: 'jane', age: 40, job: 'developer'}, Teammate.objects.first().values());
   });
 
   it('should get an object when threre\'s only one', () => {
-    chai.assert.deepEqual({name: 'joe', age: 30, job: 'developer'}, Store.get({name: 'joe'}));
+    chai.assert.deepEqual({name: 'joe', age: 30, job: 'developer'}, Teammate.objects.get({name: 'joe'}).values());
   });
 
   it('should throw DoesNotExist when no objects is found', () => {
     let err = null;
 
     try {
-      Store.get({age: 20}) 
+      Teammate.objects.get({age: 20});
     } catch (cathed) {
       err = cathed;
     }
@@ -53,7 +57,7 @@ describe('QuerySet', () => {
     let err = null;
 
     try {
-      Store.get({age: 40});
+      Teammate.objects.get({age: 40});
     } catch (cathed) {
       err = cathed;
     }
@@ -62,35 +66,35 @@ describe('QuerySet', () => {
   });
 
   it('should create a copy after a filter', () => {
-    const filter40 = Store.filter({age: 40});
+    const filter40 = Teammate.objects.filter({age: 40});
     const filterDeveloper = filter40.filter({job: 'developer'});
 
     chai.assert.deepEqual([
       {name: 'jane', age: 40, job: 'developer'},
       {name: 'josh', age: 40, job: 'designer'},
       {name: 'betty', age: 40, job: 'developer'},
-    ], filter40.all());
+    ], filter40.all().map(p => p.values()));
 
     chai.assert.deepEqual([
       {name: 'jane', age: 40, job: 'developer'},
       {name: 'betty', age: 40, job: 'developer'},
-    ], filterDeveloper.all());
+    ], filterDeveloper.all().map(p => p.values()));
   });
 
   it('should create a copy after an exclude', () => {
-    const exclude30 = Store.exclude({age: 30});
+    const exclude30 = Teammate.objects.exclude({age: 30});
     const excludeDesigner = exclude30.exclude({job: 'designer'});
 
     chai.assert.deepEqual([
       {name: 'jane', age: 40, job: 'developer'},
       {name: 'josh', age: 40, job: 'designer'},
       {name: 'betty', age: 40, job: 'developer'},
-    ], exclude30.all());
+    ], exclude30.all().map(p => p.values()));
 
     chai.assert.deepEqual([
       {name: 'jane', age: 40, job: 'developer'},
       {name: 'betty', age: 40, job: 'developer'},
-    ], excludeDesigner.all());
+    ], excludeDesigner.all().map(p => p.values()));
   });
 
   it('should sort by name', () => {
@@ -99,7 +103,7 @@ describe('QuerySet', () => {
       {name: 'jane', age: 40, job: 'developer'},
       {name: 'joe', age: 30, job: 'developer'},
       {name: 'josh', age: 40, job: 'designer'},
-    ], Store.orderBy('name').all());
+    ], Teammate.objects.orderBy('name').all().map(p => p.values()));
   });
 
   it('should sort by age', () => {
@@ -108,7 +112,7 @@ describe('QuerySet', () => {
       {name: 'jane', age: 40, job: 'developer'},
       {name: 'josh', age: 40, job: 'designer'},
       {name: 'betty', age: 40, job: 'developer'},
-    ], Store.orderBy('age').all());
+    ], Teammate.objects.orderBy('age').all().map(p => p.values()));
   });
 
 })

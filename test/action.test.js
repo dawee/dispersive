@@ -6,7 +6,7 @@ const Dispatcher = require('../lib/dispatcher');
 
 describe('Action', () => {
 
-  const Store = Dispersive.createStore();
+  const Store = Dispersive.createStoreModel();
 
   it('should trigger immediately after', () => {
     const listener = sinon.spy();

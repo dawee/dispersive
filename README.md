@@ -24,20 +24,24 @@ const addContactToNotebook = Dispersive.createAction(
 ## Create a Store
 
 ```js
-const ContactStore = Dispersive.createStore();
-
-ContactStore.bindAction(addContactToNotebook, (contact) => {
-  ContactStore.create(contact);
-  ContactStore.trigger('change');
+const Contact = Dispersive.createStoreModel({
+  name: null,
+  age: null,
+  phone: null,
 });
 
-ContactStore.get30s = () => ContactStore.filter({age: 30}).all();
+Contact.bindAction(addContactToNotebook, (contact) => {
+  Contact.create(contact);
+  Contact.trigger('change');
+});
+
+Contact.get30s = () => Contact.objects.filter({age: 30}).all();
 ```
 
 ## Listen to store
 
 ```js
-ContactStore.on('change', () => myComponent.setState(ContactStore.get30s()));
+Contact.on('change', () => myComponent.setState(Contact.get30s()));
 ```
 
 ## Trigger Action

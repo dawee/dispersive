@@ -5,7 +5,7 @@ if (process.env.DISPERSIVE_ECMA === '5') {
   const Dispatcher = require('./lib/dispatcher');
   const Store = require('./lib/store');
 
-  exports.createStore = (dispatcher) => new Store(dispatcher);
+  exports.createStoreModel = Store.createModel;
   exports.createAction = Action.create;
   exports.createActionGroup = Action.createGroup;
   exports.createDispatcher = () => new Dispatcher();
