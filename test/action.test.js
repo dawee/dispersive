@@ -8,18 +8,6 @@ describe('Action', () => {
 
   const Store = Dispersive.createStoreModel();
 
-  it('should trigger immediately after', () => {
-    const listener = sinon.spy();
-    const action = Dispersive.createAction(
-      (value) => ({value})
-    );
-
-    Store.bindAction(action, listener);
-    action(42);
-    assert(listener.called);
-    assert.equal(42, listener.getCall(0).args[0].value);
-  });
- 
   it('should trigger asynchronously', (done) => {
     const listener = (data) => {
       assert.equal(42, data.value);
@@ -30,7 +18,7 @@ describe('Action', () => {
       (value) => new Promise((resolve, reject) => resolve({value}))
     );
 
-    Store.bindAction(action, listener);
+    Store.subscribe(action, listener);
     action(42);
   });
 
@@ -58,9 +46,9 @@ describe('Action', () => {
         .chain(action2, [value])
     ));
 
-    Store.bindAction(action1, listener1);
-    Store.bindAction(action2, listener2);
-    Store.bindAction(grouped, listener);
+    Store.subscribe(action1, listener1);
+    Store.subscribe(action2, listener2);
+    Store.subscribe(grouped, listener);
     grouped(42);
   });
 
@@ -74,7 +62,7 @@ describe('Action', () => {
       (value) => new Promise((resolve, reject) => reject({value}))
     );
 
-    Store.bindAction(action.error, listener);
+    Store.subscribe(action.error, listener);
     action(42);
   });
 
@@ -102,9 +90,9 @@ describe('Action', () => {
         .chain(action2, [value])
     ));
 
-    Store.bindAction(action1, listener1);
-    Store.bindAction(action2, listener2);
-    Store.bindAction(grouped.error, listener);
+    Store.subscribe(action1, listener1);
+    Store.subscribe(action2, listener2);
+    Store.subscribe(grouped.error, listener);
     grouped(42);    
   });
 })

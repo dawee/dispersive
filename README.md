@@ -30,7 +30,7 @@ const Contact = Dispersive.createStoreModel({
   phone: null,
 });
 
-Contact.bindAction(addContactToNotebook, (contact) => {
+Contact.subscribe(addContactToNotebook, (contact) => {
   Contact.create(contact);
   Contact.trigger('change');
 });

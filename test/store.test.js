@@ -24,7 +24,7 @@ describe('Store', () => {
     const Model = Dispersive.createStoreModel({id: null});
     const action = Dispersive.createAction();
 
-    Model.bindAction(action, () => done());
+    Model.subscribe(action, () => done());
     action();
   });
 
@@ -35,13 +35,13 @@ describe('Store', () => {
     const grouped = Dispersive.createAction(() => Dispersive.createActionGroup().chain(action));
     const listener = sinon.spy();
 
-    groupedStore.bindAction(grouped, () => {
+    groupedStore.subscribe(grouped, () => {
       assert(!listener.called);
       done();
     });
 
-    Model.bindAction(action, listener);
-    Model.unbindAll();
+    Model.subscribe(action, listener);
+    Model.unsubscribeAll();
 
     grouped();
   });
