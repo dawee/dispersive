@@ -12,10 +12,10 @@ describe('QuerySet', () => {
   });
 
   before((done) => {
-    Teammate.create({name: 'jane', age: 40, job: 'developer'});
-    Teammate.create({name: 'joe', age: 30, job: 'developer'});
-    Teammate.create({name: 'josh', age: 40, job: 'designer'});
-    Teammate.create({name: 'betty', age: 40, job: 'developer'});
+    Teammate.objects().create({name: 'jane', age: 40, job: 'developer'});
+    Teammate.objects().create({name: 'joe', age: 30, job: 'developer'});
+    Teammate.objects().create({name: 'josh', age: 40, job: 'designer'});
+    Teammate.objects().create({name: 'betty', age: 40, job: 'developer'});
     done();
   });
 
@@ -24,28 +24,28 @@ describe('QuerySet', () => {
       {name: 'jane', age: 40, job: 'developer'},
       {name: 'josh', age: 40, job: 'designer'},
       {name: 'betty', age: 40, job: 'developer'},
-    ], Teammate.objects.filter({age: 40}).all().map(p => p.values()));
+    ], Teammate.objects().filter({age: 40}).all().map(p => p.values()));
   });
 
   it('should exclude objects', () => {
     chai.assert.deepEqual([
       {name: 'joe', age: 30, job: 'developer'},
-    ], Teammate.objects.exclude({age: 40}).all().map(p => p.values()));
+    ], Teammate.objects().exclude({age: 40}).all().map(p => p.values()));
   });
 
   it('should get only first object', () => {
-    chai.assert.deepEqual({name: 'jane', age: 40, job: 'developer'}, Teammate.objects.first().values());
+    chai.assert.deepEqual({name: 'jane', age: 40, job: 'developer'}, Teammate.objects().first().values());
   });
 
   it('should get an object when threre\'s only one', () => {
-    chai.assert.deepEqual({name: 'joe', age: 30, job: 'developer'}, Teammate.objects.get({name: 'joe'}).values());
+    chai.assert.deepEqual({name: 'joe', age: 30, job: 'developer'}, Teammate.objects().get({name: 'joe'}).values());
   });
 
   it('should throw DoesNotExist when no objects is found', () => {
     let err = null;
 
     try {
-      Teammate.objects.get({age: 20});
+      Teammate.objects().get({age: 20});
     } catch (cathed) {
       err = cathed;
     }
@@ -57,7 +57,7 @@ describe('QuerySet', () => {
     let err = null;
 
     try {
-      Teammate.objects.get({age: 40});
+      Teammate.objects().get({age: 40});
     } catch (cathed) {
       err = cathed;
     }
@@ -66,7 +66,7 @@ describe('QuerySet', () => {
   });
 
   it('should create a copy after a filter', () => {
-    const filter40 = Teammate.objects.filter({age: 40});
+    const filter40 = Teammate.objects().filter({age: 40});
     const filterDeveloper = filter40.filter({job: 'developer'});
 
     chai.assert.deepEqual([
@@ -82,7 +82,7 @@ describe('QuerySet', () => {
   });
 
   it('should create a copy after an exclude', () => {
-    const exclude30 = Teammate.objects.exclude({age: 30});
+    const exclude30 = Teammate.objects().exclude({age: 30});
     const excludeDesigner = exclude30.exclude({job: 'designer'});
 
     chai.assert.deepEqual([
@@ -103,7 +103,7 @@ describe('QuerySet', () => {
       {name: 'jane', age: 40, job: 'developer'},
       {name: 'joe', age: 30, job: 'developer'},
       {name: 'josh', age: 40, job: 'designer'},
-    ], Teammate.objects.orderBy('name').all().map(p => p.values()));
+    ], Teammate.objects().orderBy('name').all().map(p => p.values()));
   });
 
   it('should sort by age', () => {
@@ -112,7 +112,7 @@ describe('QuerySet', () => {
       {name: 'jane', age: 40, job: 'developer'},
       {name: 'josh', age: 40, job: 'designer'},
       {name: 'betty', age: 40, job: 'developer'},
-    ], Teammate.objects.orderBy('age').all().map(p => p.values()));
+    ], Teammate.objects().orderBy('age').all().map(p => p.values()));
   });
 
 })

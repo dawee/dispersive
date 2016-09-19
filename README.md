@@ -31,11 +31,11 @@ const Contact = Dispersive.createStoreModel({
 });
 
 Contact.subscribe(addContactToNotebook, (contact) => {
-  Contact.create(contact);
+  Contact.objects().create(contact);
   Contact.trigger('change');
 });
 
-Contact.get30s = () => Contact.objects.filter({age: 30}).all();
+Contact.get30s = () => Contact.objects().filter({age: 30}).all();
 ```
 
 ## Listen to store

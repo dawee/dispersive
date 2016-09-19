@@ -7,17 +7,17 @@ describe('Store', () => {
   it('create a new entry', () => {
     const Model = Dispersive.createStoreModel({id: null});
 
-    Model.create({id: 42});
-    assert.equal(Model.objects.first().id, 42);
+    Model.objects().create({id: 42});
+    assert.equal(Model.objects().first().id, 42);
   });
 
 
   it('delete a given entry', () => {
     const Model = Dispersive.createStoreModel({id: null});
-    const entry = Model.create({id: 42});
+    const entry = Model.objects().create({id: 42});
     
     entry.delete();
-    assert.equal(Model.objects.count(), 0);
+    assert.equal(Model.objects().count(), 0);
   });
 
   it('should bind action', (done) => {
