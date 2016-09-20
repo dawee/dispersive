@@ -46,4 +46,23 @@ describe('Store', () => {
     grouped();
   });
 
+  describe('objects()', () => {
+
+    it('should trigger a new object', (done) => {
+      const Model = Dispersive.createStoreModel();
+
+      Model.objects().changed(() => done());
+      Model.objects().create();
+    });
+
+    it('should not trigger a deleted object', (done) => {
+      const Model = Dispersive.createStoreModel();
+      const model = Model.objects().create();
+
+      Model.objects().changed(() => done());
+      model.delete();
+    });
+
+  })
+
 })
