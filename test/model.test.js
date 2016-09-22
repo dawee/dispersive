@@ -2,19 +2,19 @@ const assert = require('assert');
 const sinon = require('sinon');
 const Dispersive = require('..');
 
-describe('Store', () => {
+describe('Model', () => {
 
   it('create a new entry', () => {
-    const Model = class extends Dispersive.Model() {};
+    const Model = class extends Dispersive.Model({foo: null}) {};
 
-    Model.objects.create({id: 42});
-    assert.equal(Model.objects.first().id, 42);
+    Model.objects.create({foo: 42});
+    assert.equal(Model.objects.first().foo, 42);
   });
 
 
   it('delete a given entry', () => {
-    const Model = class extends Dispersive.Model() {};
-    const entry = Model.objects.create({id: 42});
+    const Model = class extends Dispersive.Model({foo: null}) {};
+    const entry = Model.objects.create({foo: 42});
     
     entry.delete();
     assert.equal(Model.objects.count(), 0);
