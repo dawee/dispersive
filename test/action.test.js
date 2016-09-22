@@ -11,7 +11,7 @@ describe('Action', () => {
       done();
     };
 
-    const action = createAction((value) => new Promise((resolve, reject) => resolve({value})));
+    const action = createAction((value) => new Promise(resolve => resolve({value})));
 
     action.subscribe(listener);
     action(42);
@@ -27,8 +27,8 @@ describe('Action', () => {
       done();
     };
 
-    const action1 = createAction((value) => new Promise((resolve, reject) => resolve({value})));
-    const action2 = createAction((value) => new Promise((resolve, reject) => resolve({value})));
+    const action1 = createAction((value) => new Promise(resolve => resolve({value})));
+    const action2 = createAction((value) => new Promise(resolve => resolve({value})));
     const grouped = createAction((value) => action1(value).then(() => action2(value)));
 
     action1.subscribe(listener1);
@@ -60,7 +60,7 @@ describe('Action', () => {
     };
 
     const action1 = createAction((value) => new Promise((resolve, reject) => reject({value})));
-    const action2 = createAction((value) => new Promise((resolve, reject) => resolve({value})));
+    const action2 = createAction((value) => new Promise(resolve => resolve({value})));
     const grouped = createAction((value) => action1(value).then(() => action2(value)));
 
     action1.subscribe(listener1);
