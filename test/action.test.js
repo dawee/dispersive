@@ -1,6 +1,6 @@
 const assert = require('assert');
 const sinon = require('sinon');
-const Dispersive = require('..');
+const {createAction} = require('..');
 
 
 describe('Action', () => {
@@ -11,9 +11,7 @@ describe('Action', () => {
       done();
     };
 
-    const action = Dispersive.createAction(
-      (value) => new Promise((resolve, reject) => resolve({value}))
-    );
+    const action = createAction((value) => new Promise((resolve, reject) => resolve({value})));
 
     action.subscribe(listener);
     action(42);
@@ -29,15 +27,9 @@ describe('Action', () => {
       done();
     };
 
-    const action1 = Dispersive.createAction(
-      (value) => new Promise((resolve, reject) => resolve({value}))
-    );
-
-    const action2 = Dispersive.createAction(
-      (value) => new Promise((resolve, reject) => resolve({value}))
-    );
-
-    const grouped = Dispersive.createAction((value) => action1(value).then(action2.with(value)));
+    const action1 = createAction((value) => new Promise((resolve, reject) => resolve({value})));
+    const action2 = createAction((value) => new Promise((resolve, reject) => resolve({value})));
+    const grouped = createAction((value) => action1(value).then(() => action2(value)));
 
     action1.subscribe(listener1);
     action2.subscribe(listener2);
@@ -51,9 +43,7 @@ describe('Action', () => {
       done();
     };    
 
-    const action = Dispersive.createAction(
-      (value) => new Promise((resolve, reject) => reject({value}))
-    );
+    const action = createAction((value) => new Promise((resolve, reject) => reject({value})));
 
     action.error.subscribe(listener);
     action(42);
@@ -69,18 +59,9 @@ describe('Action', () => {
       done();
     };
 
-    const action1 = Dispersive.createAction(
-      (value) => new Promise((resolve, reject) => reject({value}))
-    );
-
-    const action2 = Dispersive.createAction(
-      (value) => new Promise((resolve, reject) => resolve({value}))
-    );
-
-    const grouped = Dispersive.createAction(
-      (value) => action1(value)
-        .then(action2.with(value))
-    );
+    const action1 = createAction((value) => new Promise((resolve, reject) => reject({value})));
+    const action2 = createAction((value) => new Promise((resolve, reject) => resolve({value})));
+    const grouped = createAction((value) => action1(value).then(() => action2(value)));
 
     action1.subscribe(listener1);
     action2.subscribe(listener2);
