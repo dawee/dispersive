@@ -37,11 +37,7 @@ describe('Action', () => {
       (value) => new Promise((resolve, reject) => resolve({value}))
     );
 
-    const grouped = Dispersive.createAction((value) => (
-      Dispersive.createActionGroup()
-        .chain(action1, [value])
-        .chain(action2, [value])
-    ));
+    const grouped = Dispersive.createAction((value) => action1(value).then(action2.with(value)));
 
     action1.subscribe(listener1);
     action2.subscribe(listener2);
@@ -81,11 +77,10 @@ describe('Action', () => {
       (value) => new Promise((resolve, reject) => resolve({value}))
     );
 
-    const grouped = Dispersive.createAction((value) => (
-      Dispersive.createActionGroup()
-        .chain(action1, [value])
-        .chain(action2, [value])
-    ));
+    const grouped = Dispersive.createAction(
+      (value) => action1(value)
+        .then(action2.with(value))
+    );
 
     action1.subscribe(listener1);
     action2.subscribe(listener2);

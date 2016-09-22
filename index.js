@@ -7,7 +7,6 @@ if (process.env.DISPERSIVE_ECMA === '5') {
 
   exports.createStoreModel = Store.createModel;
   exports.createAction = Action.create;
-  exports.createActionGroup = Action.createGroup;
   exports.createDispatcher = () => new Dispatcher();
 }
 

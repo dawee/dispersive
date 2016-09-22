@@ -7,7 +7,6 @@ var Store = require('./es5/lib/store');
 
 exports.createStoreModel = Store.createModel;
 exports.createAction = Action.create;
-exports.createActionGroup = Action.createGroup;
 exports.createDispatcher = function () {
   return new Dispatcher();
 };
