@@ -5,11 +5,13 @@ const Dispersive = require('..');
 
 describe('QuerySet', () => {
 
-  const Teammate = Dispersive.createStoreModel({
+  const schema = {
     name: null,
     age: null,
     job: null,
-  });
+  };
+
+  const Teammate = class extends Dispersive.Model(schema) {}
 
   before((done) => {
     Teammate.objects.create({name: 'jane', age: 40, job: 'developer'});
