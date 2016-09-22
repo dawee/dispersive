@@ -1,12 +1,9 @@
 const assert = require('assert');
 const sinon = require('sinon');
 const Dispersive = require('..');
-const Dispatcher = require('../lib/dispatcher');
 
 
 describe('Action', () => {
-
-  const Store = Dispersive.createStoreModel();
 
   it('should trigger asynchronously', (done) => {
     const listener = (data) => {
@@ -18,7 +15,7 @@ describe('Action', () => {
       (value) => new Promise((resolve, reject) => resolve({value}))
     );
 
-    Store.subscribe(action, listener);
+    action.subscribe(listener);
     action(42);
   });
 
@@ -46,9 +43,9 @@ describe('Action', () => {
         .chain(action2, [value])
     ));
 
-    Store.subscribe(action1, listener1);
-    Store.subscribe(action2, listener2);
-    Store.subscribe(grouped, listener);
+    action1.subscribe(listener1);
+    action2.subscribe(listener2);
+    grouped.subscribe(listener);
     grouped(42);
   });
 
@@ -62,7 +59,7 @@ describe('Action', () => {
       (value) => new Promise((resolve, reject) => reject({value}))
     );
 
-    Store.subscribe(action.error, listener);
+    action.error.subscribe(listener);
     action(42);
   });
 
@@ -90,9 +87,9 @@ describe('Action', () => {
         .chain(action2, [value])
     ));
 
-    Store.subscribe(action1, listener1);
-    Store.subscribe(action2, listener2);
-    Store.subscribe(grouped.error, listener);
-    grouped(42);    
+    action1.subscribe(listener1);
+    action2.subscribe(listener2);
+    grouped.error.subscribe(listener);
+    grouped(42);
   });
 })
