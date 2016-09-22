@@ -24,21 +24,21 @@ describe('QuerySet', () => {
       {name: 'jane', age: 40, job: 'developer'},
       {name: 'josh', age: 40, job: 'designer'},
       {name: 'betty', age: 40, job: 'developer'},
-    ], Teammate.objects.filter({age: 40}).all().map(p => p.values()));
+    ], Teammate.objects.filter({age: 40}).values({exclude: ['id']}));
   });
 
   it('should exclude objects', () => {
     chai.assert.deepEqual([
       {name: 'joe', age: 30, job: 'developer'},
-    ], Teammate.objects.exclude({age: 40}).all().map(p => p.values()));
+    ], Teammate.objects.exclude({age: 40}).values({exclude: ['id']}));
   });
 
   it('should get only first object', () => {
-    chai.assert.deepEqual({name: 'jane', age: 40, job: 'developer'}, Teammate.objects.first().values());
+    chai.assert.deepEqual({name: 'jane', age: 40, job: 'developer'}, Teammate.objects.first().values({exclude: ['id']}));
   });
 
   it('should get an object when threre\'s only one', () => {
-    chai.assert.deepEqual({name: 'joe', age: 30, job: 'developer'}, Teammate.objects.get({name: 'joe'}).values());
+    chai.assert.deepEqual({name: 'joe', age: 30, job: 'developer'}, Teammate.objects.get({name: 'joe'}).values({exclude: ['id']}));
   });
 
   it('should throw DoesNotExist when no objects is found', () => {
@@ -73,12 +73,12 @@ describe('QuerySet', () => {
       {name: 'jane', age: 40, job: 'developer'},
       {name: 'josh', age: 40, job: 'designer'},
       {name: 'betty', age: 40, job: 'developer'},
-    ], filter40.all().map(p => p.values()));
+    ], filter40.all().map(p => p.values({exclude: ['id']})));
 
     chai.assert.deepEqual([
       {name: 'jane', age: 40, job: 'developer'},
       {name: 'betty', age: 40, job: 'developer'},
-    ], filterDeveloper.all().map(p => p.values()));
+    ], filterDeveloper.all().map(p => p.values({exclude: ['id']})));
   });
 
   it('should create a copy after an exclude', () => {
@@ -89,12 +89,12 @@ describe('QuerySet', () => {
       {name: 'jane', age: 40, job: 'developer'},
       {name: 'josh', age: 40, job: 'designer'},
       {name: 'betty', age: 40, job: 'developer'},
-    ], exclude30.all().map(p => p.values()));
+    ], exclude30.all().map(p => p.values({exclude: ['id']})));
 
     chai.assert.deepEqual([
       {name: 'jane', age: 40, job: 'developer'},
       {name: 'betty', age: 40, job: 'developer'},
-    ], excludeDesigner.all().map(p => p.values()));
+    ], excludeDesigner.all().map(p => p.values({exclude: ['id']})));
   });
 
   it('should sort by name', () => {
@@ -103,7 +103,7 @@ describe('QuerySet', () => {
       {name: 'jane', age: 40, job: 'developer'},
       {name: 'joe', age: 30, job: 'developer'},
       {name: 'josh', age: 40, job: 'designer'},
-    ], Teammate.objects.orderBy('name').all().map(p => p.values()));
+    ], Teammate.objects.orderBy('name').all().map(p => p.values({exclude: ['id']})));
   });
 
   it('should sort by age', () => {
@@ -112,7 +112,7 @@ describe('QuerySet', () => {
       {name: 'jane', age: 40, job: 'developer'},
       {name: 'josh', age: 40, job: 'designer'},
       {name: 'betty', age: 40, job: 'developer'},
-    ], Teammate.objects.orderBy('age').all().map(p => p.values()));
+    ], Teammate.objects.orderBy('age').all().map(p => p.values({exclude: ['id']})));
   });
 
 })
