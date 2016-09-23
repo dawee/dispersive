@@ -37,6 +37,48 @@ describe('Model', () => {
       model.delete();
     });
 
+    it('should create a SetIndex for each indexed field', () => {
+      const schema = {
+        age: {index: true},
+        name: null,
+      };
+
+      const Model = class extends Dispersive.Model(schema) {};
+
+      assert('age' in Model.objects.index);
+      assert(! ('name' in Model.objects.index));
+    });
+
+    it('should add values to SetIndex', () => {
+      const schema = {
+        age: {index: true},
+        name: null,
+      };
+
+      const Model = class extends Dispersive.Model(schema) {};
+      const model = Model.objects.create({age: 20, name: 'joe'});
+      const values = Model.objects.index.id[model.id];
+
+      assert.equal(Model.objects.index.age.refs[values], 20);
+      assert(Model.objects.index.age.sets[20].has(values));
+    });
+
+    it('should remove values from SetIndex', () => {
+      const schema = {
+        age: {index: true},
+        name: null,
+      };
+
+      const Model = class extends Dispersive.Model(schema) {};
+      const model = Model.objects.create({age: 20, name: 'joe'});
+      const values = Model.objects.index.id[model.id];
+
+      model.delete();
+
+      assert.equal(Object.keys(Model.objects.index.age.refs).length, 0);
+      assert.equal(Model.objects.index.age.sets[20].has(values), false);
+    });
+
   })
 
 })
