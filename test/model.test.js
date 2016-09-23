@@ -14,9 +14,10 @@ describe('Model', () => {
 
   it('delete a given entry', () => {
     const Model = class extends Dispersive.Model({foo: null}) {};
-    const entry = Model.objects.create({foo: 42});
+    const model = Model.objects.create({foo: 42});
     
-    entry.delete();
+    model.delete();
+
     assert.equal(Model.objects.count(), 0);
   });
 
@@ -57,7 +58,7 @@ describe('Model', () => {
 
       const Model = class extends Dispersive.Model(schema) {};
       const model = Model.objects.create({age: 20, name: 'joe'});
-      const values = Model.objects.index.id[model.id];
+      const values = Model.objects.index.id.get(model.id);
 
       assert.equal(Model.objects.index.age.refs[values], 20);
       assert(Model.objects.index.age.sets[20].has(values));
@@ -71,7 +72,7 @@ describe('Model', () => {
 
       const Model = class extends Dispersive.Model(schema) {};
       const model = Model.objects.create({age: 20, name: 'joe'});
-      const values = Model.objects.index.id[model.id];
+      const values = Model.objects.index.id.get(model.id);
 
       model.delete();
 
