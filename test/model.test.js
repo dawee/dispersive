@@ -41,13 +41,13 @@ describe('Model', () => {
     it('should create a SetIndex for each indexed field', () => {
       const schema = {
         age: {index: true},
-        name: null,
+        name: {index: false},
       };
 
       const Model = class extends Dispersive.Model(schema) {};
 
       assert('age' in Model.objects.index);
-      assert(! ('name' in Model.objects.index));
+      assert.equal('name' in Model.objects.index, false);
     });
 
     it('should add values to SetIndex', () => {
