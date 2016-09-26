@@ -5,7 +5,7 @@ const Dispersive = require('..');
 describe('Model', () => {
 
   it('create a new entry', () => {
-    const Model = class extends Dispersive.Model({foo: null}) {};
+    const Model = class extends Dispersive.Model.use({foo: null}) {};
 
     Model.objects.create({foo: 42});
     assert.equal(Model.objects.first().foo, 42);
@@ -13,7 +13,7 @@ describe('Model', () => {
 
 
   it('delete a given entry', () => {
-    const Model = class extends Dispersive.Model({foo: null}) {};
+    const Model = class extends Dispersive.Model.use({foo: null}) {};
     const model = Model.objects.create({foo: 42});
     
     model.delete();
@@ -24,14 +24,14 @@ describe('Model', () => {
   describe('objects', () => {
 
     it('should trigger a new object', (done) => {
-      const Model = class extends Dispersive.Model() {};
+      const Model = class extends Dispersive.Model {};
 
       Model.objects.changed(() => done());
       Model.objects.create();
     });
 
     it('should not trigger a deleted object', (done) => {
-      const Model = class extends Dispersive.Model() {};
+      const Model = class extends Dispersive.Model {};
       const model = Model.objects.create();
 
       Model.objects.changed(() => done());
@@ -44,7 +44,7 @@ describe('Model', () => {
         name: {index: false},
       };
 
-      const Model = class extends Dispersive.Model(schema) {};
+      const Model = class extends Dispersive.Model.use(schema) {};
 
       assert('age' in Model.objects.index);
       assert.equal('name' in Model.objects.index, false);
@@ -56,7 +56,7 @@ describe('Model', () => {
         name: null,
       };
 
-      const Model = class extends Dispersive.Model(schema) {};
+      const Model = class extends Dispersive.Model.use(schema) {};
       const model = Model.objects.create({age: 20, name: 'joe'});
       const values = Model.objects.index.id.get(model.id);
 
@@ -70,7 +70,7 @@ describe('Model', () => {
         name: null,
       };
 
-      const Model = class extends Dispersive.Model(schema) {};
+      const Model = class extends Dispersive.Model.use(schema) {};
       const model = Model.objects.create({age: 20, name: 'joe'});
       const values = Model.objects.index.id.get(model.id);
 

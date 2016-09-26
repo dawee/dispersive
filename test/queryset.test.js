@@ -11,7 +11,7 @@ describe('QuerySet', () => {
       job: null,
     };
 
-    const Teammate = Dispersive.Model(schema);
+    const Teammate = Dispersive.Model.use(schema);
 
     before((done) => {
       Teammate.objects.create({name: 'jane', age: 40, job: 'developer'});
@@ -133,7 +133,7 @@ describe('QuerySet', () => {
 
     }
 
-    class Teammate extends Dispersive.Model(schema) {
+    class Teammate extends Dispersive.Model.use(schema) {
 
       static get objects() {
         this._objects = !!this._objects ? this._objects : new CountingObjectManager(this);
