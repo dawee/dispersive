@@ -1,6 +1,6 @@
 # Actions
 
-Actions are the entry point of the [flow](https://facebook.github.io/flux/img/flux-simple-f8-diagram-1300w.png). They are not though like flux actions as they can be **asynchronous** and **chained**. A component (or a view if you're not using a React-like renderer) should be the only element capable of calling an action. Most of the time a component call an action when a user-interface event was received.
+Actions are the entry point of the [flow](https://facebook.github.io/flux/img/flux-simple-f8-diagram-1300w.png). Yet, they are not exactly like flux actions as they can be **asynchronous** and **chained**. A component (or a view if you're not using a React-like renderer) should be the only element capable of calling an action. Most of the time a component call an action when a user-interface event was received.
 
 
 ## Create an action
