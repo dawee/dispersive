@@ -203,6 +203,78 @@ const onlyCheckedTodos = Todo.objects.filter({checked: true});
 const homeTodos = onlyCheckedTodos.filter({tag: 'home'});
 const workTodos = onlyCheckedTodos.filter({tag: 'work'});
 
-console.log(homeTodos.all()); // an array of home checked todos
-console.log(workTodos.all()); // an array of work checked todos
+homeTodos.all(); // an array of home checked todos
+workTodos.all(); // an array of work checked todos
 ```
+
+### queryset.orderBy(name)
+
+You can create a sorted queryset by calling *orderBy* :
+
+Example :
+
+```js
+const sortedTodo = Todo.objects.orderBy('text');
+sortedTodo.all(); // an array of all todos, sorted alphabetically
+```
+
+As *filter* and *exclude*, orderBy returns a new queryset. You can chain filters before and after calling it.
+
+Example :
+
+```js
+Todo.objects
+    .filter({checked: true})
+    .orderBy('text')
+    .exclude({tag: 'work'})
+    .all();
+```
+
+### queryset.values(opts)
+
+Retrieve a values list for a given queryset.
+
+Calling :
+
+```js
+const valuesArray = Todo.objects.filter({checked: true}).values()
+```
+
+Is equivalent to :
+
+```js
+const valuesArray = Todo.objects.filter({checked: true}).all().map(
+  todo => todo.values()
+);
+```
+
+### queryset.first()
+
+Returns the first value of a given queryset.
+
+```js
+const firstSortedTodo = Todo.objects.orderBy('text').first();
+```
+
+### queryset.get(expression)
+
+Returns the only existing result for the given *expression*.
+
+Calling
+
+```js
+Todo.objects.get({id: '65ba62db9'});
+```
+
+is like calling :
+
+```js
+Todo.objects.filter({id: '65ba62db9'}).all()[0];
+```
+
+except *get* method :
+
+  * does not iterate on all the results to create an array
+  * throw an exception if no entry was found
+  * throw an exception if more than one entry is found
+
