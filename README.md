@@ -11,42 +11,4 @@ Dispersive is a data flow controller for applications based on [Flux](https://gi
 npm install dispersive
 ```
 
-## Create an Action
-
-```js
-const Dispersive = require('dispersive');
-
-const addContactToNotebook = Dispersive.createAction(
-  (name, age, phone) => ({name, age, phone})
-);
-```
-
-## Create a Store
-
-```js
-const Contact = Dispersive.createStoreModel({
-  name: null,
-  age: null,
-  phone: null,
-});
-
-Contact.subscribe(addContactToNotebook, (contact) => {
-  Contact.objects.create(contact);
-  Contact.trigger('change');
-});
-
-Contact.get30s = () => Contact.objects.filter({age: 30}).all();
-```
-
-## Listen to store
-
-```js
-Contact.on('change', () => myComponent.setState(Contact.get30s()));
-```
-
-## Trigger Action
-
-```js
-addContactToNotebook('joe', 30, '0786898754');
-```
-
+[Read the doc](./doc/getting-started.md).
