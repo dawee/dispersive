@@ -9,7 +9,7 @@ The store manager save transitory data. A store entry is meant to be shown by co
 
 The store is a stack of differents model classes.
 
-```
+```js
 class Todo extends Dispersive.Model {
   ...
 }
@@ -25,7 +25,7 @@ A schema describes the values to store for each model with their default values.
 
 You can define it this way :
 
-```
+```js
 class Todo extends Dispersive.Model {
   static createSchema() {
     return super.createSchema({
@@ -38,7 +38,7 @@ class Todo extends Dispersive.Model {
 
 Or with the helper mix-in **Model.use(schema)** :
 
-```
+```js
 const schema = {
   text: '',
   checked: false,
@@ -58,13 +58,13 @@ All the creations and the queries are inspired by the [Django managers](https://
 
 ### Create a new entry
 
-```
+```js
 Todo.objects.create({text: 'wash dishes'});
 ```
 
 is equivalent to :
 
-```
+```js
 const todo = new Todo();
 
 todo.text = 'wash dishes';
