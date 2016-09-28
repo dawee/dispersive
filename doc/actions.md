@@ -1,6 +1,6 @@
 # Actions
 
-Actions are the entry point of the [flow](https://facebook.github.io/flux/img/flux-simple-f8-diagram-1300w.png). Yet, they are not exactly like flux actions as they can be **asynchronous** and **chained**. A component (or a view if you're not using a React-like renderer) should be the only element capable of calling an action. Most of the time a component call an action when a user-interface event was received.
+Actions are the entry point of the [flow](https://facebook.github.io/flux/img/flux-simple-f8-diagram-1300w.png). Yet, they are not exactly like flux actions as they can be **asynchronous** and **chained**. A component (or a view if you're not using a React-like renderer) should be the only element capable of calling an action. Most of the time a component calls an action when a user-interface event is received.
 
 
 ## Create an action
@@ -13,7 +13,7 @@ The action handler is the function that will execute the action and return its r
 const addTodo = Dispersive.createAction(text => ({text}));
 ```
 
-This previous example send an event with the object **{text: '...'}** every time **addTodo('...')** is called.
+This previous example sends an event with the object **{text: '...'}** every time **addTodo('...')** is called.
 
 
 ## Subscribe to an action
@@ -36,7 +36,7 @@ addTodo.subscribe(data => createNotificationFromText(data));
 
 ## Asynchronous action
 
-You can execute an asynchronous action by returning a Promise instead of an object. In this case, every subscriptions will be called when the Promise *resolve* function is called.
+You can execute an asynchronous action by returning a Promise instead of an object. In this case, every subscription will be called when the Promise *resolve* function is called.
 
 ```js
 const fetchAllTodos = createAction(_ => new Promise(
@@ -64,7 +64,7 @@ fetchAllTodos.error.subscribe(error => createErrorMessage(error));
 
 ## Chain actions
 
-Any action can be used as a promise. Sometimes you'll need that the complete flow of an action is finished to call another one. This is done by creating an action group.
+Any action can be used as a promise. Sometimes you'll need the complete flow of an action to end, to call another one. This is done by creating an action group.
 
 ```js
 const addTodo = Dispersive.createAction(text => ({text}));
