@@ -12,8 +12,8 @@ import React from 'react';
 ## Actions
 
 ```js
-const createTodo = (text => {text});
-const checkTodo = (todoId => {todoId});
+const createTodo = Dispersive.createAction(text => {text});
+const checkTodo = Dispersive.createAction(todoId => {todoId});
 ```
 
 ## Store
