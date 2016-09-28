@@ -1,7 +1,7 @@
 # Store
 
 
-The store manager save transitory data. A store entry is meant to be shown by components (or views). **The store is not a cache system**. If a data cache is needed it should be managed during the execution of an [action Promise](actions.md#asynchronous-action).
+The store manager saves transitory data. A store entry is meant to be shown by components (or views). **The store is not a cache system**. If a data cache is needed it should be managed during the execution of an [action Promise](actions.md#asynchronous-action).
 
 
 ## Model
@@ -82,7 +82,7 @@ todo.save({emitChange: false});
 
 ### model.id
 
-Every saved model instance has an generated unique id. **You must never not change its value**. Unique ids are generated with [substack's hat](https://github.com/substack/node-hat) library.
+Every saved model instance has an generated unique id. **You must never change its value**. Unique ids are generated with [substack's hat](https://github.com/substack/node-hat) library.
 
 ```js
 todo.save();
@@ -99,7 +99,7 @@ console.log(todo.id); // 'c65ba62db9f82a26e8a4aa2249970df9'
 
 ### model.emit(name, data) / model.on(name, listener)
 
-Every models instances are event emitters. Their parent class is [Facebook EventEmitter](https://github.com/facebook/emitter). **Only components/views should listen to model events.**
+Every model instance is an event emitter. Their parent class is [Facebook EventEmitter](https://github.com/facebook/emitter). **Only components/views should listen to model events.**
 
 ```js
 model.on('hello', data => console.log(data.foo)); // 'bar'
@@ -154,7 +154,7 @@ todo.delete({emitChange: false});
 
 ## ObjectManager
 
-The ObjectManager stores and retrieve values defined by the *Schema*.
+The ObjectManager stores and retrieves values defined by the *Schema*.
 All the creations and the queries are inspired by the [Django managers](https://docs.djangoproject.com/en/1.10/topics/db/managers/).
 
 ### Create a new entry
@@ -189,7 +189,7 @@ const allTodos = Todo.objects.all();
 
 ### queryset.filter(expression), queryset.exclude(expression)
 
-Each methods *filter* and *exclude* create a new queryset object that filters or exclude the results following an *expression*. An expression is key-value object like this :
+All methods *filter* and *exclude* create a new queryset object that filters or exclude the results following an *expression*. An expression is key-value object like this :
 
 ```js
 const onlyCheckedTodos = Todo.objects.filter({checked: true});
@@ -232,7 +232,7 @@ Todo.objects
 
 ### queryset.values(opts)
 
-Retrieve a values list for a given queryset.
+Retrieves a values list for a given queryset.
 
 Calling :
 
