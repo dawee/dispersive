@@ -1,7 +1,7 @@
 # Store
 
 
-The store manager save transitory data. A store entry is meant to be shown by components (or views). **The store is not a cache system**. If a data cache is needed it should be managed during the execution of an (action Promise)[actions.md#asynchronous-action].
+The store manager save transitory data. A store entry is meant to be shown by components (or views). **The store is not a cache system**. If a data cache is needed it should be managed during the execution of an [action Promise](actions.md#asynchronous-action).
 
 
 ## Model
