@@ -1,16 +1,24 @@
 #Getting started
 
-Here's a simple Todo example with React;
+Here's a simple Todo example with React.
+
+## Import
 
 ```js
 import Dispersive from 'dispersive';
 import React from 'react';
+```
 
-// Actions
+## Actions
+
+```js
 const createTodo = (text => {text});
 const checkTodo = (todoId => {todoId});
+```
 
-// Store
+## Store
+
+```js
 const schema = {text: '', checked: false};
 const Todo = Dispersive.Model.use(schema);
 
@@ -20,9 +28,11 @@ checkTodo.subscribe({todoId} => {
   todo.checked = true;
   todo.save();
 });
+```
 
-// Line Component
+## TodoLine Component
 
+```js
 class TodoLine extends React.Component {
   
   constructor(props) {
@@ -56,10 +66,11 @@ class TodoLine extends React.Component {
   }
 
 }
+```
 
+## TodoList Component
 
-// List Component
-
+```js
 class TodoList extends React.Component {
   
   constructor(props) {
@@ -91,5 +102,4 @@ class TodoList extends React.Component {
   }
 
 }
-
 ```
