@@ -19,7 +19,7 @@ At this point, **Todo** has an *ObjectManager* but no schema.
 So, **Todo** is able to store entries with *id* but no specific data.
 We need to add a *schema*.
 
-## Schema
+### Model.schema
 
 A schema describes the values to store for each model with their default values.
 
@@ -42,6 +42,7 @@ Or with the helper mix-in **Model.use(schema)** :
 const schema = {
   text: '',
   checked: false,
+  tag: null,
 };
 
 class Todo extends Dispersive.Model.use(schema) {
@@ -49,7 +50,107 @@ class Todo extends Dispersive.Model.use(schema) {
 }
 ```
 
-At this point. **Todo** is ready to save data (*text* and *checked* values) in the *ObjectManager*.
+At this point. **Todo** is ready to save data in the *ObjectManager*.
+
+### Model.constructor(data)
+
+When a model instance is created, you can pass the first values to the constructor.
+
+```js
+const todo = new Todo({text: 'wash dishes'});
+
+console.log(todo.text); // 'wash dishes'
+console.log(todo.checked); // false
+```
+
+### model.save({emitChange: true})
+
+A model is an interface to manipulate the values defined in the schema. To sync current model values with the store, you should save it.
+
+```js
+todo.checked = true;
+todo.save();
+```
+
+At this point, if a component is listening to this entry changes, it will be notified.
+
+If you don't want to trigger an event, you should pass *emitChange: false*
+
+```js
+todo.save({emitChange: false});
+```
+
+### model.id
+
+Every saved model instance has an generated unique id. **You must never not change its value**. Unique ids are generated with [substack's hat](https://github.com/substack/node-hat) library.
+
+```js
+todo.save();
+console.log(todo.id); // 'c65ba62db9f82a26e8a4aa2249970df9'
+```
+
+### model.emitChange()
+
+*emitChange* is equivalent to **model.emit('change')**
+
+### model.changed(listener)
+
+*changed* is equivalent to **model.on('change', listener)**
+
+### model.emit(name, data) / model.on(name, listener)
+
+Every models instances are event emitters. Their parent class is [Facebook EventEmitter](https://github.com/facebook/emitter). **Only components/views should listen to model events.**
+
+```js
+model.on('hello', data => console.log(data.foo)); // 'bar'
+model.emit('hello', {foo: 'bar'});
+```
+
+### model.values({include: [], exclude: []})
+
+To get only the schema values of an entry you should call :
+
+```js
+const values = todo.values();
+```
+
+Example :
+
+```js
+const todo = new Todo({text: 'wash dishes'});
+console.log(todo.values());
+// {text: 'wash dishes', checked: false, tag: null, id: null};
+```
+
+You can exclude some values, example :
+
+```js
+console.log(todo.values({exclude: ['id']}));
+// {text: 'wash dishes', checked: false, tag: null};
+```
+
+Or you can force to include some values, example :
+
+```js
+console.log(todo.values({include: ['text', 'checked']}));
+// {text: 'wash dishes', checked: false};
+```
+
+### model.delete({emitChange: true})
+
+To remove an entry from the store you should call :
+
+```js
+model.delete();
+```
+
+At this point, if a component is listening to the *ObjectManager* changes, it will be notified. 
+
+If you don't want to trigger an event, you should pass *emitChange: false*
+
+```js
+todo.delete({emitChange: false});
+```
 
 ## ObjectManager
 
@@ -69,4 +170,39 @@ const todo = new Todo();
 
 todo.text = 'wash dishes';
 todo.save();
+```
+
+An ObjectManager is a *Queryset* object. So it can do queries and delete entries too.
+
+## Queryset
+
+A Queryset is used to search entries in the store. The entry point of all querysets is the ObjectManager attached to Model classes : **Model.objects**.
+
+
+### queryset.all()
+
+To retrieve all entries of a queryset, you should call :
+
+```js
+const allTodos = Todo.objects.all();
+```
+
+### queryset.filter(expression), queryset.exclude(expression)
+
+Each methods *filter* and *exclude* create a new queryset object that filters or exclude the results following an *expression*. An expression is key-value object like this :
+
+```js
+const onlyCheckedTodos = Todo.objects.filter({checked: true});
+const onlyNotCheckedTodos = Todo.objects.exclude({checked: true});
+```
+
+As they return another queryset, it's possible to chain them :
+
+```js
+const onlyCheckedTodos = Todo.objects.filter({checked: true});
+const homeTodos = onlyCheckedTodos.filter({tag: 'home'});
+const workTodos = onlyCheckedTodos.filter({tag: 'work'});
+
+console.log(homeTodos.all()); // an array of home checked todos
+console.log(workTodos.all()); // an array of work checked todos
 ```
