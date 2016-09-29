@@ -10,7 +10,7 @@ To create a simple action you need to call **createAction** with an *action hand
 The action handler is the function that will execute the action and return its result :
 
 ```js
-const addTodo = Dispersive.createAction(text => ({text}));
+const addTodo = Dispersive.createAction(text => ({text: text.strip()}));
 ```
 
 This previous example sends an event with the object **{text: '...'}** every time **addTodo('...')** is called.
