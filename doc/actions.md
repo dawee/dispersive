@@ -39,8 +39,8 @@ addTodo.subscribe(data => createNotificationFromText(data));
 You can execute an asynchronous action by returning a Promise instead of an object. In this case, every subscription will be called when the Promise *resolve* function is called.
 
 ```js
-const fetchAllTodos = createAction(_ => new Promise(
-  (resolve) => request.get('http://www.example/api/todo').then(resolve)
+const fetchAllTodos = createAction(() => new Promise(
+  resolve => request.get('http://www.example/api/todo').then(resolve)
 ));
 ```
 
@@ -49,8 +49,8 @@ const fetchAllTodos = createAction(_ => new Promise(
 When a Promise *reject* is called, you can subscribe to the action error. This is done by subscribing to the **error subaction**.
 
 ```js
-const fetchAllTodos = createAction(_ => new Promise(
-  (resolve) => request.get('http://www.example/api/todo')
+const fetchAllTodos = createAction(() => new Promise(
+  resolve => request.get('http://www.example/api/todo')
     .then(resolve)
     .catch(reject)
 ));
@@ -71,7 +71,7 @@ const addTodo = Dispersive.createAction(text => ({text}));
 const notifyTodo = Dispersive.createAction(text => ({text}));
 
 const createAndNotifyTodo = createAction(
-  text => addTodo(text).then(_ => notifyTodo(text))
+  text => addTodo(text).then(() => notifyTodo(text))
 );
 ```
 
