@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/dawee/dispersive.svg?branch=master)](https://travis-ci.org/dawee/dispersive)
 
-Dispersive is a data flow controller for applications based on [Flux](https://github.com/facebook/flux) architecture.
+Dispersive is a data flow controller inpired from [Flux](https://github.com/facebook/flux).
 
 
 ## Install
@@ -11,4 +11,8 @@ Dispersive is a data flow controller for applications based on [Flux](https://gi
 npm install dispersive
 ```
 
-[Read the doc](./doc/getting-started.md).
+## Documentation
+
+ 1. [Getting started](./doc/getting-started.md)
+ 2. [Actions](./doc/actions.md)
+ 3. [Store](./doc/store.md)
