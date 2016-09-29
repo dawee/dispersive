@@ -82,4 +82,24 @@ describe('Model', () => {
 
   })
 
+  describe('emitter', () => {
+
+    it('should emit on all other models pointing on the same entry id', () => {
+      const Model = class extends Dispersive.Model {};
+      const {id} = Model.objects.create();
+      const listener = sinon.spy();
+
+
+      const first = Model.objects.get({id});
+      const second = Model.objects.get({id});
+
+      first.changed(listener);
+      second.save();
+
+      assert(listener.called);
+    });
+
+  });
+
+
 })
