@@ -2,8 +2,8 @@
   "presets": ["es2015"],
   "plugins": [
     "transform-runtime",
-    "transform-es3-member-expression-literals",
-    "transform-es3-property-literals",
-    "transform-proto-to-assign"
+    'transform-es2015-block-scoping',
+    ['transform-es2015-classes', {loose: true}],
+    'transform-proto-to-assign'
   ]
 }

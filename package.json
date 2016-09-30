@@ -1,6 +1,6 @@
 {
   "name": "dispersive",
-  "version": "0.6.4",
+  "version": "0.6.5",
   "description": "Storage management inspired by the Flux philosophy",
   "main": "index.js",
   "scripts": {
@@ -31,6 +31,8 @@
   },
   "devDependencies": {
     "babel-cli": "6.10.1",
+    "babel-plugin-transform-es2015-block-scoping": "6.15.0",
+    "babel-plugin-transform-es2015-classes": "6.14.0",
     "babel-plugin-transform-es3-member-expression-literals": "6.8.0",
     "babel-plugin-transform-es3-property-literals": "6.8.0",
     "babel-plugin-transform-proto-to-assign": "6.9.0",
