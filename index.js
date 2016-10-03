@@ -7,5 +7,6 @@ if (process.env.DISPERSIVE_ECMA === '5') {
   exports.ObjectManager = require('./lib/manager');
   exports.createAction = Action.create;
   exports.Dispatcher = require('./lib/dispatcher');
+  exports.Schema = require('./lib/schema');
 }
 

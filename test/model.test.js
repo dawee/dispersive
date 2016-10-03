@@ -24,7 +24,7 @@ describe('Model', () => {
   describe('objects', () => {
 
     it('should trigger a new object', (done) => {
-      const Model = class extends Dispersive.Model {};
+      const Model = Dispersive.Model.fix(class extends Dispersive.Model {});
 
       Model.objects.changed(() => done());
       Model.objects.create();
@@ -32,6 +32,8 @@ describe('Model', () => {
 
     it('should not trigger a deleted object', (done) => {
       const Model = class extends Dispersive.Model {};
+      Dispersive.Model.fix(Model);
+
       const model = Model.objects.create();
 
       Model.objects.changed(() => done());
@@ -44,7 +46,9 @@ describe('Model', () => {
         name: {index: false},
       };
 
-      const Model = class extends Dispersive.Model.use(schema) {};
+      const Model = class extends Dispersive.Model {};
+
+      Dispersive.Model.fix(Model, schema);
 
       assert('age' in Model.objects.index);
       assert.equal('name' in Model.objects.index, false);
@@ -86,6 +90,9 @@ describe('Model', () => {
 
     it('should emit on all other models pointing on the same entry id', () => {
       const Model = class extends Dispersive.Model {};
+
+      Dispersive.Model.fix(Model);
+
       const {id} = Model.objects.create();
       const listener = sinon.spy();
 

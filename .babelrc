@@ -1,9 +1,6 @@
 {
   "presets": ["es2015"],
   "plugins": [
-    "transform-runtime",
-    'transform-es2015-block-scoping',
-    ['transform-es2015-classes', {loose: true}],
-    'transform-proto-to-assign'
+    "transform-runtime"
   ]
 }
