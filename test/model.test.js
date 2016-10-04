@@ -64,7 +64,7 @@ describe('Model', () => {
       const model = Model.objects.create({age: 20, name: 'joe'});
       const values = Model.objects.index.id.get(model.id);
 
-      assert.equal(Model.objects.index.age.refs[values], 20);
+      assert.equal(Model.objects.index.age.refs[values.id], 20);
       assert(Model.objects.index.age.sets[20].has(values));
     });
 
@@ -84,6 +84,25 @@ describe('Model', () => {
       assert.equal(Model.objects.index.age.sets[20].has(values), false);
     });
 
+    it('should remove all entries', () => {
+      const schema = {
+        age: {index: true},
+        name: null,
+      };
+
+      const Model = class extends Dispersive.Model.use(schema) {};
+      
+      Model.objects.create({age: 20, name: 'joe'});
+      Model.objects.create({age: 20, name: 'jack'});
+
+      assert.equal(Model.objects.count(), 2);
+
+      Model.objects.delete();
+
+      assert.equal(Model.objects.count(), 0);
+    });
+
+
   })
 
   describe('emitter', () => {
@@ -95,7 +114,6 @@ describe('Model', () => {
 
       const {id} = Model.objects.create();
       const listener = sinon.spy();
-
 
       const first = Model.objects.get({id});
       const second = Model.objects.get({id});
