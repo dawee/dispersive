@@ -11,7 +11,7 @@ class Movie extends Model.use(schema) {
 
   parse(feed) {
     this.title = feed.title;
-    this.posterUrl = `https://image.tmdb.org/t/p/w500/${feed.poster_path}`;
+    this.posterUrl = `https://image.tmdb.org/t/p/w500${feed.poster_path}`;
   }
 
   static createAll(feed) {

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dispersive example : Movies</title>
+  <style type="text/css">
+
+body, #content {
+  background-color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+.wall {
+  line-height: 0;
+}
+
+.poster {
+  position: relative;
+  display: inline-block;
+  width: 20vw;  
+  height: 30vw;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: auto 100%;
+}
+
+.poster .overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: #333;
+  opacity: 0.8;
+  transition: opacity 1s ease-in;
+}
+
+.poster:hover .overlay {
+  opacity: 0;
+}
+
+  </style>
+  <script type="text/javascript" src="./static/dispersive-movies.js"></script>
+</head>
+<body>
+  <div id="content"></div>
+  <script type="text/javascript">bootMoviesApp();</script>
+</body>
+</html>

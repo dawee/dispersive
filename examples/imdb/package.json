@@ -1,21 +1,29 @@
 {
-  "name": "imdb",
-  "version": "0.0.1",
-  "private": true,
-  "devDependencies": {
-    "react-scripts": "0.6.1"
+  "name": "dispersive-imdb",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "aliasify": {
+    "aliases": {
+      "dispersive": "dispersive/es5"
+    }
   },
   "dependencies": {
     "babel-polyfill": "6.16.0",
-    "dispersive": "0.7.1",
-    "react": "^15.3.2",
-    "react-dom": "^15.3.2",
+    "dispersive": "0.7.2",
+    "react": "15.3.2",
+    "react-dom": "15.3.2",
     "superagent": "2.3.0"
   },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+  "devDependencies": {
+    "aliasify": "2.0.0",
+    "babel-preset-es2015": "6.16.0",
+    "babel-preset-react": "6.16.0",
+    "browserify": "13.1.0"
   }
 }
