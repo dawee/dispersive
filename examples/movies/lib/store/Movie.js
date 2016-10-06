@@ -22,11 +22,6 @@ class NoPosterError {
 
 class Movie extends Model.use(schema) {
 
-  constructor(feed = {}) {
-    super(feed);
-    if (!!feed) this.parse(feed);
-  }
-
   parse(feed) {
     this.releaseDate = this.releaseDate || feed.release_date;
     this.posterUrl = this.posterUrl || this.getPoster(feed.poster_path);
@@ -39,11 +34,7 @@ class Movie extends Model.use(schema) {
   }
 
   save(...argv) {
-    if (!!this.posterUrl) {
-      super.save(...argv);
-    } else {
-      console.log(`"${this.title}" was not saved : no poster found`);
-    }
+    if (!!this.posterUrl) super.save(...argv);
   }
 
   static createAll(feeds) {
