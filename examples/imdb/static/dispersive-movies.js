@@ -22,8 +22,8 @@ var _dispersive = require('dispersive/es5');
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var query = _qs2.default.stringify({
-  'primary_release_date.lte': (0, _moment2.default)().format('YYYY-MM-DD'),
-  'primary_release_date.gte': (0, _moment2.default)().startOf('month').format('YYYY-MM-DD'),
+  'primary_release_date.lte': (0, _moment2.default)().add(1, 'month').endOf('month').format('YYYY-MM-DD'),
+  'primary_release_date.gte': (0, _moment2.default)().add(1, 'month').startOf('month').format('YYYY-MM-DD'),
   api_key: 'b54fdd936c40e2df62dbfab8efa08c6b'
 });
 

@@ -5,8 +5,8 @@ import {createAction} from 'dispersive';
 
 
 const query = qs.stringify({
-  'primary_release_date.lte': moment().format('YYYY-MM-DD'),
-  'primary_release_date.gte': moment().startOf('month').format('YYYY-MM-DD'),
+  'primary_release_date.lte': moment().add(1, 'month').endOf('month').format('YYYY-MM-DD'),
+  'primary_release_date.gte': moment().add(1, 'month').startOf('month').format('YYYY-MM-DD'),
   api_key: 'b54fdd936c40e2df62dbfab8efa08c6b',
 });
 
