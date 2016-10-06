@@ -5,8 +5,9 @@ import TheMovieDB from './resource/TheMovieDB';
 const actions = {};
 const theMoviesDB = new TheMovieDB();
 
-actions.fetchLastMovies = createAction(() => theMoviesDB.fetchNext());
-actions.boot = createAction(() => actions.fetchLastMovies());
+
+actions.fetchMovies = createAction(() => theMoviesDB.fetchNext());
+actions.boot = createAction(actions.fetchMovies);
 
 
 export default actions;

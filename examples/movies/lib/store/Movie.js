@@ -27,8 +27,6 @@ class Movie extends Model.use(schema) {
   }
 
   static createAll(feeds) {
-    console.log(feeds.results[0]);
-
     for (const feed of feeds.results) {
       Movie.objects.create(feed, {emitChange: false});
     }
@@ -39,6 +37,6 @@ class Movie extends Model.use(schema) {
 }
 
 
-actions.fetchLastMovies.subscribe(feeds => Movie.createAll(feeds));
+actions.fetchMovies.subscribe(feeds => Movie.createAll(feeds));
 
 export default Movie;
