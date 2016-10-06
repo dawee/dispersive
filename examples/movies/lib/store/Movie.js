@@ -4,6 +4,7 @@ import moment from 'moment';
 
 
 const schema = {
+  theMovieId: null,
   title: null,
   posterUrl: null,
   releaseDate: null,
@@ -47,7 +48,11 @@ class Movie extends Model.use(schema) {
 
   static createAll(feeds) {
     for (const feed of feeds.results) {
-      Movie.objects.create(feed, {emitChange: false});
+      const theMovieId = feed.id;
+      const model = Movie.objects.getOrCreate({theMovieId}, {emitChange: false});
+
+      model.parse(feed);
+      model.save();
     }
 
     this.objects.emitChange();
