@@ -17,10 +17,6 @@ class MoviesWall extends React.Component {
     this.setState({movies: Movie.objects.values()});
   }
 
-  componentDidMount() {
-    actions.fetchLastMovies();
-  }
-
   render() {
     return (
       <div className="wall">

@@ -1,33 +1,42 @@
 import {Model} from 'dispersive';
 import actions from '../actions';
+import moment from 'moment';
+
 
 const schema = {
   title: null,
   posterUrl: null,
+  releaseDate: null,
 };
 
 
 class Movie extends Model.use(schema) {
 
-  parse(feed) {
-    this.title = feed.title;
-    this.posterUrl = `https://image.tmdb.org/t/p/w500${feed.poster_path}`;
+  constructor(feed = {}) {
+    super(feed);
+    if (!!feed) this.parse(feed);
   }
 
-  static createAll(feed) {
-    for (const movieFeed of feed.results) {
-      const movie = new Movie();
+  parse(feed) {
+    this.releaseDate = this.releaseDate || feed.release_date;
+    this.posterUrl = this.posterUrl || this.getPoster(feed.poster_path);
+  }
 
-      movie.parse(movieFeed);
-      movie.save();
+  getPoster(path) {
+    return `https://image.tmdb.org/t/p/w500${path}`;
+  }
+
+  static createAll(feeds) {
+    for (const feed of feeds.results) {
+      Movie.objects.create(feed, {emitChange: false});
     }
+
+    this.objects.emitChange();
   }
 
 }
 
 
-actions.fetchLastMovies.subscribe(feed => Movie.createAll(feed));
-
-window.Movie = Movie;
+actions.fetchLastMovies.subscribe(feeds => Movie.createAll(feeds));
 
 export default Movie;

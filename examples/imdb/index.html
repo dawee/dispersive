@@ -4,10 +4,19 @@
   <title>Dispersive example : Movies</title>
   <style type="text/css">
 
-body, #content {
+body {
+  overflow: hidden;
   background-color: #333;
+}
+
+body, #content {
   margin: 0;
   padding: 0;
+}
+
+#content {
+  overflow-y: auto;
+  width: 105vw;
 }
 
 .wall {
@@ -17,11 +26,13 @@ body, #content {
 .poster {
   position: relative;
   display: inline-block;
-  width: 20vw;  
-  height: 30vw;
+  width: 25vw;
+  height: 15vw;
+  margin: 0;
+  padding: 0;
   background-repeat: no-repeat;
-  background-position: center center;
-  background-size: auto 100%;
+  background-position: center 80%;
+  background-size: 100% auto;
 }
 
 .poster .overlay {
@@ -32,7 +43,7 @@ body, #content {
   left: 0;
   background: #333;
   opacity: 0.8;
-  transition: opacity 1s ease-in;
+  transition: opacity 0.6s;
 }
 
 .poster:hover .overlay {
