@@ -10,6 +10,15 @@ const schema = {
 };
 
 
+class NoPosterError {
+
+  constructor(title) {
+    this.name = 'NoPosterError';
+    this.message = `"${title}" was not shown : no poster found`;
+  }
+}
+
+
 class Movie extends Model.use(schema) {
 
   constructor(feed = {}) {
@@ -23,7 +32,17 @@ class Movie extends Model.use(schema) {
   }
 
   getPoster(path) {
+    if (!path) return null;
+
     return `https://image.tmdb.org/t/p/w500${path}`;
+  }
+
+  save(...argv) {
+    if (!!this.posterUrl) {
+      super.save(...argv);
+    } else {
+      console.log(`"${this.title}" was not saved : no poster found`);
+    }
   }
 
   static createAll(feeds) {
