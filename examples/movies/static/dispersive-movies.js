@@ -316,6 +316,8 @@ var Movie = function (_Model$use) {
   }], [{
     key: 'createAll',
     value: function createAll(feeds) {
+      console.log(feeds.results[0]);
+
       var _iteratorNormalCompletion = true;
       var _didIteratorError = false;
       var _iteratorError = undefined;

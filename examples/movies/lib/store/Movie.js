@@ -27,6 +27,8 @@ class Movie extends Model.use(schema) {
   }
 
   static createAll(feeds) {
+    console.log(feeds.results[0]);
+
     for (const feed of feeds.results) {
       Movie.objects.create(feed, {emitChange: false});
     }
