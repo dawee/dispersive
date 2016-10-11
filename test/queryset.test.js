@@ -1,6 +1,6 @@
 const assert = require('assert');
 const chai = require('chai');
-const Dispersive = require('..');
+const Dispersive = require('./dispersive');
 
 describe('QuerySet', () => {
 

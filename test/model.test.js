@@ -1,6 +1,6 @@
 const assert = require('assert');
 const sinon = require('sinon');
-const Dispersive = require('..');
+const Dispersive = require('./dispersive');
 
 describe('Model', () => {
 

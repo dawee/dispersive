@@ -1,6 +1,6 @@
 const assert = require('assert');
 const sinon = require('sinon');
-const {createAction} = require('..');
+const {createAction} = require('./dispersive');
 
 
 describe('Action', () => {
