@@ -1,6 +1,6 @@
 const assert = require('assert');
 const sinon = require('sinon');
-const {createAction} = require('./dispersive');
+const {Action, createAction} = require('./dispersive');
 
 
 describe('Action', () => {
@@ -67,5 +67,22 @@ describe('Action', () => {
     action2.subscribe(listener2);
     grouped.error.subscribe(listener);
     grouped(42);
+  });
+
+  it('should be able to call another action type', () => {
+    const check = sinon.spy();
+
+    class CustomAction extends Action {
+
+      callHandler(...argv) {
+        check();
+        super.callHandler(...argv);
+      }
+    }
+
+    const action1 = createAction(value => {value}, {type: CustomAction});
+
+    action1();
+    assert(check.called);
   });
 })
