@@ -85,4 +85,17 @@ describe('Action', () => {
     action1();
     assert(check.called);
   });
+
+  it('should call action.before then the specified handler', done => {
+    const checkHandler = sinon.spy();
+    const action1 = createAction(value => {value});
+
+    action1.before.subscribe(() => {
+      assert(!checkHandler.called);
+      done();
+    });
+
+    action1.subscribe(checkHandler);
+    action1();
+  });
 })
