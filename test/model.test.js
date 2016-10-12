@@ -8,7 +8,7 @@ describe('Model', () => {
     const Model = class extends Dispersive.Model.use({foo: null}) {};
 
     Model.objects.create({foo: 42});
-    assert.equal(Model.objects.first().foo, 42);
+    assert.equal(Model.objects.get().foo, 42);
   });
 
 
@@ -17,7 +17,16 @@ describe('Model', () => {
 
     const model = new Model({foo: 42});
     model.save();
-    assert.equal(Model.objects.first().foo, 42);
+    assert.equal(Model.objects.get().foo, 42);
+  });
+
+  it('should update an existing model', () => {
+    const Model = class extends Dispersive.Model.use({foo: null}) {};
+    
+    Model.objects.create({foo: 0});
+    Model.objects.get().update({foo: 42});
+
+    assert.equal(Model.objects.get().foo, 42);
   });
 
   it('should delete a given entry', () => {
