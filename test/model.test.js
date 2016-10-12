@@ -4,7 +4,7 @@ const Dispersive = require('./dispersive');
 
 describe('Model', () => {
 
-  it('create a new entry', () => {
+  it('should create a new entry with objects.create', () => {
     const Model = class extends Dispersive.Model.use({foo: null}) {};
 
     Model.objects.create({foo: 42});
@@ -12,7 +12,15 @@ describe('Model', () => {
   });
 
 
-  it('delete a given entry', () => {
+  it('should create a new entry model.save', () => {
+    const Model = class extends Dispersive.Model.use({foo: null}) {};
+
+    const model = new Model({foo: 42});
+    model.save();
+    assert.equal(Model.objects.first().foo, 42);
+  });
+
+  it('should delete a given entry', () => {
     const Model = class extends Dispersive.Model.use({foo: null}) {};
     const model = Model.objects.create({foo: 42});
     
@@ -126,5 +134,15 @@ describe('Model', () => {
 
   });
 
+
+  // Bugfixes
+
+  it('should be able to create than save a model (#6)', () => {
+    const Model = class extends Dispersive.Model.use({foo: null}) {};
+
+    const model = Model.objects.create({foo: 42});
+    model.save();
+    assert.equal(Model.objects.first().foo, 42);
+  });
 
 })
