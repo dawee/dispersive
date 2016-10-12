@@ -1,4 +1,6 @@
 
+validate: test es5-test
+
 re: clean es5
 
 clean:
