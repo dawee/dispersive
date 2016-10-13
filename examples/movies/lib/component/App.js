@@ -1,6 +1,6 @@
 import React from 'react';
 import MoviesWall from './MoviesWall';
-import Header from './header';
+import Header from './Header';
 import actions from '../actions';
 
 class App extends React.Component {
