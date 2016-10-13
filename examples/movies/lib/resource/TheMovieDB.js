@@ -3,26 +3,12 @@ import moment from 'moment';
 import qs from 'qs';
 
 
-class Resource {
-
-  static createRequest(url, query) {
-    const queryString = qs.stringify(query);
-
-    return new Promise((resolve, reject) => request.get(`${url}?${queryString}`, (err, res) => {
-      if (!!err) return reject(err);
-
-      resolve(res.body);
-    }));
-  }
-
-}
+const baseURL = 'https://api.themoviedb.org/3/discover/movie';
 
 
-class TheMovieDB extends Resource {
+class TheMovieDB {
 
   constructor() {
-    super();
-
     this.query = {
       page: 0,
       api_key: 'b54fdd936c40e2df62dbfab8efa08c6b',
@@ -32,8 +18,13 @@ class TheMovieDB extends Resource {
 
   fetchNext() {
     this.query.page++;
+    return TheMovieDB.createRequestPromise(`${baseURL}?${qs.stringify(this.query)}`);
+  }
 
-    return TheMovieDB.createRequest('https://api.themoviedb.org/3/discover/movie', this.query);
+  static createRequestPromise(url) {
+    return new Promise(
+      (resolve, reject) => request.get(url, (err, res) => !!err ? reject(err) : resolve(res.body))
+    );
   }
 
 }
