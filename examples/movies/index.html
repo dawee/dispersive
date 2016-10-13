@@ -2,73 +2,7 @@
 <html>
 <head>
   <title>Dispersive example : Movies</title>
-  <style type="text/css">
-
-body {
-  overflow: hidden;
-  background-color: #333;
-}
-
-body, #content {
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-}
-
-header {
-  width: 100%;
-  height: 48px;
-}
-
-#content {
-  overflow-y: auto;
-  width: 100vw;
-  height: 100vh;
-}
-
-.wall {
-  position: relative;
-  line-height: 0;
-  width: 100vw;
-  height: auto;
-}
-
-.poster {
-  position: relative;
-  display: inline-block;
-  width: 25vw;
-  height: 20vw;
-  margin: 0;
-  padding: 0;
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: 100% auto;
-}
-
-.poster .overlay {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background: #333;
-  opacity: 0.8;
-  transition: opacity 0.6s;
-}
-
-.poster:hover .overlay {
-  opacity: 0;
-}
-
-.sensor {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 100vh;
-}
-
-  </style>
+  <link rel="stylesheet" type="text/css" href="./static/dispersive-movies.css">
   <script type="text/javascript" src="./static/dispersive-movies.js"></script>
 </head>
 <body>
