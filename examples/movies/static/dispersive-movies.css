@@ -7,7 +7,7 @@ body {
 body, #content {
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 header {
@@ -15,18 +15,39 @@ header {
   height: 48px;
 }
 
+header .search-input {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+}
+
+header .search-input input {
+  height: 40px;
+  background-color: #cdcdcd;
+}
+
 #content {
-  overflow-y: auto;
   width: 100vw;
   height: 100vh;
 }
 
 .wall {
+  position: absolute;
+  top: 48px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.wall .scrollable {
   position: relative;
-  line-height: 0;
   width: 100vw;
   height: auto;
+  line-height: 0;
 }
+
 
 .poster {
   position: relative;

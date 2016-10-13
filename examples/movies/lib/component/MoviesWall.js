@@ -26,12 +26,14 @@ class MoviesWall extends React.Component {
   render() {
     return (
       <div className="wall">
-        {this.state.movies.map(movie => <MoviePoster key={movie.id} movieId={movie.id} />)}
-        <VisibilitySensor
-          partialVisibility={true}
-          onChange={this.onSensorVisibilityChange}>
-          <div className='sensor' />
-        </VisibilitySensor>
+        <div className="scrollable">
+          {this.state.movies.map(movie => <MoviePoster key={movie.id} movieId={movie.id} />)}
+          <VisibilitySensor
+            partialVisibility={true}
+            onChange={this.onSensorVisibilityChange}>
+            <div className='sensor' />
+          </VisibilitySensor>
+        </div>
       </div>
     );
   }
