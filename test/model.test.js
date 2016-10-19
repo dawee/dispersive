@@ -154,4 +154,12 @@ describe('Model', () => {
     assert.equal(Model.objects.first().foo, 42);
   });
 
+  it('should be able to index null values (#7)', () => {
+    const Model = class extends Dispersive.Model.use({foo: null}) {};
+
+    Model.objects.create({foo: false});
+    
+    assert.equal(Model.objects.filter({foo: false}).count(), 1);
+  });
+
 })
