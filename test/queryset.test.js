@@ -129,7 +129,6 @@ describe('QuerySet', () => {
 
     const Teammate = Dispersive.Model.use(schema);
 
-
     it('should listen only to valid created source', () => {
       const listener30 = sinon.spy()
       const listener30NoDev = sinon.spy()
@@ -164,6 +163,50 @@ describe('QuerySet', () => {
       filter40.changed(listener40);
 
       model.delete();
+
+      assert.equal(listener30.called, true);
+      assert.equal(listener30NoDev.called, false);
+      assert.equal(listener40.called, false);
+    });
+
+    it('should listen only to valid created source, with event funnel', () => {
+      const listener30 = sinon.spy()
+      const listener30NoDev = sinon.spy()
+      const listener40 = sinon.spy()
+      const filter30 = Teammate.objects.filter({age: 30});
+      const filter30NoDev = filter30.exclude({job: 'developer'});
+      const filter40 = Teammate.objects.filter({age: 40});
+
+      filter30.changed(listener30);
+      filter30NoDev.changed(listener30NoDev);
+      filter40.changed(listener40);
+
+      Dispersive.usingEventFunnel(() => {
+        Teammate.objects.create({age: 30, job: 'developer'});
+      });
+
+      assert.equal(listener30.called, true);
+      assert.equal(listener30NoDev.called, false);
+      assert.equal(listener40.called, false);
+    });
+
+    it('should listen only to valid deleted source, with event funnel', () => {
+      const listener30 = sinon.spy()
+      const listener30NoDev = sinon.spy()
+      const listener40 = sinon.spy()
+      const filter30 = Teammate.objects.filter({age: 30});
+      const filter30NoDev = filter30.exclude({job: 'developer'});
+      const filter40 = Teammate.objects.filter({age: 40});
+
+      const model = Teammate.objects.create({age: 30, job: 'developer'});
+
+      filter30.changed(listener30);
+      filter30NoDev.changed(listener30NoDev);
+      filter40.changed(listener40);
+
+      Dispersive.usingEventFunnel(() => {
+        model.delete();
+      });
 
       assert.equal(listener30.called, true);
       assert.equal(listener30NoDev.called, false);
