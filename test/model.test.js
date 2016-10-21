@@ -59,8 +59,8 @@ describe('Model', () => {
 
     it('should create a SetIndex for each indexed field', () => {
       const schema = {
-        age: {index: true},
-        name: {index: false},
+        age: new Dispersive.Schema.IndexedField(),
+        name: null,
       };
 
       const Model = class extends Dispersive.Model {};
