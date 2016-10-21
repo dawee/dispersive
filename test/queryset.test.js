@@ -213,6 +213,30 @@ describe('QuerySet', () => {
       assert.equal(listener40.called, false);
     });
 
+    it('should trigger only once using event funnel', () => {
+      const listener = sinon.spy();
+      const listener30 = sinon.spy()
+      const listener40 = sinon.spy();
+      const listener50 = sinon.spy();
+
+      Teammate.objects.changed(listener);
+      Teammate.objects.filter({age: 30}).changed(listener30);
+      Teammate.objects.filter({age: 40}).changed(listener40);
+      Teammate.objects.filter({age: 50}).changed(listener50);
+
+      Dispersive.usingEventFunnel(() => {
+        Teammate.objects.create({age: 30});
+        Teammate.objects.create({age: 30});
+        Teammate.objects.create({age: 40});
+        Teammate.objects.create({age: 40});
+      });
+
+      assert(listener30.calledOnce);
+      assert(listener40.calledOnce);
+      assert(!listener50.called);
+      assert(listener.calledOnce);
+    });
+
   });
 
   describe('perfs', () => {
