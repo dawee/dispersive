@@ -19,40 +19,25 @@ const checkTodo = Dispersive.createAction(todoId => {todoId});
 ## Store
 
 ```js
-const schema = {text: '', checked: false};
-const Todo = Dispersive.Model.use(schema);
+const store = new Dispersive.Store();
+store.register('todos', {schema: {text: '', checked: false}});
 
-createTodo.subscribe({text} => Todo.objects.create({text}));
-checkTodo.subscribe({todoId} => {
-  const todo = Todo.objects.get({id: todoId});
-  todo.checked = true;
-  todo.save();
-});
+createTodo.subscribe({text} => store.todos.create({text}));
+checkTodo.subscribe({todoId} => store.todos.get({id: todoId}).update({checked: true});
 ```
 
 ## TodoLine Component
 
 ```js
-class TodoLine extends React.Component {
-  
-  constructor(props) {
-    super(props);
-    this.todo.changed(_ => this.updateState());
-    this.onCheck = (_ => checkTodo(this.props.todoId));
-    this.state = this.getState();
-  }
+const props = {
+  todoId: React.PropTypes.string.isRequired,
+};
 
-  get todo() {
-    return Todo.objects.get({id: this.props.todoId});
-  }
+const state = {
+  todo: new Dispersive.UniqueStateField(props => store.todos.get({id: todoId})),
+};
 
-  updateState() {
-    this.setState(this.getState());
-  }
-
-  getState() {
-    return {todo: this.todo.values()};
-  }
+class TodoLine extends Dispersive.mixin(React.Component, {props, state}) {
 
   render() {
     return (
@@ -71,28 +56,15 @@ class TodoLine extends React.Component {
 ## TodoList Component
 
 ```js
-class TodoList extends React.Component {
-  
-  constructor(props) {
-    super(props);
-    Todo.objects.changed(_ => this.updateState());
-    this.onCreateTodo = this.onCreateTodo.bind(this);
-    this.state = this.getState();
-  }
+const events = ['onCreateTodo'];
 
-  onCreateTodo(e) {
-    if (e.key === 'Enter') createTodo(this.refs.text.value);
-  }
+const state = {
+  todos: new Dispersive.ListStateField(store.todos),
+};
 
-  updateState() {
-    this.setState(this.getState());
-  }
+class TodoList extends Dispersive.mixin(React.Component, {events, state}) {
 
-  getState() {
-    return {todos: Todo.objects.values()};
-  }
-
-  render() {
+render() {
     return (
       <ul>
         {this.state.todos.map(todo => <TodoLine todoId={todo.id}>)}
