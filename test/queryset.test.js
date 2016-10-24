@@ -14,7 +14,7 @@ describe('QuerySet', () => {
     const Teammate = class extends Dispersive.Model {};
     const store = new Dispersive.Store();
 
-    store.register('teammates', Teammate, {schema});
+    store.register('teammates', {model: Teammate, schema});
 
     beforeEach(() => {
       Teammate.objects.delete();
@@ -163,7 +163,7 @@ describe('QuerySet', () => {
     const Teammate = class extends Dispersive.Model {};
     const store = new Dispersive.Store();
 
-    store.register('teammates', Teammate, {schema});
+    store.register('teammates', {model: Teammate, schema});
 
     it('should listen only to valid created source', () => {
       const listener30 = sinon.spy()
@@ -295,7 +295,7 @@ describe('QuerySet', () => {
     const store = new Dispersive.Store();
 
 
-    store.register('teammates', Teammate, {schema, manager: CountingObjectManager});
+    store.register('teammates', {model: Teammate, manager: CountingObjectManager, schema});
 
 
     for (let i = 0; i < 100; ++i) {

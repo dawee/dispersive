@@ -17,7 +17,7 @@ describe('Store', () => {
   beforeEach(() => {
     store.forget('models');
     Fellow = class extends Dispersive.Model {};
-    store.register('models', Fellow, {schema});
+    store.register('fellows', {model: Fellow, schema});
   });
 
   describe('models', () => {

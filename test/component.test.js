@@ -26,7 +26,7 @@ class Todo extends Dispersive.Model {
 
 const store = new Dispersive.Store();
 
-store.register('todos', Todo, {schema});
+store.register('todos', {model: Todo, schema});
 
 describe('Component', () => {
 
