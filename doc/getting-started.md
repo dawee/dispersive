@@ -20,6 +20,7 @@ const checkTodo = Dispersive.createAction(todoId => {todoId});
 
 ```js
 const store = new Dispersive.Store();
+
 store.register('todos', {schema: {text: '', checked: false}});
 
 createTodo.subscribe({text} => store.todos.create({text}));
