@@ -34,7 +34,7 @@ const props = {
 };
 
 const state = {
-  todo: new Dispersive.UniqueStateField(props => store.todos.get({id: todoId})),
+  todo: new Dispersive.UniqueStateField(props => store.todos.filter({id: todoId})),
 };
 
 class TodoLine extends Dispersive.mixin(React.Component, {props, state}) {
