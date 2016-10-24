@@ -32,10 +32,24 @@ describe('QuerySet', () => {
       ], Teammate.objects.filter({age: 40}).values({exclude: ['id']}));
     });
 
+    it('should filter objects with predicate', () => {
+      assert.deepEqual([
+        {name: 'jane', age: 40, job: 'developer'},
+        {name: 'josh', age: 40, job: 'designer'},
+        {name: 'betty', age: 40, job: 'developer'},
+      ], Teammate.objects.filter(teammate => teammate.age === 40).values({exclude: ['id']}));
+    });
+
     it('should exclude objects', () => {
       assert.deepEqual([
         {name: 'joe', age: 30, job: 'developer'},
       ], Teammate.objects.exclude({age: 40}).values({exclude: ['id']}));
+    });
+
+    it('should exclude objects from predicate', () => {
+      assert.deepEqual([
+        {name: 'joe', age: 30, job: 'developer'},
+      ], Teammate.objects.exclude(teammate => teammate.age === 40).values({exclude: ['id']}));
     });
 
     it('should get only first object', () => {
