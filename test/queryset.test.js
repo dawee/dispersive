@@ -32,7 +32,7 @@ describe('QuerySet', () => {
       ], Teammate.objects.filter({age: 40}).values({exclude: ['id']}));
     });
 
-    it('should filter objects with predicate', () => {
+    it('should filter objects using predicate', () => {
       assert.deepEqual([
         {name: 'jane', age: 40, job: 'developer'},
         {name: 'josh', age: 40, job: 'designer'},
@@ -46,7 +46,7 @@ describe('QuerySet', () => {
       ], Teammate.objects.exclude({age: 40}).values({exclude: ['id']}));
     });
 
-    it('should exclude objects from predicate', () => {
+    it('should exclude objects using predicate', () => {
       assert.deepEqual([
         {name: 'joe', age: 30, job: 'developer'},
       ], Teammate.objects.exclude(teammate => teammate.age === 40).values({exclude: ['id']}));
@@ -132,6 +132,19 @@ describe('QuerySet', () => {
         {name: 'josh', age: 40, job: 'designer'},
         {name: 'betty', age: 40, job: 'developer'},
       ], Teammate.objects.orderBy('age').all().map(p => p.values({exclude: ['id']})));
+    });
+
+    it('should sort by age using predicate', () => {
+      const sorted = Teammate.objects
+        .orderBy(teammate => teammate.name)
+        .orderBy(teammate => -teammate.age);
+
+      assert.deepEqual([
+        {name: 'betty', age: 40, job: 'developer'},
+        {name: 'jane', age: 40, job: 'developer'},
+        {name: 'josh', age: 40, job: 'designer'},
+        {name: 'joe', age: 30, job: 'developer'},
+      ], sorted.all().map(p => p.values({exclude: ['id']})));
     });
 
   })
