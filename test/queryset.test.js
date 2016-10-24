@@ -56,6 +56,10 @@ describe('QuerySet', () => {
       assert.deepEqual({name: 'jane', age: 40, job: 'developer'}, Teammate.objects.first().values({exclude: ['id']}));
     });
 
+    it('should get only last object', () => {
+      assert.deepEqual({name: 'betty', age: 40, job: 'developer'}, Teammate.objects.last().values({exclude: ['id']}));
+    });
+
     it('should get an object when threre\'s only one', () => {
       assert.deepEqual({name: 'joe', age: 30, job: 'developer'}, Teammate.objects.get({name: 'joe'}).values({exclude: ['id']}));
     });
