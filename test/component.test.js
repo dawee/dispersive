@@ -20,9 +20,13 @@ const schema = {
   checked: false
 };
 
-class Todo extends Dispersive.Model.use(schema) {
+class Todo extends Dispersive.Model {
   // Todo model is empty
 }
+
+const store = new Dispersive.Store();
+
+store.register('todos', Todo, {schema});
 
 describe('Component', () => {
 

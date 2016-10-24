@@ -1,5 +1,4 @@
-const assert = require('assert');
-const chai = require('chai');
+const {assert} = require('chai');
 const sinon = require('sinon');
 const Dispersive = require('./dispersive');
 
@@ -12,18 +11,21 @@ describe('QuerySet', () => {
       job: null,
     };
 
-    const Teammate = Dispersive.Model.use(schema);
+    const Teammate = class extends Dispersive.Model {};
+    const store = new Dispersive.Store();
 
-    before((done) => {
+    store.register('teammates', Teammate, {schema});
+
+    beforeEach(() => {
+      Teammate.objects.delete();
       Teammate.objects.create({name: 'jane', age: 40, job: 'developer'});
       Teammate.objects.create({name: 'joe', age: 30, job: 'developer'});
       Teammate.objects.create({name: 'josh', age: 40, job: 'designer'});
       Teammate.objects.create({name: 'betty', age: 40, job: 'developer'});
-      done();
     });
 
     it('should filter objects', () => {
-      chai.assert.deepEqual([
+      assert.deepEqual([
         {name: 'jane', age: 40, job: 'developer'},
         {name: 'josh', age: 40, job: 'designer'},
         {name: 'betty', age: 40, job: 'developer'},
@@ -31,17 +33,17 @@ describe('QuerySet', () => {
     });
 
     it('should exclude objects', () => {
-      chai.assert.deepEqual([
+      assert.deepEqual([
         {name: 'joe', age: 30, job: 'developer'},
       ], Teammate.objects.exclude({age: 40}).values({exclude: ['id']}));
     });
 
     it('should get only first object', () => {
-      chai.assert.deepEqual({name: 'jane', age: 40, job: 'developer'}, Teammate.objects.first().values({exclude: ['id']}));
+      assert.deepEqual({name: 'jane', age: 40, job: 'developer'}, Teammate.objects.first().values({exclude: ['id']}));
     });
 
     it('should get an object when threre\'s only one', () => {
-      chai.assert.deepEqual({name: 'joe', age: 30, job: 'developer'}, Teammate.objects.get({name: 'joe'}).values({exclude: ['id']}));
+      assert.deepEqual({name: 'joe', age: 30, job: 'developer'}, Teammate.objects.get({name: 'joe'}).values({exclude: ['id']}));
     });
 
     it('should throw DoesNotExist when no objects is found', () => {
@@ -53,7 +55,7 @@ describe('QuerySet', () => {
         err = cathed;
       }
 
-      chai.assert.equal('DoesNotExist', err.name);
+      assert.equal('DoesNotExist', err.name);
     });
 
     it('should throw MoreThanOneValue when more than one object is found', () => {
@@ -65,20 +67,20 @@ describe('QuerySet', () => {
         err = cathed;
       }
 
-      chai.assert.equal('MoreThanOneValue', err.name);
+      assert.equal('MoreThanOneValue', err.name);
     });
 
     it('should create a copy after a filter', () => {
       const filter40 = Teammate.objects.filter({age: 40});
       const filterDeveloper = filter40.filter({job: 'developer'});
 
-      chai.assert.deepEqual([
+      assert.deepEqual([
         {name: 'jane', age: 40, job: 'developer'},
         {name: 'josh', age: 40, job: 'designer'},
         {name: 'betty', age: 40, job: 'developer'},
       ], filter40.all().map(p => p.values({exclude: ['id']})));
 
-      chai.assert.deepEqual([
+      assert.deepEqual([
         {name: 'jane', age: 40, job: 'developer'},
         {name: 'betty', age: 40, job: 'developer'},
       ], filterDeveloper.all().map(p => p.values({exclude: ['id']})));
@@ -88,20 +90,20 @@ describe('QuerySet', () => {
       const exclude30 = Teammate.objects.exclude({age: 30});
       const excludeDesigner = exclude30.exclude({job: 'designer'});
 
-      chai.assert.deepEqual([
+      assert.deepEqual([
         {name: 'jane', age: 40, job: 'developer'},
         {name: 'josh', age: 40, job: 'designer'},
         {name: 'betty', age: 40, job: 'developer'},
       ], exclude30.all().map(p => p.values({exclude: ['id']})));
 
-      chai.assert.deepEqual([
+      assert.deepEqual([
         {name: 'jane', age: 40, job: 'developer'},
         {name: 'betty', age: 40, job: 'developer'},
       ], excludeDesigner.all().map(p => p.values({exclude: ['id']})));
     });
 
     it('should sort by name', () => {
-      chai.assert.deepEqual([
+      assert.deepEqual([
         {name: 'betty', age: 40, job: 'developer'},
         {name: 'jane', age: 40, job: 'developer'},
         {name: 'joe', age: 30, job: 'developer'},
@@ -110,7 +112,7 @@ describe('QuerySet', () => {
     });
 
     it('should sort by age', () => {
-      chai.assert.deepEqual([
+      assert.deepEqual([
         {name: 'joe', age: 30, job: 'developer'},
         {name: 'jane', age: 40, job: 'developer'},
         {name: 'josh', age: 40, job: 'designer'},
@@ -127,7 +129,10 @@ describe('QuerySet', () => {
       job: null,
     };
 
-    const Teammate = Dispersive.Model.use(schema);
+    const Teammate = class extends Dispersive.Model {};
+    const store = new Dispersive.Store();
+
+    store.register('teammates', Teammate, {schema});
 
     it('should listen only to valid created source', () => {
       const listener30 = sinon.spy()
@@ -241,27 +246,26 @@ describe('QuerySet', () => {
 
   describe('perfs', () => {
     const schema = {
-      age: {index: true},
+      age: new Dispersive.IndexedField(),
     };
 
     class CountingObjectManager extends Dispersive.ObjectManager {
 
       _modelFromValues(values) {
+        const ModelType = this.model;
+
         this.iterations++;
-        return new this.ModelType(values);
+        return new ModelType(values);
       }
 
     }
 
-    class Teammate extends Dispersive.Model.use(schema) {
+    const Teammate = class extends Dispersive.Model {};
+    const store = new Dispersive.Store();
 
-      static get objects() {
-        this._objects = !!this._objects ? this._objects : new CountingObjectManager(this);
 
-        return this._objects;
-      }
+    store.register('teammates', Teammate, {schema, manager: CountingObjectManager});
 
-    }
 
     for (let i = 0; i < 100; ++i) {
       Teammate.objects.create({name: 'jack', age: 20});
