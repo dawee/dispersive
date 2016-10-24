@@ -52,11 +52,11 @@ createTodo.subscribe(
 
 ```js
 checkTodo.subscribe(
-  {todoId} => store.todos.get({id: todoId}).update({checked: true}
+  {todoId} => store.todos.get({id: todoId}).update({checked: true})
 );
 ```
 
-As the store subscribed to this 2 actions, when someone call :
+As the store subscribed to these 2 actions, when someone call :
 
 ```js
 createTodo('wash dishes');
