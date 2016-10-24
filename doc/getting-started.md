@@ -22,19 +22,19 @@ At this point we can, for instance:
 
 ```js
 store.todos.create({text: 'wash dishes'});
-```js
+```
 
 * filter non-checked Todos,
 
 ```js
 const nonCheckedTodos = store.todos.filter({checked: false}).all();
-```js
+```
 
 * or check the first Todo,
 
 ```js
 store.todos.first().update({checked: true});
-```js
+```
 
 
 ## 2. Then, we'll add some actions, to control the store
@@ -42,11 +42,15 @@ store.todos.first().update({checked: true});
 ```js
 const createTodo = Dispersive.createAction(text => {text});
 const checkTodo = Dispersive.createAction(todoId => {todoId});
+```
 
+```js
 createTodo.subscribe(
   {text} => store.todos.create({text})
 );
+```
 
+```js
 checkTodo.subscribe(
   {todoId} => store.todos.get({id: todoId}).update({checked: true}
 );
