@@ -74,6 +74,17 @@ describe('QuerySet', () => {
       ], Teammate.objects.filter({age: 41}).values({exclude: ['id']}));
     });
 
+    it('should retrieve an entry at specified index', () => {
+      assert.deepEqual(
+        {name: 'josh', age: 40, job: 'designer'},
+        Teammate.objects.filter({age: 40}).at(1).values({exclude: ['id']})
+      );
+    });
+
+    it('should throw an exception if an entry is out of range', () => {
+      assert.throws(() => Teammate.objects.filter({age: 40}).at(4));
+    });
+
 
     it('should throw DoesNotExist when no objects is found', () => {
       let err = null;

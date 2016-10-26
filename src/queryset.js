@@ -38,6 +38,15 @@ class NotInSchema {
 
 }
 
+class OutOfRange {
+
+  constructor(index) {
+    this.name = 'OutOfRange';
+    this.message = `index (${index}) is out of objects range`;
+  }
+
+}
+
 
 class QuerySet extends EventEmitter {
 
@@ -246,6 +255,24 @@ class QuerySet extends EventEmitter {
 
   first() {
     return this.entries().next().value;
+  }
+
+  at(index) {
+    const entries = this.entries();
+    let entry = {value: undefined, done: true};
+    let counter = 0;
+
+    for (counter = 0; counter <= index; ++counter) {
+      entry = entries.next();
+
+      if (entry.done) break;
+    }
+
+    if (entry.value === undefined || counter < index) {
+      throw new OutOfRange(index);
+    }
+
+    return entry.value;
   }
 
   last() {
