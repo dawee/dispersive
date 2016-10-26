@@ -200,7 +200,7 @@ class ObjectManager extends QuerySet {
 
     model.id = hat();
     model.emitter = EventEmitter.createEmitter();
-    values = model.values();
+    values = model.schemaValues();
 
     this.emitters[model.id] = model.emitter;
     this.index.id.add(values);
@@ -210,10 +210,14 @@ class ObjectManager extends QuerySet {
   }
 
   _syncExisting(model) {
+    let schemaValues = null;
+
     if (! this.index.id.get(model.id)) throw new ObjectManager.ModelNotSyncable();
 
-    Object.assign(this.index.id.get(model.id), model.values());
-    this._syncLinks(model.values());
+    schemaValues = model.schemaValues();
+
+    Object.assign(this.index.id.get(model.id), schemaValues);
+    this._syncLinks(schemaValues);
   }
 
   isValidId(id) {

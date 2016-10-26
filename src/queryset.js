@@ -241,7 +241,7 @@ class QuerySet extends EventEmitter {
       : this.generator(mixedPrefilters);
 
     for (const entry of entries) {
-      if (!this.predicate || this.predicate(entry.values())) yield entry;
+      if (!this.predicate || this.predicate(entry.schemaValues())) yield entry;
     }
   }
 

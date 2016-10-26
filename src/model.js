@@ -18,6 +18,10 @@ class Model extends EventEmitter.Emittable {
     }
   }
 
+  schemaValues() {
+    return clone(pick(this, ...[...this.schema().names()]));
+  }
+
   values(opts = {}) {
     const values = pick(this, ...[...this.schema().names()].filter(
       name => {
