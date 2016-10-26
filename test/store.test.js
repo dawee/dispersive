@@ -80,7 +80,7 @@ describe('Store', () => {
       const values = Fellow.objects.index.id.get(fellow.id);
 
       assert.equal(Fellow.objects.index.age.refs[values.id], 20);
-      assert(Fellow.objects.index.age.sets[20].has(values));
+      assert(Fellow.objects.index.age.sets[20].has(values.id));
     });
 
     it('should remove values from SetIndex', () => {
@@ -103,7 +103,6 @@ describe('Store', () => {
 
       assert.equal(Fellow.objects.count(), 0);
     });
-
 
   })
 
@@ -138,6 +137,19 @@ describe('Store', () => {
       
       assert.equal(Fellow.objects.filter({age: false}).count(), 1);
     });
+
+    it('should update set-indexed values without creating others (#19)', () => {
+      const store = new Dispersive.Store();
+
+      store.register('fellows', {schema: {age: new Dispersive.IndexedField(), name: null}});
+
+      const joe = store.fellows.create({age: 20, name: 'joe'});
+
+      joe.save();
+
+      assert.equal(store.fellows.filter({age: 20}).count(), 1);
+    })
+
 
   });
 

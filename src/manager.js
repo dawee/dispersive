@@ -35,17 +35,19 @@ class SetIndex extends Index {
 
   constructor(name) {
     super(name);
+    this.values = {};
     this.sets = {};
   }
 
   link(val, values) {
     if (! (val in this.sets)) this.sets[val] = new Set();
 
-    this.sets[val].add(values);
+    this.values[values.id] = values;
+    this.sets[val].add(values.id);
   }
 
   unlink(val, values) {
-    this.sets[val].delete(values);
+    this.sets[val].delete(values.id);
   }
 
   countOf(val) {
@@ -54,8 +56,8 @@ class SetIndex extends Index {
 
   *allOf(val) {
     if (val in this.sets) {
-      for (const values of this.sets[val]) {
-        yield values;
+      for (const id of this.sets[val]) {
+        yield this.values[id];
       }
     }
   }
