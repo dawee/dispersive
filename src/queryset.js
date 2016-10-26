@@ -254,6 +254,14 @@ class QuerySet extends EventEmitter {
     return all[all.length - 1];
   }
 
+  update(values, opts) {
+    for (const entry of this.entries()) {
+      entry.update(values, opts);
+    }
+
+    return this;
+  }
+
   count() {
     return this.all().length;
   }
@@ -262,6 +270,8 @@ class QuerySet extends EventEmitter {
     for (const entry of this.entries()) {
       entry.delete();
     }
+
+    return this;
   }
 
   get(expression) {

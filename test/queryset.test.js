@@ -64,6 +64,17 @@ describe('QuerySet', () => {
       assert.deepEqual({name: 'joe', age: 30, job: 'developer'}, Teammate.objects.get({name: 'joe'}).values({exclude: ['id']}));
     });
 
+    it('should update all the filtered objects', () => {
+      Teammate.objects.filter({age: 40}).update({age: 41});
+
+      assert.deepEqual([
+        {name: 'jane', age: 41, job: 'developer'},
+        {name: 'josh', age: 41, job: 'designer'},
+        {name: 'betty', age: 41, job: 'developer'},
+      ], Teammate.objects.filter({age: 41}).values({exclude: ['id']}));
+    });
+
+
     it('should throw DoesNotExist when no objects is found', () => {
       let err = null;
 

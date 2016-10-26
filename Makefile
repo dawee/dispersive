@@ -1,5 +1,5 @@
 
-validate: test es5-test
+validate: lint test es5-test
 
 re: clean lib
 
@@ -7,7 +7,7 @@ clean:
 	@rm -rf lib
 
 lint:
-	@eslint lib
+	@eslint src
 
 test: re
 	@mocha
