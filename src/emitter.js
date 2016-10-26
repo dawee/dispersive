@@ -1,5 +1,6 @@
 const FBEmitter = require('fbemitter').EventEmitter;
 
+const funnels = [];
 let funnel = null;
 
 class Emittable {
@@ -100,9 +101,11 @@ class Funnel {
 
   static using(handler) {
     funnel = new Funnel();
+    funnels.push(funnel);
     handler(funnel);
     funnel.emit();
-    funnel = null;
+    funnels.pop();
+    funnel = funnels.length === 0 ? null : funnels[funnels.length - 1];
   }
 }
 
