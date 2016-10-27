@@ -47,7 +47,7 @@ class Action {
   callHandler(...argv) {
     if (!!this.before) this.before.trigger();
 
-    const res = this.handler === null ? null : this.handler(...argv);
+    const res = this.handler === null ? null : this.handler.call(this, ...argv);
     const promise = (res instanceof Promise) ? res : new Promise(resolve => resolve(res));
 
     promise
