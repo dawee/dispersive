@@ -5,7 +5,7 @@
   "main": "lib",
   "scripts": {
     "prepublish": "make validate",
-    "test": "make test"
+    "test": "make validate"
   },
   "repository": {
     "type": "git",

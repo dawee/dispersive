@@ -1,6 +1,7 @@
 const hat = require('hat');
 const Dispatcher = require('./dispatcher');
 
+const SUBS = ['before', 'error'];
 
 class Action {
 
@@ -19,12 +20,14 @@ class Action {
     this.handler = handler;
     this.wrapper = this.buildWrapper();
 
-    if (!isSubAction) {
-      this.before = new Action(null, this.dispatcher, true);
-      this.wrapper.before = this.before.wrapper;
-      this.error = new Action(null, this.dispatcher, true);
-      this.wrapper.error = this.error.wrapper;
-    }
+    if (!isSubAction) SUBS.forEach(name => this.attachSubAction(name));
+  }
+
+  attachSubAction(name) {
+    const action = new Action(null, this.dispatcher, true);
+
+    this[name] = action;
+    this.wrapper[name] = action.wrapper;
   }
 
   buildWrapper() {
