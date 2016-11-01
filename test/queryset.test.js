@@ -2,6 +2,7 @@ const {assert} = require('chai');
 const sinon = require('sinon');
 const Dispersive = require('./dispersive');
 
+
 describe('QuerySet', () => {
 
   describe('basis', () => {
@@ -17,6 +18,8 @@ describe('QuerySet', () => {
     store.register('teammates', {model: Teammate, schema});
 
     beforeEach(() => {
+      Dispersive.QuerySet.recompute = false;
+
       Teammate.objects.delete();
       Teammate.objects.create({name: 'jane', age: 40, job: 'developer'});
       Teammate.objects.create({name: 'joe', age: 30, job: 'developer'});
@@ -363,4 +366,45 @@ describe('QuerySet', () => {
     });
   })
 
-})
+  describe('recompute', () => {
+
+    const store = new Dispersive.Store();
+    const schema = {
+      name: null,
+      category: 0,
+    };
+
+    beforeEach(() => {
+      Dispersive.QuerySet.recompute = true;
+      store.register('stuff', {schema});
+    });
+
+    afterEach(() => store.forget('stuff'));
+
+    it('should recompute first', () => {
+      store.stuff.create({name: 'zorro'});
+
+      const first = store.stuff.orderBy('name').first();
+
+      assert.equal(first.name, 'zorro');
+
+      store.stuff.create({name: 'albert'});
+
+      assert.equal(first.__qpack__.recompute().name, 'albert');
+    });
+
+    it('should recompute last', () => {
+      store.stuff.create({name: 'albert'});
+
+      const last = store.stuff.orderBy('name').last();
+
+      assert.equal(last.name, 'albert');
+
+      store.stuff.create({name: 'zorro'});
+
+      assert.equal(last.__qpack__.recompute().name, 'zorro');
+    });
+
+  });
+
+});

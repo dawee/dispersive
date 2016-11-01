@@ -1,4 +1,5 @@
 const EventEmitter = require('./emitter');
+const util = require('util');
 
 
 class GetterException {
@@ -246,15 +247,27 @@ class QuerySet extends EventEmitter {
   }
 
   values(opts) {
-    return this.all().map(model => model.values(opts));
+    const result = this.all().map(model => model.values(opts));
+
+    if (!!QuerySet.recompute && !!result) this.packRecompute(result, 'values', opts);
+
+    return result;
   }
 
   all() {
-    return [...this.entries()];
+    const result = [...this.entries()];
+
+    if (!!QuerySet.recompute && !!result) this.packRecompute(result, 'all');
+
+    return result;
   }
 
   first() {
-    return this.entries().next().value;
+    const result = this.entries().next().value;
+
+    if (!!QuerySet.recompute && !!result) this.packRecompute(result, 'first');
+
+    return result;
   }
 
   at(index) {
@@ -272,13 +285,18 @@ class QuerySet extends EventEmitter {
       throw new OutOfRange(index);
     }
 
+    if (!!QuerySet.recompute && !!entry.value) this.packRecompute(entry.value, 'at', index);
+
     return entry.value;
   }
 
   last() {
     const all = this.all();
+    const result = all[all.length - 1];
 
-    return all[all.length - 1];
+    if (!!QuerySet.recompute && !!result) this.packRecompute(result, 'last');
+
+    return result;
   }
 
   update(values, opts) {
@@ -289,7 +307,18 @@ class QuerySet extends EventEmitter {
     return this;
   }
 
+  packRecompute(result, func, ...args) {
+    result.__qpack__ = {
+      queryset: this,
+      recompute: () => this[func](...args),
+    };
+  }
+
   count() {
+    if (process.env.NODE_ENV !== 'production') {
+      util.debuglog('queryset.count() is deprecated. Use queryset.all().length instead');
+    }
+
     return this.all().length;
   }
 
@@ -307,6 +336,7 @@ class QuerySet extends EventEmitter {
 
     if (entry.value === undefined) throw new DoesNotExist(expression);
     if (!iterator.next().done) throw new MoreThanOneValue(expression);
+    if (!!QuerySet.recompute && !!entry.value) this.packRecompute(entry.value, 'get', expression);
 
     return entry.value;
   }
