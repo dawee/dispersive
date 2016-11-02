@@ -8,15 +8,15 @@ class Field {
     this.unique = unique;
   }
 
-  static create(expression) {
-    if (expression instanceof Field) return expression;
+  static create(spec) {
+    if (spec instanceof Field) return spec;
 
     let field = null;
 
-    if (typeof expression === 'object' && expression !== null) {
-      field = new Field(expression);
+    if (typeof spec === 'object' && spec !== null && !Array.isArray(spec)) {
+      field = new Field(spec);
     } else {
-      field = new Field({initial: expression});
+      field = new Field({initial: spec});
     }
 
     return field;

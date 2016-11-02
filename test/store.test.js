@@ -148,7 +148,19 @@ describe('Store', () => {
       joe.save();
 
       assert.equal(store.fellows.filter({age: 20}).count(), 1);
-    })
+    });
+
+    it('should be able to use empty arrays as initial values (#21)', () => {
+      const store = new Dispersive.Store();
+      const Pokemon = store.register('pokemons', {schema: {name: null, words: []}});
+      const nobody = Pokemon.objects.create({name: 'nobody'});
+
+      assert.deepEqual([], nobody.words);
+
+      const pikachu = Pokemon.objects.create({name: 'pikachu', words: ['pikapika', 'pikachu']});
+
+      assert.deepEqual(['pikapika', 'pikachu'], pikachu.words);
+    });
 
 
   });

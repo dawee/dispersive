@@ -13,6 +13,8 @@ class Store {
     ModelType.objects = new ManagerType(ModelType);
 
     this[name] = ModelType.objects;
+
+    return ModelType;
   }
 
   forget(name) {
