@@ -9,7 +9,7 @@ clean:
 lint:
 	@eslint src
 
-test: re
+test:
 	@mocha
 
 es5-test: re
