@@ -32,7 +32,7 @@ class Model extends EventEmitter.Emittable {
       }
     ));
 
-    return clone(values);
+    return values;
   }
 
   on(...argv) {
