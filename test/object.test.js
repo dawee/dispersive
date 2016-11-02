@@ -1,6 +1,6 @@
 const assert = require('assert');
 const sinon = require('sinon');
-const {pick, omit} = require('../lib/object');
+const {pick, omit} = require('../src/object');
 
 
 describe('Object utils', () => {

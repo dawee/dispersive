@@ -381,7 +381,7 @@ describe('QuerySet', () => {
 
     afterEach(() => store.forget('stuff'));
 
-    it('should recompute first', () => {
+    it('should recompute "first"', () => {
       store.stuff.create({name: 'zorro'});
 
       const first = store.stuff.orderBy('name').first();
@@ -393,7 +393,7 @@ describe('QuerySet', () => {
       assert.equal(first.__qpack__.recompute().name, 'albert');
     });
 
-    it('should recompute last', () => {
+    it('should recompute "last"', () => {
       store.stuff.create({name: 'albert'});
 
       const last = store.stuff.orderBy('name').last();
@@ -403,6 +403,38 @@ describe('QuerySet', () => {
       store.stuff.create({name: 'zorro'});
 
       assert.equal(last.__qpack__.recompute().name, 'zorro');
+    });
+
+    it('should recompute "values"', () => {
+      store.stuff.create({name: 'albert'});
+      
+      const values = store.stuff.values({include: ['name']});
+
+      assert.deepEqual('albert', values[0].name);
+      assert.deepEqual('albert', values.__qpack__.recompute()[0].name);
+    });
+
+    it('should recompute "all"', () => {
+      store.stuff.create({name: 'albert'});
+      
+      const all = store.stuff.all();
+
+      assert.deepEqual('albert', all[0].name);
+      assert.deepEqual('albert', all.__qpack__.recompute()[0].name);
+    });
+
+    it('should recompute "at"', () => {
+      store.stuff.create({name: 'zorro'});
+      store.stuff.create({name: 'alan'});
+
+      const at1 = store.stuff.orderBy('name').at(1);
+
+      assert.equal(at1.name, 'zorro');
+
+      store.stuff.create({name: 'albert'});
+
+      assert.equal(at1.__qpack__.recompute().name, 'albert');
+
     });
 
   });
