@@ -15,9 +15,18 @@ describe('Store', () => {
   const store = new Dispersive.Store();
   
   beforeEach(() => {
-    store.forget('models');
-    Fellow = class extends Dispersive.Model {};
-    store.register('fellows', {model: Fellow, schema});
+    store.forget('fellows');
+    Fellow = store.register('fellows', {model: Fellow, schema});
+  });
+
+  it('should register sub store', () => {
+    const rootStore = new Dispersive.Store();
+    const market = new Dispersive.Store();
+
+    market.register('products');
+
+    rootStore.register('market', market);
+    assert.deepEqual(rootStore.models, ['market.products']);
   });
 
   describe('models', () => {
