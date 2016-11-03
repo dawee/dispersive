@@ -1,6 +1,6 @@
 const assert = require('assert');
 const sinon = require('sinon');
-const {Action, createAction} = require('./dispersive');
+const {ActionTree, Action, createAction} = require('./dispersive');
 
 
 describe('Action', () => {
@@ -98,4 +98,18 @@ describe('Action', () => {
     action1.subscribe(checkHandler);
     action1();
   });
+
+  describe('Tree', () => {
+
+    it('should add action from handler', done => {
+      const product = new ActionTree();
+
+      const add = (name) => ({name});
+
+      product.register('add', add);
+      product.add.subscribe(() => done());
+      product.add('something');
+    });
+
+  })
 })

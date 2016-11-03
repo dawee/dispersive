@@ -1,5 +1,6 @@
 const hat = require('hat');
 const Dispatcher = require('./dispatcher');
+const Tree = require('./tree');
 
 const SUBS = ['before', 'error'];
 
@@ -45,7 +46,7 @@ class Action {
   }
 
   callHandler(...argv) {
-    if (!!this.before) this.before.trigger();
+    if (!!this.before) this.before.trigger(...argv);
 
     const res = this.handler === null ? null : this.handler.call(this, ...argv);
     const promise = (res instanceof Promise) ? res : new Promise(resolve => resolve(res));
@@ -59,4 +60,19 @@ class Action {
 
 }
 
-module.exports = Action;
+class ActionTree extends Tree {
+
+  get actions() {
+    return this.dump();
+  }
+
+  _register(name, handler) {
+    this[name] = Action.create(handler);
+    this._leafs.add(name);
+
+    return this[name];
+  }
+
+}
+
+module.exports = {Action, ActionTree};

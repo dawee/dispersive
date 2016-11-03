@@ -1,6 +1,6 @@
 const Dispersive = module.exports = {};
 
-Dispersive.Action = require('./action');
+const {Action, ActionTree} = require('./action');
 Dispersive.Dispatcher = require('./dispatcher');
 Dispersive.EventEmitter = require('./emitter');
 Dispersive.ObjectManager = require('./manager');
@@ -14,7 +14,9 @@ Dispersive.Store = require('./store');
  */
 
 Dispersive.IndexedField = Dispersive.Schema.IndexedField;
-Dispersive.createAction = Dispersive.Action.create;
+Dispersive.createAction = Action.create;
+Dispersive.ActionTree = ActionTree;
+Dispersive.Action = Action;
 Dispersive.usingEventFunnel = Dispersive.EventEmitter.Funnel.using;
 
 // Default instances
