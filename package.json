@@ -12,7 +12,7 @@
     "url": "git+https://github.com/dawee/dispersive.git"
   },
   "author": "David Corticchiato",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/dawee/dispersive/issues"
   },
