@@ -22,4 +22,5 @@ Dispersive.usingEventFunnel = Dispersive.EventEmitter.Funnel.using;
 // Default instances
 
 Dispersive.store = new Dispersive.Store();
+Dispersive.actions = new Dispersive.ActionTree();
 Dispersive.dispatcher = Dispersive.Dispatcher.main;

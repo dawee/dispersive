@@ -62,10 +62,6 @@ class Action {
 
 class ActionTree extends Tree {
 
-  get actions() {
-    return this.dump();
-  }
-
   _register(name, handler) {
     this[name] = Action.create(handler);
     this._leafs.add(name);

@@ -6,17 +6,33 @@ class Tree {
     this._trees = new Set();
   }
 
-  dump() {
-    let models = Array.from(this._leafs);
-
-    for (const name of this._trees) {
-      models = models.concat(`${name}.${this[name].models}`);
-    }
-
-    return models;
+  get tree() {
+    return this.dump();
   }
 
-  register(name, sub) {
+  dump() {
+    let tree = Array.from(this._leafs);
+
+    for (const name of this._trees) {
+      tree = tree.concat(`${name}.${this[name].tree}`);
+    }
+
+    return tree;
+  }
+
+  registerAll(subs) {
+    for (const name of Object.keys(subs)) {
+      this.register(name, subs[name]);
+    }
+  }
+
+  register(names, sub) {
+    let name = null;
+
+    if (typeof names === 'object') return this.registerAll(names);
+
+    name = names;
+
     if (name in this) return;
 
     if (!!sub && sub instanceof this.constructor) {

@@ -111,5 +111,29 @@ describe('Action', () => {
       product.add('something');
     });
 
+    it('should add action tree', () => {
+      const actions = new ActionTree();
+      const product = new ActionTree();
+
+      const add = (name) => ({name});
+
+      actions.register('product', product);
+      product.register('add', add);
+
+      assert.deepEqual(['product.add'], actions.tree);
+    });
+
+   it('should add actions with short-hand object', () => {
+      const actions = new ActionTree();
+      const product = new ActionTree();
+
+      const add = (name) => ({name});
+
+      actions.register({product});
+      product.register({add});
+
+      assert.deepEqual(['product.add'], actions.tree);
+    });
+
   })
 })
