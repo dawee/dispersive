@@ -10,11 +10,11 @@ class Emittable {
   }
 
   changed(listener, ctx = null) {
-    this.on('change', listener, ctx);
+    return this.on('change', listener, ctx);
   }
 
   on(name, listener, ctx = null) {
-    this.emitter.addListener(name, (data) => listener.call(ctx, data));
+    return this.emitter.addListener(name, (data) => listener.call(ctx, data));
   }
 
   emit(name, data = {}) {

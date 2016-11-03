@@ -121,6 +121,21 @@ describe('Store', () => {
       assert(listener.called);
     });
 
+    it('should be able to unsubscribe an event', () => {
+      const {id} = Fellow.objects.create();
+      const listener = sinon.spy();
+
+      const first = Fellow.objects.get({id});
+      const second = Fellow.objects.get({id});
+
+      const subscription = first.changed(listener);
+
+      subscription.remove();
+      second.save();
+
+      assert.equal(listener.called, false);
+    });
+
   });
 
 
