@@ -13,7 +13,7 @@ test:
 	@mocha
 
 es5-test: re
-	@DISPERSIVE_ECMA=5 mocha --compilers js:babel-register --require babel-polyfill
+	@DISPERSIVE_ECMA=5 mocha
 
 lib:
 	@babel src --out-dir lib
