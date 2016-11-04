@@ -1,6 +1,7 @@
 const QuerySet = require('./queryset');
 const EventEmitter = require('./emitter');
 const hat = require('hat');
+const clone = require('clone');
 
 class Index {
 
@@ -214,18 +215,27 @@ class ObjectManager extends QuerySet {
     this.index.id.add(values);
     this._syncLinks(this.index.id.get(model.id));
 
-    if (opts.emitChange) this.emitChange({__source__: values});
+    if (opts.emitChange) this.emitChange({__source__: {values}});
   }
 
-  _syncExisting(model) {
-    let schemaValues = null;
+  _syncExisting(model, opts = {emitChange: true}) {
+    const event = {};
+    const prevalues = clone(this.index.id.get(model.id));
+    let values = null;
 
     if (! this.index.id.get(model.id)) throw new ObjectManager.ModelNotSyncable();
 
-    schemaValues = model.schemaValues();
+    values = model.schemaValues();
 
-    Object.assign(this.index.id.get(model.id), schemaValues);
-    this._syncLinks(schemaValues);
+    Object.assign(this.index.id.get(model.id), values);
+    this._syncLinks(values);
+
+    if (opts.emitChange) {
+      event.__source__ = {prevalues, values};
+      event.__existingSource__ = true;
+      model.emitChange(event);
+      this.emitChange(event);
+    }
   }
 
   isValidId(id) {
@@ -233,7 +243,7 @@ class ObjectManager extends QuerySet {
   }
 
   sync(model, opts = {emitChange: true}) {
-    if (!!model.id) return this._syncExisting(model);
+    if (!!model.id) return this._syncExisting(model, opts);
 
     this._syncNew(model, opts);
   }
@@ -249,7 +259,7 @@ class ObjectManager extends QuerySet {
     this.index.id.delete(values);
     delete this.emitters[model.id];
 
-    if (opts.emitChange) this.emitChange({__source__: values});
+    if (opts.emitChange) this.emitChange({__source__: {values}});
   }
 
 }

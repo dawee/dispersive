@@ -45,20 +45,8 @@ class Model extends EventEmitter.Emittable {
     return super.emit(...argv);
   }
 
-  emitChange(data = {}) {
-    data.__source__ = this.schemaValues();
-    data.__existingSource__ = true;
-    this.objects().emitChange(data);
-    super.emitChange(data);
-  }
-
   save(opts = {emitChange: true}) {
-    const isNew = !this.id;
-
     this.constructor.objects.sync(this, opts);
-
-    if (!isNew && opts.emitChange) this.emitChange();
-
     return this;
   }
 

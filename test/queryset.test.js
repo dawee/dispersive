@@ -190,13 +190,24 @@ describe('QuerySet', () => {
 
     store.register('teammates', {model: Teammate, schema});
 
-    it('should listen to model changes if filter is impacted', () => {
+    it('should listen to model changes if filter is match', () => {
       const listener = sinon.spy()
       
       Teammate.objects.create({name: 'betty', age: 40, job: 'developer'});
 
       Teammate.objects.filter({age: 30}).changed(listener);
       Teammate.objects.filter({age: 40}).first().update({age: 30});
+
+      assert.equal(listener.called, true);
+    });
+
+    it('should listen to model changes if filter no longer match', () => {
+      const listener = sinon.spy()
+      
+      Teammate.objects.create({name: 'betty', age: 30, job: 'developer'});
+
+      Teammate.objects.filter({age: 30}).changed(listener);
+      Teammate.objects.filter({age: 30}).first().update({age: 40});
 
       assert.equal(listener.called, true);
     });
