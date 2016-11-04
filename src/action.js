@@ -32,7 +32,7 @@ class Action {
   }
 
   buildWrapper() {
-    const wrapper = (...argv) => this.callHandler(...argv);
+    const wrapper = (...args) => this.callHandler(...args);
 
     wrapper.action = this;
     wrapper.subscribe = listener => this.dispatcher.subscribe(this, listener);
@@ -45,10 +45,10 @@ class Action {
     this.dispatcher.trigger(this, data);
   }
 
-  callHandler(...argv) {
-    if (!!this.before) this.before.trigger(...argv);
+  callHandler(...args) {
+    if (!!this.before) this.before.trigger({args});
 
-    const res = this.handler === null ? null : this.handler.call(this, ...argv);
+    const res = this.handler === null ? null : this.handler.call(this, ...args);
     const promise = (res instanceof Promise) ? res : new Promise(resolve => resolve(res));
 
     promise
