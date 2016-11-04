@@ -190,6 +190,28 @@ describe('QuerySet', () => {
 
     store.register('teammates', {model: Teammate, schema});
 
+    it('should listen to model changes if filter is impacted', () => {
+      const listener = sinon.spy()
+      
+      Teammate.objects.create({name: 'betty', age: 40, job: 'developer'});
+
+      Teammate.objects.filter({age: 30}).changed(listener);
+      Teammate.objects.filter({age: 40}).first().update({age: 30});
+
+      assert.equal(listener.called, true);
+    });
+
+    it('should not listen to model changes if filter is not impacted', () => {
+      const listener = sinon.spy()
+      
+      Teammate.objects.create({name: 'betty', age: 40, job: 'developer'});
+
+      Teammate.objects.filter({age: 30}).changed(listener);
+      Teammate.objects.filter({age: 40}).first().update({age: 50});
+
+      assert.equal(listener.called, false);
+    });
+
     it('should listen only to valid created source', () => {
       const listener30 = sinon.spy()
       const listener30NoDev = sinon.spy()

@@ -76,11 +76,9 @@ class QuerySet extends EventEmitter {
   }
 
   on(name, listener, ctx = null) {
-    if (this.manager === this) return super.on(name, listener, ctx);
-
-    this.manager.on(name, data => {
-      const targeted = (('source' in data) && this.validate(data.source))
-        || (('sources' in data) && this.validateAny(data.sources));
+    return this.manager.emitter.addListener(name, data => {
+      const targeted = (('__source__' in data) && this.validate(data.__source__))
+        || (('__sources__' in data) && this.validateAny(data.__sources__));
 
       if (targeted) listener.call(ctx, data);
     });

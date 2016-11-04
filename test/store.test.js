@@ -67,6 +67,17 @@ describe('Store', () => {
       Fellow.objects.create();
     });
 
+    it('should not trigger objects if model exists', () => {
+      const listener = sinon.spy();
+      const fellow = Fellow.objects.create();
+      
+      Fellow.objects.changed(listener);
+      fellow.update({age: 20});
+
+      assert.equal(listener.called, false);
+    });
+
+
     it('should not trigger a deleted object', (done) => {
       const fellow = Fellow.objects.create();
 

@@ -48,14 +48,14 @@ class Funnel {
   same(emitted, stacked) {
     return emitted.emitter === stacked.emitter
       && emitted.name === stacked.name
-      && stacked.data.sources.has(emitted.data.source);
+      && stacked.data.__sources__.has(emitted.data.__source__);
   }
 
   addSource(emitted, stacked) {
     if (emitted.emitter !== stacked.emitter) return false;
     if (emitted.name !== stacked.name) return false;
 
-    if ('source' in emitted.data) stacked.data.sources.add(emitted.data.source);
+    if ('__source__' in emitted.data) stacked.data.__sources__.add(emitted.data.__source__);
 
     return true;
   }
@@ -80,11 +80,11 @@ class Funnel {
   add(event) {
     if (this.mergeToStack(event)) return;
 
-    event.data.sources = new Set();
+    event.data.__sources__ = new Set();
 
-    if ('source' in event.data) {
-      event.data.sources.add(event.data.source);
-      delete event.data.source;
+    if ('__source__' in event.data) {
+      event.data.__sources__.add(event.data.__source__);
+      delete event.data.__source__;
     }
 
     this.stack.push(event);
@@ -92,7 +92,7 @@ class Funnel {
 
   emit() {
     for (const event of this.stack) {
-      event.data.sources = Array.from(event.data.sources);
+      event.data.__sources__ = Array.from(event.data.__sources__);
       event.emitter.emit(event.name, event.data);
     }
 

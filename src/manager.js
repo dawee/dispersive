@@ -177,6 +177,12 @@ class ObjectManager extends QuerySet {
     return model;
   }
 
+  on(name, listener, ctx = null) {
+    return this.emitter.addListener(name, data => {
+      if (!(data && data.__existingSource__)) listener.call(ctx, data);
+    });
+  }
+
   create(data, opts = {emitChange: true}) {
     const ModelType = this.model;
     const model = new ModelType(data);
@@ -208,7 +214,7 @@ class ObjectManager extends QuerySet {
     this.index.id.add(values);
     this._syncLinks(this.index.id.get(model.id));
 
-    if (opts.emitChange) this.emitChange({source: values});
+    if (opts.emitChange) this.emitChange({__source__: values});
   }
 
   _syncExisting(model) {
@@ -243,7 +249,7 @@ class ObjectManager extends QuerySet {
     this.index.id.delete(values);
     delete this.emitters[model.id];
 
-    if (opts.emitChange) this.emitChange({source: values});
+    if (opts.emitChange) this.emitChange({__source__: values});
   }
 
 }
