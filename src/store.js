@@ -5,10 +5,6 @@ const Tree = require('./tree');
 
 class Store extends Tree {
 
-  get models() {
-    return this.dump();
-  }
-
   _register(name, {model = null, schema = {}, manager = ObjectManager}) {
     const ManagerType = manager;
     const ModelType = model || class extends Model {};

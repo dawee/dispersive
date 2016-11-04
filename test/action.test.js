@@ -123,7 +123,7 @@ describe('Action', () => {
       assert.deepEqual(['product.add'], actions.tree);
     });
 
-   it('should add actions with short-hand object', () => {
+    it('should add handlers with short-hand object', () => {
       const actions = new ActionTree();
       const product = new ActionTree();
 
@@ -133,6 +133,19 @@ describe('Action', () => {
       product.register({add});
 
       assert.deepEqual(['product.add'], actions.tree);
+    });
+
+    it('should add actions or handlers with short-hand object', () => {
+      const actions = new ActionTree();
+      const product = new ActionTree();
+
+      const add = (name) => ({name});
+      const sub = createAction((name) => ({name}));
+
+      actions.register({product});
+      product.register({add, sub});
+
+      assert.deepEqual(actions.tree, ['product.add', 'product.sub']);
     });
 
   })

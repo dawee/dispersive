@@ -26,7 +26,7 @@ describe('Store', () => {
     market.register('products');
 
     rootStore.register('market', market);
-    assert.deepEqual(rootStore.models, ['market.products']);
+    assert.deepEqual(rootStore.tree, ['market.products']);
   });
 
   describe('models', () => {

@@ -63,7 +63,12 @@ class Action {
 class ActionTree extends Tree {
 
   _register(name, handler) {
-    this[name] = Action.create(handler);
+    if (!!handler && !!handler.action && handler.action instanceof Action) {
+      this[name] = handler;
+    } else {
+      this[name] = Action.create(handler);
+    }
+
     this._leafs.add(name);
 
     return this[name];

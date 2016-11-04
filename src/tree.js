@@ -7,17 +7,19 @@ class Tree {
   }
 
   get tree() {
-    return this.dump();
+    return [...this.dump()];
   }
 
-  dump() {
-    let tree = Array.from(this._leafs);
-
-    for (const name of this._trees) {
-      tree = tree.concat(`${name}.${this[name].tree}`);
+  *dump() {
+    for (const leaf of this._leafs) {
+      yield leaf;
     }
 
-    return tree;
+    for (const name of this._trees) {
+      for (const branch of this[name].dump()) {
+        yield `${name}.${branch}`;
+      }
+    }
   }
 
   registerAll(subs) {
