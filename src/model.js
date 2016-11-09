@@ -51,10 +51,7 @@ class Model extends EventEmitter.Emittable {
   }
 
   update(values = {}, opts) {
-    for (const key of Object.keys(values)) {
-      if (this.schema().has(key)) this[key] = values[key];
-    }
-
+    Object.assign(this, values);
     this.save(opts);
   }
 
