@@ -9,21 +9,20 @@ class Model extends EventEmitter.Emittable {
   constructor(data = {}) {
     super();
 
-    if (!this.objects()) throw new Model.NoObjectManager();
-    if (!this.schema()) throw new ObjectManager.NoSchema();
-    if ('id' in data && !this.objects().isValidId(data.id)) delete data.id;
+    if (!this.objects) throw new Model.NoObjectManager();
+    if (!this.schema) throw new ObjectManager.NoSchema();
+    if ('id' in data && !this.objects.isValidId(data.id)) delete data.id;
 
-    for (const [name, initial] of this.schema().initials()) {
-      this[name] = name in data ? data[name] : initial;
-    }
+    Object.assign(this, this.schema.initialValues);
+    Object.assign(this, data);
   }
 
   schemaValues() {
-    return clone(pick(this, ...[...this.schema().names()]));
+    return clone(pick(this, ...[...this.schema.names()]));
   }
 
   values(opts = {}) {
-    const values = pick(this, ...[...this.schema().names()].filter(
+    const values = pick(this, ...[...this.schema.names()].filter(
       name => {
         if (!!opts.include && opts.include.indexOf(name) < 0) return false;
         if (!!opts.exclude && opts.exclude.indexOf(name) >= 0) return false;
@@ -56,14 +55,14 @@ class Model extends EventEmitter.Emittable {
   }
 
   delete() {
-    this.objects().unsync(this);
+    this.objects.unsync(this);
   }
 
-  schema() {
+  get schema() {
     return this.constructor.schema;
   }
 
-  objects() {
+  get objects() {
     return this.constructor.objects;
   }
 

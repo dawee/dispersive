@@ -63,6 +63,16 @@ class Schema {
     }
   }
 
+  get initialValues() {
+    const fields = {};
+
+    for (const [name, field] of this.fields()) {
+      fields[name] = field.initial;
+    }
+
+    return fields;
+  }
+
   has(name) {
     return name in this._fields;
   }
