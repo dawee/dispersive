@@ -24,3 +24,9 @@ Dispersive.usingEventFunnel = Dispersive.EventEmitter.Funnel.using;
 Dispersive.store = new Dispersive.Store();
 Dispersive.actions = new Dispersive.ActionTree();
 Dispersive.dispatcher = Dispersive.Dispatcher.main;
+
+
+if (process.env.NODE_ENV !== 'production' && typeof window !== 'undefined') {
+  window._actions = Dispersive.actions;
+  window._store = Dispersive.store;
+}
