@@ -9,9 +9,3 @@
 ```sh
 npm install dispersive
 ```
-
-## Documentation
-
- 1. [Getting started](./doc/getting-started.md)
- 2. [Actions](./doc/actions.md)
- 3. [Store](./doc/store.md)
