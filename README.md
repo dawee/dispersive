@@ -2,8 +2,7 @@
 
 [![Build Status](https://travis-ci.org/dawee/dispersive.svg?branch=master)](https://travis-ci.org/dawee/dispersive)
 
-Dispersive is a data flow controller inpired from [Flux](https://github.com/facebook/flux).
-
+ Data flow controller inspired by [Django](https://www.djangoproject.com/) ORM and the [Flux](https://github.com/facebook/flux) philosophy
 
 ## Install
 
