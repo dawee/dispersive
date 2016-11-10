@@ -189,12 +189,14 @@ class QuerySet extends EventEmitter {
     return this._orderByUsingPredicate(nameOrPredicate);
   }
 
-  validate(source) {
-    if (!!this.predicate && !this.predicate(source.values)) {
-      return !!source.prevalues && this.predicate(source.prevalues);
-    }
+  validate({values = {}, prevalues = null}) {
+    const valid = (
+      !this.predicate
+      || !!prevalues && this.predicate(values) !== this.predicate(prevalues)
+      || !prevalues && this.predicate(values)
+    );
 
-    return !!this.parent ? this.parent.validate(source) : true;
+    return valid && !!this.parent ? this.parent.validate({values, prevalues}) : valid;
   }
 
   validateAny(sourcesArray) {

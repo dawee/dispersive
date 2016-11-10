@@ -212,13 +212,24 @@ describe('QuerySet', () => {
       assert.equal(listener.called, true);
     });
 
-    it('should not listen to model changes if filter is not impacted', () => {
+    it('should not listen to model changes if filter still not match', () => {
       const listener = sinon.spy()
       
       Teammate.objects.create({name: 'betty', age: 40, job: 'developer'});
 
       Teammate.objects.filter({age: 30}).changed(listener);
       Teammate.objects.filter({age: 40}).first().update({age: 50});
+
+      assert.equal(listener.called, false);
+    });
+
+    it('should not listen to model changes if filter already matched', () => {
+      const listener = sinon.spy()
+      
+      const betty = Teammate.objects.create({name: 'betty', age: 30, job: 'developer'});
+
+      Teammate.objects.filter({age: 30}).changed(listener);
+      betty.update({job: 'scrum master'});
 
       assert.equal(listener.called, false);
     });
