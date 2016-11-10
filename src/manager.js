@@ -185,6 +185,18 @@ class ObjectManager extends QuerySet {
   }
 
   create(data, opts = {emitChange: true}) {
+    if (Array.isArray(data)) {
+      const models = [];
+
+      EventEmitter.Funnel.using(() => {
+        for (const sub of data) {
+          models.push(this.create(sub));
+        }
+      });
+
+      return models;
+    }
+
     const ModelType = this.model;
     const model = new ModelType(data);
 

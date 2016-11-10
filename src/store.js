@@ -18,6 +18,26 @@ class Store extends Tree {
     return ModelType;
   }
 
+  create(data) {
+    const tree = {};
+
+    for (const childName of Object.keys(data)) {
+      tree[childName] = this[childName].create(data[childName]);
+    }
+
+    return tree;
+  }
+
+  values(opts) {
+    const values = {};
+
+    for (const [name, child] of this.children()) {
+      values[name] = child.values(opts);
+    }
+
+    return values;
+  }
+
 }
 
 module.exports = Store;

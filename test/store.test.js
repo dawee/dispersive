@@ -29,6 +29,25 @@ describe('Store', () => {
     assert.deepEqual(rootStore.tree, ['market.products']);
   });
 
+  it('should create models from data tree', () => {
+    const rootStore = new Dispersive.Store();
+    const market = new Dispersive.Store();
+
+    market.register('products', {schema: {name: null, price: null}});
+
+    rootStore.register('market', market);
+
+    rootStore.create({
+      market: {
+        products: [
+          {name: 'lipstick', price: 3.5},
+        ],
+      },
+    });
+
+    assert.equal(rootStore.values().market.products[0].name, 'lipstick');
+  });
+
   describe('models', () => {
 
     it('should create a new entry with objects.create', () => {
@@ -65,6 +84,13 @@ describe('Store', () => {
     it('should trigger a new object', (done) => {
       Fellow.objects.changed(() => done());
       Fellow.objects.create();
+    });
+
+    it('should create several objects', () => {
+      Fellow.objects.create([{name: 'joe'}, {name: 'john'}]);
+    
+      assert.equal(Fellow.objects.all().length, 2);
+      assert.equal(Fellow.objects.first().name, 'joe');
     });
 
     it('should not trigger objects if model exists', () => {

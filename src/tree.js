@@ -22,6 +22,16 @@ class Tree {
     }
   }
 
+  *children() {
+    for (const leaf of this._leafs) {
+      yield [leaf, this[leaf]];
+    }
+
+    for (const tree of this._trees) {
+      yield [tree, this[tree]];
+    }
+  }
+
   registerAll(subs) {
     for (const name of Object.keys(subs)) {
       this.register(name, subs[name]);
