@@ -50,7 +50,14 @@ class Model extends EventEmitter.Emittable {
   }
 
   update(values = {}, opts) {
-    Object.assign(this, values);
+    const predicate = typeof values === 'function' ? values : null;
+
+    if (predicate) {
+      predicate(this);
+    } else {
+      Object.assign(this, values);
+    }
+
     this.save(opts);
   }
 

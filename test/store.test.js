@@ -15,8 +15,16 @@ describe('Store', () => {
   const store = new Dispersive.Store();
   
   beforeEach(() => {
+    Fellow = class extends Dispersive.Model {
+
+      growUp() {
+        this.age++;
+      }
+
+    };
+
     store.forget('fellows');
-    Fellow = store.register('fellows', {model: Fellow, schema});
+    store.register('fellows', {model: Fellow, schema});
   });
 
   it('should register sub store', () => {
@@ -65,6 +73,13 @@ describe('Store', () => {
     it('should update an existing model', () => {
       Fellow.objects.create({age: 0});
       Fellow.objects.get().update({age: 42});
+
+      assert.equal(Fellow.objects.get().age, 42);
+    });
+
+    it('should update an existing model using predicate', () => {
+      Fellow.objects.create({age: 41});
+      Fellow.objects.update(fellow => fellow.growUp());
 
       assert.equal(Fellow.objects.get().age, 42);
     });
