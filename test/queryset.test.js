@@ -84,10 +84,35 @@ describe('QuerySet', () => {
       );
     });
 
+    it('should retrieve a range of one element', () => {
+      assert.deepEqual(
+        [{name: 'josh', age: 40, job: 'designer'}],
+        Teammate.objects.filter({age: 40}).range(1, 2).map(e => e.values({exclude: ['id']}))
+      );
+    });
+
+    it('should retrieve an empty range', () => {
+      assert.deepEqual(
+        [],
+        Teammate.objects.filter({age: 40}).range()
+      );
+    });
+
+    it('should retrieve 2 first elements', () => {
+      assert.deepEqual(
+        ['betty', 'jane'],
+        Teammate.objects.orderBy('name').range(2).map(e => e.name));
+    });
+
+    it('should retrieve first and last elements', () => {
+      assert.deepEqual(
+        ['betty', 'josh'],
+        Teammate.objects.orderBy('name').range({step: 3}).map(e => e.name));
+    });
+
     it('should throw an exception if an entry is out of range', () => {
       assert.throws(() => Teammate.objects.filter({age: 40}).at(4));
     });
-
 
     it('should throw DoesNotExist when no objects is found', () => {
       let err = null;
@@ -497,6 +522,24 @@ describe('QuerySet', () => {
 
       assert.equal(at1.__qpack__.recompute().name, 'albert');
 
+    });
+
+    it('should recompute "range"', () => {
+      store.stuff.create({name: 'alan'});
+      store.stuff.create({name: 'alan2'});
+      store.stuff.create({name: 'bill'});
+      store.stuff.create({name: 'bill2'});
+      store.stuff.create({name: 'zorro'});
+      store.stuff.create({name: 'zorro2'});
+
+      const range = store.stuff.orderBy('name').range(0, 4, 2);
+
+      assert.deepEqual(range.map(stuff => stuff.name), ['alan', 'bill']);
+
+      store.stuff.create({name: 'albert'});
+      store.stuff.create({name: 'albert2'});
+
+      assert.deepEqual(range.__qpack__.recompute().map(stuff => stuff.name), ['alan', 'albert']);
     });
 
   });

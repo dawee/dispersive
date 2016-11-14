@@ -295,6 +295,38 @@ class QuerySet extends EventEmitter {
     return entry.value;
   }
 
+  _range({start = 0, stop = Infinity, step = 1}) {
+    const entries = this.entries();
+    const results = [];
+    let entry = null;
+    let counter = 0;
+
+    for (counter = 0; counter < stop; ++counter) {
+      entry = entries.next();
+
+      if (counter >= start && !!entry.value && counter % step === 0) {
+        results.push(entry.value);
+      }
+
+      if (entry.done) break;
+    }
+
+    return results;
+  }
+
+  range(start = null, stop = null, step = 1) {
+    const config = !!start && typeof start === 'object' ? start : null;
+
+    if (!config && stop === null) return this.range(0, start, step);
+
+    const results = !!config ? this._range(config) : this._range({start, stop, step});
+
+    if (!!QuerySet.recompute) this.packRecompute(results, 'range', start, stop, step);
+
+    return results;
+  }
+
+
   last() {
     const all = this.all();
     const result = all[all.length - 1];
