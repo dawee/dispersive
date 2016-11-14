@@ -57,6 +57,7 @@ class QuerySet extends EventEmitter {
     this.predicate = opts.predicate || null;
     this.parent = opts.parent || null;
     this.prefilters = opts.prefilters || [];
+    this.reversed = opts.reversed || false;
     this.model = opts.model;
     this.generator = opts.generator;
     this.manager = opts.manager;
@@ -114,9 +115,9 @@ class QuerySet extends EventEmitter {
     return prefilters;
   }
 
-  createQuerySet({predicate = null, prefilters = [], orderedBy = null}) {
+  createQuerySet({reversed = false, predicate = null, prefilters = [], orderedBy = null}) {
     return new QuerySet({
-      orderedBy, predicate, prefilters,
+      orderedBy, predicate, prefilters, reversed,
       generator: this.entries.bind(this),
       manager: this.manager,
       parent: this,
@@ -167,26 +168,28 @@ class QuerySet extends EventEmitter {
     return this._excludeUsingExpression(expressionOrPredicate);
   }
 
-  _orderByUsingName(name) {
+  _orderByUsingName(name, {reversed = false}) {
     this.assertInSchema(name);
 
     return this.createQuerySet({
+      reversed,
       orderedBy: (entry) => entry[name],
     });
   }
 
-  _orderByUsingPredicate(predicate) {
+  _orderByUsingPredicate(predicate, {reversed = false}) {
     return this.createQuerySet({
+      reversed,
       orderedBy: predicate,
     });
   }
 
-  orderBy(nameOrPredicate) {
+  orderBy(nameOrPredicate, opts) {
     if (typeof nameOrPredicate === 'string') {
-      return this._orderByUsingName(nameOrPredicate);
+      return this._orderByUsingName(nameOrPredicate, opts || {});
     }
 
-    return this._orderByUsingPredicate(nameOrPredicate);
+    return this._orderByUsingPredicate(nameOrPredicate, opts || {});
   }
 
   validate({values = {}, prevalues = null}) {
@@ -233,7 +236,7 @@ class QuerySet extends EventEmitter {
         }
       }
 
-      return result;
+      return this.reversed ? -result : result;
     });
   }
 
