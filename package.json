@@ -1,6 +1,6 @@
 {
   "name": "dispersive",
-  "version": "0.16.0",
+  "version": "0.16.1",
   "description": "Storage management inspired by the Flux philosophy",
   "main": "lib",
   "scripts": {

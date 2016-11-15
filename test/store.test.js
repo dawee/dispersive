@@ -92,6 +92,16 @@ describe('Store', () => {
       assert.equal(Fellow.objects.count(), 0);
     });
 
+    it('shoudd not change id through update', () => {
+      const fellow = Fellow.objects.create({age: 20});
+      const id = fellow.id;
+
+      assert(!!id);
+
+      fellow.update({id: null, age: 42});
+      assert.equal(fellow.id, id);
+    })
+
   });
 
   describe('objects', () => {
