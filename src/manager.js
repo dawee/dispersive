@@ -204,6 +204,10 @@ class ObjectManager extends QuerySet {
     return model;
   }
 
+  flush() {
+    this.delete();
+  }
+
   _syncLinks(values) {
     for (const indexName of this.indexNames) {
       this.index[indexName].add(values);

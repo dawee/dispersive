@@ -56,13 +56,33 @@ describe('Store', () => {
     assert.equal(rootStore.values().market.products[0].name, 'lipstick');
   });
 
+  it('should flush models', () => {
+    const rootStore = new Dispersive.Store();
+    const market = new Dispersive.Store();
+
+    market.register('products', {schema: {name: null, price: null}});
+
+    rootStore.register('market', market);
+
+    rootStore.create({
+      market: {
+        products: [
+          {name: 'lipstick', price: 3.5},
+        ],
+      },
+    });
+
+    rootStore.flush();
+
+    assert.equal(rootStore.values().market.products.length, 0);
+  });
+
   describe('models', () => {
 
     it('should create a new entry with objects.create', () => {
       Fellow.objects.create({age: 42});
       assert.equal(Fellow.objects.get().age, 42);
     });
-
 
     it('should create a new entry model.save', () => {
       const fellow = new Fellow({age: 42});

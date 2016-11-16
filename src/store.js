@@ -28,6 +28,12 @@ class Store extends Tree {
     return tree;
   }
 
+  flush() {
+    for (const [name, child] of this.children()) {
+      child.flush(name);
+    }
+  }
+
   values(opts) {
     const values = {};
 
