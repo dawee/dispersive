@@ -22,6 +22,14 @@ class Model extends EventEmitter.Emittable {
     };
   }
 
+  static attach(model, {schema = null, manager = ObjectManager}) {
+    model.schemaFields = schema;
+    model.manager = manager;
+    model.model = model;
+
+    return model;
+  }
+
   constructor(data = {}) {
     super();
 

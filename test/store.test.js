@@ -137,6 +137,22 @@ describe('Store', () => {
       assert.equal(rootStore.buddies.create().name, 'john');
     });
 
+    it('should be able to set schema with attach', () => {
+      const schema = {
+        name: 'john',
+      };
+
+      class Buddy extends Dispersive.Model {
+        // Empty model        
+      }
+
+      Dispersive.Model.attach(Buddy, {schema});
+
+      const rootStore = new Dispersive.Store();
+
+      rootStore.register('buddies', Buddy);
+      assert.equal(rootStore.buddies.create().name, 'john');
+    });
   });
 
   describe('objects', () => {
