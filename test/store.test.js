@@ -122,6 +122,21 @@ describe('Store', () => {
       assert.equal(fellow.id, id);
     })
 
+    it('should be able to set schema with using', () => {
+      const schema = {
+        name: 'john',
+      };
+
+      class Buddy extends Dispersive.Model.using({schema}) {
+        // Empty model        
+      }
+
+      const rootStore = new Dispersive.Store();
+
+      rootStore.register('buddies', Buddy);
+      assert.equal(rootStore.buddies.create().name, 'john');
+    });
+
   });
 
   describe('objects', () => {
