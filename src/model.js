@@ -35,10 +35,9 @@ class Model extends EventEmitter.Emittable {
 
     if (!this.objects) throw new Model.NoObjectManager();
     if (!this.schema) throw new ObjectManager.NoSchema();
-    if ('id' in data && !this.objects.isValidId(data.id)) delete data.id;
 
-    Object.assign(this, this.schema.initialValues);
-    Object.assign(this, data);
+    this.schema.initModel(this);
+    this.assign(data, false);
   }
 
   schemaValues() {
@@ -73,7 +72,7 @@ class Model extends EventEmitter.Emittable {
     return this;
   }
 
-  update(values = {}, opts) {
+  assign(values = {}, keepId = true) {
     const predicate = typeof values === 'function' ? values : null;
     const id = this.id;
 
@@ -83,7 +82,11 @@ class Model extends EventEmitter.Emittable {
       Object.assign(this, values);
     }
 
-    this.id = id;
+    if (keepId || !this.objects.isValidId(this.id)) this.id = id;
+  }
+
+  update(values, opts) {
+    this.assign(values);
     this.save(opts);
   }
 

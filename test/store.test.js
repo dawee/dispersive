@@ -137,6 +137,39 @@ describe('Store', () => {
       assert.equal(rootStore.buddies.create().name, 'john');
     });
 
+    it('should be able to use schema alias during creation', () => {
+      const schema = {
+        name: {initial: 'john', alias: '_name'},
+      };
+
+      class Buddy extends Dispersive.Model.using({schema}) {
+        // Empty model        
+      }
+
+      const rootStore = new Dispersive.Store();
+
+      rootStore.register('buddies', Buddy);
+      assert.equal(rootStore.buddies.create({_name: 'joe'}).name, 'joe');
+    });
+
+    it('should be able to use schema alias during update', () => {
+      const schema = {
+        name: {initial: 'john', alias: '_name'},
+      };
+
+      class Buddy extends Dispersive.Model.using({schema}) {
+        // Empty model        
+      }
+
+      const rootStore = new Dispersive.Store();
+
+      rootStore.register('buddies', Buddy);
+      const buddy = rootStore.buddies.create();
+
+      buddy.update({_name: 'joe'})
+      assert.equal(buddy.name, 'joe');
+    });
+
     it('should be able to set schema with attach', () => {
       const schema = {
         name: 'john',

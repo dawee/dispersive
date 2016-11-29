@@ -2,10 +2,11 @@
 
 class Field {
 
-  constructor({initial = null, index = false, unique = false}) {
+  constructor({initial = null, index = false, unique = false, alias = null}) {
     this.initial = initial;
     this.index = index;
     this.unique = unique;
+    this.alias = alias;
   }
 
   static create(spec) {
@@ -45,6 +46,24 @@ class Schema {
     this._fields.id = new Field({index: true, unique: true});
   }
 
+  initModel(model) {
+    const fields = {};
+
+    for (const [name, field] of this.fields()) {
+      model[name] = field.initial;
+
+      if (!!field.alias) {
+        Object.defineProperty(model, field.alias, {
+          set(value) {
+            model[name] = value;
+          },
+        });
+      }
+    }
+
+    return fields;
+  }
+
   *fields() {
     for (const name of Object.keys(this._fields)) {
       yield [name, this._fields[name]];
@@ -63,15 +82,6 @@ class Schema {
     }
   }
 
-  get initialValues() {
-    const fields = {};
-
-    for (const [name, field] of this.fields()) {
-      fields[name] = field.initial;
-    }
-
-    return fields;
-  }
 
   has(name) {
     return name in this._fields;
