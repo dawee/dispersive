@@ -4,6 +4,10 @@
     "object-curly-spacing": ["error", "never"],
     "consistent-return": "off",
     "no-param-reassign": "off",
-    "no-underscore-dangle": "off"
+    "no-underscore-dangle": "off",
+    "max-len": ["error", {
+      "ignoreComments": true,
+      "code": 100
+    }]
   }
 }

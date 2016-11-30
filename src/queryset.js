@@ -49,8 +49,13 @@ class OutOfRange {
 }
 
 
+/** Filter, Sort and retrieve store elements. */
 class QuerySet extends EventEmitter {
 
+  /**
+   * Should not be called directly.
+   * Querysets are created by the ObjectManager or another queryset
+   */
   constructor(opts = {}) {
     super();
     this.orderedBy = opts.orderedBy || null;
@@ -138,6 +143,23 @@ class QuerySet extends EventEmitter {
     return this.createQuerySet({predicate});
   }
 
+  /**
+   * Filter results.
+   *
+   * @param {object/function} expression/predicate - the object that entries should match or a predicate.
+   * For preformance issues, always prefer expression over predicate if possible (see indexed fields).
+   *
+   * @return A new queryset
+   *
+   * @example
+   * // Using object
+   * let sortedTodos = store.todos.filter({checked: true});
+   * // Using predicate :
+   * // let sortedTodos = store.todos.filter(todo => todo.checked);
+   * for (const checkedTodo of sortedTodos.entries()) {
+   *   console.log(`"${checkedTodo.text}" was checked`);
+   * }
+   */
   filter(expressionOrPredicate) {
     if (typeof expressionOrPredicate === 'function') {
       return this._filterUsingPredicate(expressionOrPredicate);
@@ -160,6 +182,11 @@ class QuerySet extends EventEmitter {
     });
   }
 
+  /**
+   * Exclude results.
+   *
+   * See filter.
+   */
   exclude(expressionOrPredicate) {
     if (typeof expressionOrPredicate === 'function') {
       return this._excludeUsingPredicate(expressionOrPredicate);
@@ -184,6 +211,23 @@ class QuerySet extends EventEmitter {
     });
   }
 
+  /**
+   * Order results.
+   *
+   * @param {string/function} parameter/predicate - The parameter name to order with or a predicate.
+   * @param [opts] - Options
+   * @param {bool} [opts.reversed] - If true, the order is reversed
+   *
+   * @return A new queryset
+   *
+   * @example
+   * // Order todos by text (ascending) :
+   * store.todos.orderBy('age')
+   * // Using predicate : store.todos.orderBy(todo => todo.age)
+   *
+   * // Order todos by text (descending) :
+   * store.todos.orderBy('age', {reversed: true})
+   */
   orderBy(nameOrPredicate, opts) {
     if (typeof nameOrPredicate === 'string') {
       return this._orderByUsingName(nameOrPredicate, opts || {});
@@ -259,6 +303,11 @@ class QuerySet extends EventEmitter {
     return result;
   }
 
+  /**
+   * List all results
+   *
+   * @return An array of models
+   */
   all() {
     const result = [...this.entries()];
 
@@ -267,6 +316,11 @@ class QuerySet extends EventEmitter {
     return result;
   }
 
+  /**
+   * Returns the first entry
+   *
+   * @return A model
+   */
   first() {
     const result = this.entries().next().value;
 
@@ -275,6 +329,12 @@ class QuerySet extends EventEmitter {
     return result;
   }
 
+  /**
+   * Returns an entry at a specified index
+   * @param {number} index - The index in the list
+   *
+   * @return A model
+   */
   at(index) {
     const entries = this.entries();
     let entry = {value: undefined, done: true};

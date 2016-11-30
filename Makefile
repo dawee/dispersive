@@ -18,4 +18,7 @@ es5-test: re
 lib:
 	@babel src --out-dir lib
 
-.PHONY: test
+doc:
+	@jsdoc src/queryset.js -t ./node_modules/docdash -d doc
+
+.PHONY: doc test
