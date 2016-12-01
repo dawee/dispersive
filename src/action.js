@@ -42,7 +42,7 @@ class Action {
   }
 
   trigger(data) {
-    this.dispatcher.trigger(this, data);
+    this.dispatcher.trigger(this, {data});
   }
 
   callHandler(...args) {

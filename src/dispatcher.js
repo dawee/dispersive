@@ -1,4 +1,3 @@
-const {omit} = require('./object');
 const FluxDispatcher = require('flux').Dispatcher;
 
 
@@ -8,7 +7,7 @@ class Dispatcher extends FluxDispatcher {
     super();
 
     this.mapping = {};
-    this.register((data) => this.react(data));
+    this.register(event => this.wakeUp(event));
   }
 
   subscribe(action, listener) {
@@ -23,16 +22,16 @@ class Dispatcher extends FluxDispatcher {
     this.mapping[action.actionType].delete(listener);
   }
 
-  react(data) {
-    if (! (data.actionType in this.mapping)) return;
+  wakeUp(event) {
+    const handlers = this.mapping[event.actionType] || [];
 
-    this.mapping[data.actionType].forEach(
-      (handler) => setTimeout(() => handler(omit(data, 'actionType')), 0)
-    );
+    handlers.forEach((handler) => handler(event.data));
   }
 
-  trigger(action, data) {
-    this.dispatch(Object.assign({actionType: action.actionType}, data));
+  trigger(action, event) {
+    event.actionType = action.actionType;
+
+    this.dispatch(event);
   }
 
 }

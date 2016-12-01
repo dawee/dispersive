@@ -17,6 +17,20 @@ describe('Action', () => {
     action(42);
   });
 
+  it('should be able to return an empty array', (done) => {
+    const listener = (data) => {
+      assert(Array.isArray(data));
+      done();
+    };
+
+    const action = createAction(() => {
+      return [];
+    });
+
+    action.subscribe(listener);
+    action();
+  });
+
   it('should chain actions', (done) => {
     const listener1 = sinon.spy();
     const listener2 = sinon.spy();
