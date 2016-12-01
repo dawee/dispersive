@@ -1,9 +1,11 @@
 
 class Tree {
 
-  constructor() {
+  constructor(subs = {}) {
     this._leafs = new Set();
     this._trees = new Set();
+
+    this.registerAll(subs);
   }
 
   get tree() {

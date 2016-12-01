@@ -135,6 +135,20 @@ describe('Action', () => {
       assert.deepEqual(['product.add'], actions.tree);
     });
 
+    it('should add handlers from constructor', () => {
+      const actions = new ActionTree({
+
+        product: new ActionTree({
+          add(name) {
+            return {name};
+          }
+        }),
+
+      });
+
+      assert.deepEqual(['product.add'], actions.tree);
+    });
+
     it('should add actions or handlers with short-hand object', () => {
       const actions = new ActionTree();
       const product = new ActionTree();
