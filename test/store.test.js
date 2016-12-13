@@ -37,6 +37,17 @@ describe('Store', () => {
     assert.deepEqual(rootStore.tree, ['market.products']);
   });
 
+  it('should register pre-created sub store', () => {
+    const rootStore = new Dispersive.Store();
+    const market = new Dispersive.Store();
+    const products = Dispersive.Store.createObjects();
+
+    market.register({products});
+
+    rootStore.register('market', market);
+    assert.deepEqual(rootStore.tree, ['market.products']);
+  });
+
   it('should create models from data tree', () => {
     const rootStore = new Dispersive.Store();
     const market = new Dispersive.Store();
