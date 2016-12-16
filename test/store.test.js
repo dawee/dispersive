@@ -343,6 +343,20 @@ describe('Store', () => {
     });
 
 
+    it('should be able to update an element with unique field (#37)', () => {
+      const schema = {
+        value: false,
+        name: {index: true, unique: true},
+      };
+
+      const testStore = Dispersive.Store.createObjects({schema});
+
+      testStore.create({name: "foo"});
+      testStore.get({name: "foo"}).update({value: true});
+
+      assert.throws(() => testStore.create({name: "foo"}));
+    });
+
   });
 
 
