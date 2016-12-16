@@ -25,7 +25,7 @@ class Dispatcher extends FluxDispatcher {
   wakeUp(event) {
     const handlers = this.mapping[event.actionType] || [];
 
-    handlers.forEach((handler) => handler(event.data));
+    handlers.forEach(handler => handler(event.data));
   }
 
   trigger(action, event) {

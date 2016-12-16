@@ -37,6 +37,17 @@ describe('Store', () => {
     assert.deepEqual(rootStore.tree, ['market.products']);
   });
 
+  it('should register pre-created sub store', () => {
+    const rootStore = new Dispersive.Store();
+    const market = new Dispersive.Store();
+    const products = Dispersive.Store.createObjects();
+
+    market.register({products});
+
+    rootStore.register('market', market);
+    assert.deepEqual(rootStore.tree, ['market.products']);
+  });
+
   it('should create models from data tree', () => {
     const rootStore = new Dispersive.Store();
     const market = new Dispersive.Store();
@@ -321,17 +332,30 @@ describe('Store', () => {
     });
 
     it('should be able to use empty arrays as initial values (#21)', () => {
-      const store = new Dispersive.Store();
-      const Pokemon = store.register('pokemons', {schema: {name: null, words: []}});
-      const nobody = Pokemon.objects.create({name: 'nobody'});
+      const pokemons = Dispersive.Store.createObjects({schema: {name: null, words: []}});
+      const nobody = pokemons.create({name: 'nobody'});
 
       assert.deepEqual([], nobody.words);
 
-      const pikachu = Pokemon.objects.create({name: 'pikachu', words: ['pikapika', 'pikachu']});
+      const pikachu = pokemons.create({name: 'pikachu', words: ['pikapika', 'pikachu']});
 
       assert.deepEqual(['pikapika', 'pikachu'], pikachu.words);
     });
 
+
+    it('should be able to update an element with unique field (#37)', () => {
+      const schema = {
+        value: false,
+        name: {index: true, unique: true},
+      };
+
+      const testStore = Dispersive.Store.createObjects({schema});
+
+      testStore.create({name: "foo"});
+      testStore.get({name: "foo"}).update({value: true});
+
+      assert.throws(() => testStore.create({name: "foo"}));
+    });
 
   });
 

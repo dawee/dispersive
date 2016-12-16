@@ -45,31 +45,36 @@ class Action {
     this.dispatcher.trigger(this, {data});
   }
 
-  callHandler(...args) {
-    let res = null;
-    let handlerException = null;
+  createPromiseFromHandler(...args) {
+    return new Promise((resolve, reject) => {
+      let result = null;
 
+      try {
+        result = this.handler === null ? null : this.handler.call(this, ...args);
+      } catch (exception) {
+        return reject(exception);
+      }
+
+      if (! (result instanceof Promise)) return resolve(result);
+
+      result.catch(error => reject(error)).then(result => resolve(result));
+    });
+  }
+
+  callHandler(...args) {
     if (!!this.before) this.before.trigger({args});
 
-    try {
-      res = this.handler === null ? null : this.handler.call(this, ...args);
-    } catch (exception) {
-      handlerException = exception;
-    }
-
-    const promise = (res instanceof Promise) ? res : new Promise((resolve, reject) => {
-      if (!!handlerException) return reject(handlerException);
-
-      resolve(res);
+    return new Promise((resolve, reject) => {
+      this.createPromiseFromHandler(...args)
+        .catch(error => {
+          this.error.trigger(error);
+          reject(error);
+        })
+        .then(result => {
+          this.trigger(result);
+          resolve(result);
+        });
     });
-
-    promise.catch(error => {
-      if (process.env.NODE_ENV !== 'production') console.error(error);
-
-      this.error.trigger(error);
-    }).then(data => this.trigger(data));
-
-    return promise;
   }
 
 }

@@ -5,17 +5,27 @@ const Tree = require('./tree');
 
 class Store extends Tree {
 
-  _register(name, {model = null, schema = {}, manager = ObjectManager}) {
+  static _createObjects({model = null, schema = {}, manager = ObjectManager}) {
     const ModelType = model || class extends Model {};
     const ManagerType = ModelType.manager || manager;
 
     ModelType.schema = new Schema(ModelType.schemaFields || schema);
     ModelType.objects = new ManagerType(ModelType);
 
-    this[name] = ModelType.objects;
+    return ModelType.objects;
+  }
+
+  static createObjects(spec = {}) {
+    return Store._createObjects(spec);
+  }
+
+  _register(name, spec = {}) {
+    const objects = (spec instanceof ObjectManager) ? spec : Store.createObjects(spec);
+
+    this[name] = objects;
     this._leafs.add(name);
 
-    return ModelType;
+    return this[name];
   }
 
   create(data) {

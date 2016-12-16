@@ -73,7 +73,9 @@ class UniqueIndex extends Index {
   }
 
   link(val, values) {
-    if (val in this.kvs) throw new UniqueIndex.AlreadyExists(this.name, val);
+    if (val in this.kvs && this.kvs[val].id !== values.id) {
+      throw new UniqueIndex.AlreadyExists(this.name, val);
+    }
 
     this.kvs[val] = values;
   }
