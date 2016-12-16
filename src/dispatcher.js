@@ -1,8 +1,5 @@
 const FluxDispatcher = require('flux').Dispatcher;
 
-const defer = (handler, ...args) => setTimeout(
-  () => handler(...args)
-, 0);
 
 class Dispatcher extends FluxDispatcher {
 
@@ -28,7 +25,7 @@ class Dispatcher extends FluxDispatcher {
   wakeUp(event) {
     const handlers = this.mapping[event.actionType] || [];
 
-    handlers.forEach(handler => defer(handler, event.data));
+    handlers.forEach(handler => handler(event.data));
   }
 
   trigger(action, event) {

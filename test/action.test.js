@@ -93,6 +93,23 @@ describe('Action', () => {
     action1();
   });
 
+  it('should trigger before the promise resolution (#38)', done => {
+    const subscriptionSpy = sinon.spy();
+    const resolutionSpy = sinon.spy();
+    const action = createAction(() => new Promise(resolve => setTimeout(resolve, 10)));
+
+    action.subscribe(() => {
+      assert(!resolutionSpy.called);
+      subscriptionSpy()
+    });
+
+    action().then(() => {
+      resolutionSpy();
+      assert(subscriptionSpy.called);
+      done();
+    });
+  });
+
   describe('Tree', () => {
 
     it('should add action from handler', done => {
