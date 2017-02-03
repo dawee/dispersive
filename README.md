@@ -8,11 +8,11 @@
 Table of Contents
 =================
 
-      * [Install](#install)
-      * [Getting started](#getting-started)
-      * [The set of objects](#the-set-of-objects)
-      * [Objects manipulation (or the basis of querysets)](#objects-manipulation-or-the-basis-of-querysets)
-      * [Create and delete objects (talks to the manager)](#create-and-delete-objects-talks-to-the-manager)
+   * [Install](#install)
+   * [Getting started](#getting-started)
+   * [The set of objects](#the-set-of-objects)
+   * [Objects manipulation (or the basis of querysets)](#objects-manipulation-or-the-basis-of-querysets)
+   * [Create and delete objects (talks to the manager)](#create-and-delete-objects-talks-to-the-manager)
 
 
 ## Install
