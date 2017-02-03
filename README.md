@@ -1,8 +1,6 @@
-![Dispersive](https://raw.githubusercontent.com/dawee/dispersive-logo/master/dispersive-white-bg.png)
+[Django](https://www.djangoproject.com/) ORM-ish for the browser
 
 [![Build Status](https://travis-ci.org/dawee/dispersive.svg?branch=master)](https://travis-ci.org/dawee/dispersive)
-
-[Django](https://www.djangoproject.com/) ORM-ish for the browser
 
 
 Table of Contents
