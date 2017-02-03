@@ -139,3 +139,53 @@ const checkedTodos = todos.filter({checked: true});
 checkedTodos.delete(); // delete all checked todos.
 ```
 
+
+## Models
+
+In order to manipulate a single entry you need to create a model for your set of objects.
+
+This is how you define a model :
+
+
+```js
+import {Model, Store} from 'dispersive';
+
+const schema = {
+  text: '',
+  checked: false,
+};
+
+const model = class Todo extends Model {
+
+  toggleChecked() {
+    this.update({checked: !this.checked});
+  }
+
+}
+
+const todos = Store.createObjects({schema, model});
+```
+
+At this point todos (the set of objects) knows Todo (the model) and reciprocally Todo knows todos.
+
+```js
+Todo.objects // reference the same manager instance as todos
+todos.model // reference the same model class as Todo
+```
+
+You can, for instance, use a model to create an entry by using its **save** method.
+
+```js
+const washDishes = new Todo({text: 'wash dishes'});
+washDishes.save();
+```
+
+These 2 lines do the same thing as **todos.create**.
+Models can also be used to simplify updates.
+
+```js
+Todo.objects.filter({checked: false}).update(todo => todo.toggleChecked());
+// All todos are now checked
+```
+
+Generally, a model is used to simplify the modification of one entry.
