@@ -1,8 +1,3 @@
-[Django](https://www.djangoproject.com/) ORM-ish for the browser
-
-[![Build Status](https://travis-ci.org/dawee/dispersive.svg?branch=master)](https://travis-ci.org/dawee/dispersive)
-
-
 Table of Contents
 =================
 
