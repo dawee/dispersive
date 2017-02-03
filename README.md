@@ -14,6 +14,30 @@ It's meant to be used with **es6** and built in an app using [webpack](https://w
 npm install dispersive
 ```
 
+## Getting started
+
+Dispersive is now installed. You can now open a node terminal and try this :
+
+```js
+>>> const {Store} = require('dispersive')
+>>> const todos = Store.createObjects({schema: {text: '', checked: false}})
+>>> const checkedTodos = todos.filter({checked: true})
+>>> todos.create({text: 'wash dishes'})
+>>> const countTodos = () => console.log(`there are now ${todos.count()} todos`);
+>>> const countChecked = () => console.log(`there are now ${checkedTodos.count()} checked todos`);
+>>> countTodos()
+there are now 1 todos
+>>> countChecked()
+there are now 0 checked todos
+>>> todos.changed(countTodos)
+>>> checkedTodos.changed(countChecked)
+>>> todos.create({text: 'eat a banana'})
+there are now 2 todos
+>>> todos.first().update({checked: true})
+there are now 1 checked todos
+```
+
+
 ## The set of objects
 
 Like an SQL table, a _set of objects_ store entries.
@@ -81,4 +105,34 @@ function updateTodoList() {
 ```
 
 **filter** prepare a QuerySet that can be used to actually filter the data. So, every time _updateTodoList()_ is called, it will show the new uncheked todos elements on screen.
+
+**entries** is a generator. It **yields** to you the filtered elements.
+
+
+## Create and delete objects (talks to the manager)
+
+As we said in the first paragraph, the set of objects is created by the manager. We said that, in order to create a set of objects, we do not need to create a manager (we didn't use one in our TodoList example).
+
+In fact, dispersive creates a default one. **todos** was an instance of this default manager.
+
+So, what's a manager ? The manager is the first accessor to your objects. It's a QuerySet itself, so it can filter data. But it can create and delete entries.
+
+```js
+todos.create({text: 'eat a banana'}); // create one entry
+todos.create([{text: 'eat a banana'}, {text: 'wash dishes'}]); // create multiple entries
+```
+
+In the next example we will delete entries :
+
+```js
+todos.delete();
+```
+
+That's ok if we want to flush every objects in the set. But, if we want to delete specifics entries, we'll want to create a sub queryset :
+
+```js
+const checkedTodos = todos.filter({checked: true});
+
+checkedTodos.delete(); // delete all checked todos.
+```
 
