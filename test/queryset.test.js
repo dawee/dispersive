@@ -219,6 +219,14 @@ describe('QuerySet', () => {
       ], sorted.values({exclude: ['id']}));
     });
 
+    it('should map entries', () => {
+      assert.deepEqual([
+        'betty',
+        'jane',
+        'josh',
+      ], Teammate.objects.exclude({age: 30}).orderBy('name').map(({name}) => name));
+    });
+
   })
 
   describe('emitter', () => {
@@ -235,7 +243,7 @@ describe('QuerySet', () => {
 
     it('should listen to model changes if filter is match', () => {
       const listener = sinon.spy()
-      
+
       Teammate.objects.create({name: 'betty', age: 40, job: 'developer'});
 
       Teammate.objects.filter({age: 30}).changed(listener);
@@ -246,7 +254,7 @@ describe('QuerySet', () => {
 
     it('should listen to model changes if filter no longer match', () => {
       const listener = sinon.spy()
-      
+
       Teammate.objects.create({name: 'betty', age: 30, job: 'developer'});
 
       Teammate.objects.filter({age: 30}).changed(listener);
@@ -257,7 +265,7 @@ describe('QuerySet', () => {
 
     it('should not listen to model changes if filter still not match', () => {
       const listener = sinon.spy()
-      
+
       Teammate.objects.create({name: 'betty', age: 40, job: 'developer'});
 
       Teammate.objects.filter({age: 30}).changed(listener);
@@ -268,7 +276,7 @@ describe('QuerySet', () => {
 
     it('should not listen to model changes if filter already matched', () => {
       const listener = sinon.spy()
-      
+
       const betty = Teammate.objects.create({name: 'betty', age: 30, job: 'developer'});
 
       Teammate.objects.filter({age: 30}).changed(listener);
@@ -494,7 +502,7 @@ describe('QuerySet', () => {
 
     it('should recompute "values"', () => {
       store.stuff.create({name: 'albert'});
-      
+
       const values = store.stuff.values({include: ['name']});
 
       assert.deepEqual('albert', values[0].name);
@@ -503,7 +511,7 @@ describe('QuerySet', () => {
 
     it('should recompute "all"', () => {
       store.stuff.create({name: 'albert'});
-      
+
       const all = store.stuff.all();
 
       assert.deepEqual('albert', all[0].name);

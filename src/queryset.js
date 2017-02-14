@@ -295,6 +295,16 @@ class QuerySet extends EventEmitter {
     }
   }
 
+  map(predicate) {
+    const results = [];
+
+    for (const entry of this.entries()) {
+      results.push(predicate(entry));
+    }
+
+    return results;
+  }
+
   values(opts) {
     const result = this.all().map(model => model.values(opts));
 
