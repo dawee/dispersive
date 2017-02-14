@@ -1,7 +1,6 @@
 const Dispersive = module.exports = {};
 
 const {Action, ActionTree} = require('./action');
-Dispersive.Dispatcher = require('./dispatcher');
 Dispersive.EventEmitter = require('./emitter');
 Dispersive.ObjectManager = require('./manager');
 Dispersive.Model = require('./model');
@@ -23,7 +22,6 @@ Dispersive.usingEventFunnel = Dispersive.EventEmitter.Funnel.using;
 
 Dispersive.store = new Dispersive.Store();
 Dispersive.actions = new Dispersive.ActionTree();
-Dispersive.dispatcher = Dispersive.Dispatcher.main;
 
 
 if (process.env.NODE_ENV !== 'production' && typeof window !== 'undefined') {

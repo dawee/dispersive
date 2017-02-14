@@ -1,22 +1,23 @@
 const hat = require('hat');
-const Dispatcher = require('./dispatcher');
 const Tree = require('./tree');
+const EventEmitter = require('./emitter');
 
 const SUBS = ['before', 'error'];
 
-class Action {
+class Action extends EventEmitter {
 
   static create(handler, opts = {}) {
-    opts = Object.assign({dispatcher: Dispatcher.main, type: Action}, opts);
+    opts = Object.assign({type: Action}, opts);
 
     const ActionType = opts.type;
-    const action = new ActionType(handler, opts.dispatcher);
+    const action = new ActionType(handler);
 
     return action.wrapper;
   }
 
-  constructor(handler = null, dispatcher = Dispatcher.main, isSubAction = false) {
-    this.dispatcher = dispatcher;
+  constructor(handler = null, isSubAction = false) {
+    super();
+
     this.actionType = hat();
     this.handler = handler;
     this.wrapper = this.buildWrapper();
@@ -25,7 +26,7 @@ class Action {
   }
 
   attachSubAction(name) {
-    const action = new Action(null, this.dispatcher, true);
+    const action = new Action(null, true);
 
     this[name] = action;
     this.wrapper[name] = action.wrapper;
@@ -35,14 +36,13 @@ class Action {
     const wrapper = (...args) => this.callHandler(...args);
 
     wrapper.action = this;
-    wrapper.subscribe = listener => this.dispatcher.subscribe(this, listener);
-    wrapper.unsubscribe = listener => this.dispatcher.unsubscribe(this, listener);
+    wrapper.subscribe = listener => this.on('called', listener);
 
     return wrapper;
   }
 
   trigger(data) {
-    this.dispatcher.trigger(this, {data});
+    this.emit('called', data);
   }
 
   createPromiseFromHandler(...args) {

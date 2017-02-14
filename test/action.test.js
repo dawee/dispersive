@@ -1,4 +1,5 @@
 const assert = require('assert');
+const {expect} = require('chai');
 const sinon = require('sinon');
 const {ActionTree, Action, createAction} = require('./dispersive');
 
@@ -15,6 +16,19 @@ describe('Action', () => {
 
     action.subscribe(listener);
     action(42);
+  });
+
+  it('should be able to be unsubscribed', done => {
+    const listener = sinon.spy();
+    const action = createAction(() => ({}));
+    const subscription = action.subscribe(listener);
+
+    subscription.remove();
+
+    action().then(() => setTimeout(() => {
+      assert(!listener.called);
+      done();
+    }, 0));
   });
 
   it('should be able to return an empty array', (done) => {
@@ -55,7 +69,7 @@ describe('Action', () => {
     const listener = (data) => {
       assert.equal(42, data.value);
       done();
-    };    
+    };
 
     const action = createAction((value) => new Promise((resolve, reject) => reject({value})));
 

@@ -1,6 +1,6 @@
 {
   "name": "dispersive",
-  "version": "0.18.0",
+  "version": "0.18.1",
   "description": "Storage management inspired by the Flux philosophy",
   "main": "lib",
   "scripts": {
@@ -24,7 +24,6 @@
     "babel-runtime": "^6.18.0",
     "clone": "2.0.0",
     "fbemitter": "2.0.2",
-    "flux": "3.1.0",
     "hat": "0.0.3"
   },
   "devDependencies": {
