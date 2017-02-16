@@ -33,6 +33,12 @@ describe('Store', () => {
     assert.equal(books.create().wordsCount, 0);
   })
 
+  it('should create a unique object using only schema', () => {
+    const book = Dispersive.Store.createUniqueObjectFromSchema({name: '', wordsCount: 0});
+
+    assert.equal(book.wordsCount, 0);
+  })
+
   it('should register sub store', () => {
     const rootStore = new Dispersive.Store();
     const market = new Dispersive.Store();
