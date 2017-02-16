@@ -19,6 +19,10 @@ class Store extends Tree {
     return Store._createObjects(spec);
   }
 
+  static createObjectsFromSchema(schema = {}) {
+    return Store._createObjects({schema});
+  }
+
   _register(name, spec = {}) {
     const objects = (spec instanceof ObjectManager) ? spec : Store.createObjects(spec);
 

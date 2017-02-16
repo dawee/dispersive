@@ -27,6 +27,12 @@ describe('Store', () => {
     store.register('fellows', {model: Fellow, schema});
   });
 
+  it('should create objects using only schema', () => {
+    const books = Dispersive.Store.createObjectsFromSchema({name: '', wordsCount: 0});
+
+    assert.equal(books.create().wordsCount, 0);
+  })
+
   it('should register sub store', () => {
     const rootStore = new Dispersive.Store();
     const market = new Dispersive.Store();
@@ -200,11 +206,6 @@ describe('Store', () => {
     });
 
     it('should create a SetIndex for each indexed field', () => {
-      const schema = {
-        age: new Dispersive.Schema.IndexedField(),
-        name: null,
-      };
-
       assert('age' in Fellow.objects.index);
       assert.equal('name' in Fellow.objects.index, false);
     });
