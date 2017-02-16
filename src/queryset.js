@@ -306,11 +306,7 @@ class QuerySet extends EventEmitter {
   }
 
   values(opts) {
-    const result = this.all().map(model => model.values(opts));
-
-    if (!!QuerySet.recompute && !!result) this.packRecompute(result, 'values', opts);
-
-    return result;
+    return this.all().map(model => model.values(opts));
   }
 
   /**
@@ -319,11 +315,7 @@ class QuerySet extends EventEmitter {
    * @return An array of models
    */
   all() {
-    const result = [...this.entries()];
-
-    if (!!QuerySet.recompute && !!result) this.packRecompute(result, 'all');
-
-    return result;
+    return [...this.entries()];
   }
 
   /**
@@ -332,11 +324,7 @@ class QuerySet extends EventEmitter {
    * @return A model
    */
   first() {
-    const result = this.entries().next().value;
-
-    if (!!QuerySet.recompute && !!result) this.packRecompute(result, 'first');
-
-    return result;
+    return this.entries().next().value;
   }
 
   /**
@@ -359,8 +347,6 @@ class QuerySet extends EventEmitter {
     if (entry.value === undefined || counter < index) {
       throw new OutOfRange(index);
     }
-
-    if (!!QuerySet.recompute && !!entry.value) this.packRecompute(entry.value, 'at', index);
 
     return entry.value;
   }
@@ -389,21 +375,14 @@ class QuerySet extends EventEmitter {
 
     if (!config && stop === null) return this.range(0, start, step);
 
-    const results = !!config ? this._range(config) : this._range({start, stop, step});
-
-    if (!!QuerySet.recompute) this.packRecompute(results, 'range', start, stop, step);
-
-    return results;
+    return !!config ? this._range(config) : this._range({start, stop, step});
   }
 
 
   last() {
     const all = this.all();
-    const result = all[all.length - 1];
 
-    if (!!QuerySet.recompute && !!result) this.packRecompute(result, 'last');
-
-    return result;
+    return all[all.length - 1];
   }
 
   update(values, opts) {
@@ -412,13 +391,6 @@ class QuerySet extends EventEmitter {
     }
 
     return this;
-  }
-
-  packRecompute(result, func, ...args) {
-    result.__qpack__ = {
-      queryset: this,
-      recompute: () => this[func](...args),
-    };
   }
 
   count() {
@@ -443,7 +415,6 @@ class QuerySet extends EventEmitter {
 
     if (entry.value === undefined) throw new DoesNotExist(expression);
     if (!iterator.next().done) throw new MoreThanOneValue(expression);
-    if (!!QuerySet.recompute && !!entry.value) this.packRecompute(entry.value, 'get', expression);
 
     return entry.value;
   }

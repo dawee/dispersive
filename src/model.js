@@ -6,30 +6,6 @@ const {pick} = require('./object');
 
 class Model extends EventEmitter.Emittable {
 
-  static using({schema = null, manager = ObjectManager}) {
-    return class extends Model {
-      static get schemaFields() {
-        return schema;
-      }
-
-      static get manager() {
-        return manager;
-      }
-
-      static get model() {
-        return this;
-      }
-    };
-  }
-
-  static attach(model, {schema = null, manager = ObjectManager}) {
-    model.schemaFields = schema;
-    model.manager = manager;
-    model.model = model;
-
-    return model;
-  }
-
   constructor(data = {}) {
     super();
 

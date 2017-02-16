@@ -18,8 +18,6 @@ describe('QuerySet', () => {
     store.register('teammates', {model: Teammate, schema});
 
     beforeEach(() => {
-      Dispersive.QuerySet.recompute = false;
-
       Teammate.objects.delete();
       Teammate.objects.create({name: 'jane', age: 40, job: 'developer'});
       Teammate.objects.create({name: 'joe', age: 30, job: 'developer'});
@@ -460,96 +458,5 @@ describe('QuerySet', () => {
       assert.equal(Teammate.objects.iterations, 1);
     });
   })
-
-  describe('recompute', () => {
-
-    const store = new Dispersive.Store();
-    const schema = {
-      name: null,
-      category: 0,
-    };
-
-    beforeEach(() => {
-      Dispersive.QuerySet.recompute = true;
-      store.register('stuff', {schema});
-    });
-
-    afterEach(() => store.forget('stuff'));
-
-    it('should recompute "first"', () => {
-      store.stuff.create({name: 'zorro'});
-
-      const first = store.stuff.orderBy('name').first();
-
-      assert.equal(first.name, 'zorro');
-
-      store.stuff.create({name: 'albert'});
-
-      assert.equal(first.__qpack__.recompute().name, 'albert');
-    });
-
-    it('should recompute "last"', () => {
-      store.stuff.create({name: 'albert'});
-
-      const last = store.stuff.orderBy('name').last();
-
-      assert.equal(last.name, 'albert');
-
-      store.stuff.create({name: 'zorro'});
-
-      assert.equal(last.__qpack__.recompute().name, 'zorro');
-    });
-
-    it('should recompute "values"', () => {
-      store.stuff.create({name: 'albert'});
-
-      const values = store.stuff.values({include: ['name']});
-
-      assert.deepEqual('albert', values[0].name);
-      assert.deepEqual('albert', values.__qpack__.recompute()[0].name);
-    });
-
-    it('should recompute "all"', () => {
-      store.stuff.create({name: 'albert'});
-
-      const all = store.stuff.all();
-
-      assert.deepEqual('albert', all[0].name);
-      assert.deepEqual('albert', all.__qpack__.recompute()[0].name);
-    });
-
-    it('should recompute "at"', () => {
-      store.stuff.create({name: 'zorro'});
-      store.stuff.create({name: 'alan'});
-
-      const at1 = store.stuff.orderBy('name').at(1);
-
-      assert.equal(at1.name, 'zorro');
-
-      store.stuff.create({name: 'albert'});
-
-      assert.equal(at1.__qpack__.recompute().name, 'albert');
-
-    });
-
-    it('should recompute "range"', () => {
-      store.stuff.create({name: 'alan'});
-      store.stuff.create({name: 'alan2'});
-      store.stuff.create({name: 'bill'});
-      store.stuff.create({name: 'bill2'});
-      store.stuff.create({name: 'zorro'});
-      store.stuff.create({name: 'zorro2'});
-
-      const range = store.stuff.orderBy('name').range(0, 4, 2);
-
-      assert.deepEqual(range.map(stuff => stuff.name), ['alan', 'bill']);
-
-      store.stuff.create({name: 'albert'});
-      store.stuff.create({name: 'albert2'});
-
-      assert.deepEqual(range.__qpack__.recompute().map(stuff => stuff.name), ['alan', 'albert']);
-    });
-
-  });
 
 });

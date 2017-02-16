@@ -11,9 +11,9 @@ describe('Store', () => {
     age: new Dispersive.IndexedField(),
     name: null,
   };
-  
+
   const store = new Dispersive.Store();
-  
+
   beforeEach(() => {
     Fellow = class extends Dispersive.Model {
 
@@ -117,7 +117,7 @@ describe('Store', () => {
 
     it('should delete a given entry', () => {
       const fellow = Fellow.objects.create({age: 42});
-      
+
       fellow.delete();
 
       assert.equal(Fellow.objects.count(), 0);
@@ -138,14 +138,9 @@ describe('Store', () => {
         name: 'john',
       };
 
-      class Buddy extends Dispersive.Model.using({schema}) {
-        // Empty model        
-      }
+      const buddies = Dispersive.Store.createObjects({schema});
 
-      const rootStore = new Dispersive.Store();
-
-      rootStore.register('buddies', Buddy);
-      assert.equal(rootStore.buddies.create().name, 'john');
+      assert.equal(buddies.create().name, 'john');
     });
 
     it('should be able to use schema alias during creation', () => {
@@ -153,14 +148,9 @@ describe('Store', () => {
         name: {initial: 'john', alias: '_name'},
       };
 
-      class Buddy extends Dispersive.Model.using({schema}) {
-        // Empty model        
-      }
+      const buddies = Dispersive.Store.createObjects({schema});
 
-      const rootStore = new Dispersive.Store();
-
-      rootStore.register('buddies', Buddy);
-      assert.equal(rootStore.buddies.create({_name: 'joe'}).name, 'joe');
+      assert.equal(buddies.create({_name: 'joe'}).name, 'joe');
     });
 
     it('should be able to use schema alias during update', () => {
@@ -168,34 +158,12 @@ describe('Store', () => {
         name: {initial: 'john', alias: '_name'},
       };
 
-      class Buddy extends Dispersive.Model.using({schema}) {
-        // Empty model        
-      }
+      const buddies = Dispersive.Store.createObjects({schema});
 
-      const rootStore = new Dispersive.Store();
-
-      rootStore.register('buddies', Buddy);
-      const buddy = rootStore.buddies.create();
+      const buddy = buddies.create();
 
       buddy.update({_name: 'joe'})
       assert.equal(buddy.name, 'joe');
-    });
-
-    it('should be able to set schema with attach', () => {
-      const schema = {
-        name: 'john',
-      };
-
-      class Buddy extends Dispersive.Model {
-        // Empty model        
-      }
-
-      Dispersive.Model.attach(Buddy, {schema});
-
-      const rootStore = new Dispersive.Store();
-
-      rootStore.register('buddies', Buddy);
-      assert.equal(rootStore.buddies.create().name, 'john');
     });
   });
 
@@ -208,7 +176,7 @@ describe('Store', () => {
 
     it('should create several objects', () => {
       Fellow.objects.create([{name: 'joe'}, {name: 'john'}]);
-    
+
       assert.equal(Fellow.objects.all().length, 2);
       assert.equal(Fellow.objects.first().name, 'joe');
     });
@@ -216,7 +184,7 @@ describe('Store', () => {
     it('should not trigger objects if model exists', () => {
       const listener = sinon.spy();
       const fellow = Fellow.objects.create();
-      
+
       Fellow.objects.changed(listener);
       fellow.update({age: 20});
 
@@ -315,7 +283,7 @@ describe('Store', () => {
 
     it('should be able to index null values (#7)', () => {
       Fellow.objects.create({age: false});
-      
+
       assert.equal(Fellow.objects.filter({age: false}).count(), 1);
     });
 
