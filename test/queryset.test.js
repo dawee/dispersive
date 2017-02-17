@@ -30,7 +30,7 @@ describe('QuerySet', () => {
         {name: 'jane', age: 40, job: 'developer'},
         {name: 'josh', age: 40, job: 'designer'},
         {name: 'betty', age: 40, job: 'developer'},
-      ], Teammate.objects.filter({age: 40}).values({exclude: ['id']}));
+      ], Teammate.objects.filter({age: 40}).values({exclude: ['_id']}));
     });
 
     it('should filter objects using predicate', () => {
@@ -38,31 +38,31 @@ describe('QuerySet', () => {
         {name: 'jane', age: 40, job: 'developer'},
         {name: 'josh', age: 40, job: 'designer'},
         {name: 'betty', age: 40, job: 'developer'},
-      ], Teammate.objects.filter(teammate => teammate.age === 40).values({exclude: ['id']}));
+      ], Teammate.objects.filter(teammate => teammate.age === 40).values({exclude: ['_id']}));
     });
 
     it('should exclude objects', () => {
       assert.deepEqual([
         {name: 'joe', age: 30, job: 'developer'},
-      ], Teammate.objects.exclude({age: 40}).values({exclude: ['id']}));
+      ], Teammate.objects.exclude({age: 40}).values({exclude: ['_id']}));
     });
 
     it('should exclude objects using predicate', () => {
       assert.deepEqual([
         {name: 'joe', age: 30, job: 'developer'},
-      ], Teammate.objects.exclude(teammate => teammate.age === 40).values({exclude: ['id']}));
+      ], Teammate.objects.exclude(teammate => teammate.age === 40).values({exclude: ['_id']}));
     });
 
     it('should get only first object', () => {
-      assert.deepEqual({name: 'jane', age: 40, job: 'developer'}, Teammate.objects.first().values({exclude: ['id']}));
+      assert.deepEqual({name: 'jane', age: 40, job: 'developer'}, Teammate.objects.first().values({exclude: ['_id']}));
     });
 
     it('should get only last object', () => {
-      assert.deepEqual({name: 'betty', age: 40, job: 'developer'}, Teammate.objects.last().values({exclude: ['id']}));
+      assert.deepEqual({name: 'betty', age: 40, job: 'developer'}, Teammate.objects.last().values({exclude: ['_id']}));
     });
 
     it('should get an object when threre\'s only one', () => {
-      assert.deepEqual({name: 'joe', age: 30, job: 'developer'}, Teammate.objects.get({name: 'joe'}).values({exclude: ['id']}));
+      assert.deepEqual({name: 'joe', age: 30, job: 'developer'}, Teammate.objects.get({name: 'joe'}).values({exclude: ['_id']}));
     });
 
     it('should update all the filtered objects', () => {
@@ -72,20 +72,20 @@ describe('QuerySet', () => {
         {name: 'jane', age: 41, job: 'developer'},
         {name: 'josh', age: 41, job: 'designer'},
         {name: 'betty', age: 41, job: 'developer'},
-      ], Teammate.objects.filter({age: 41}).values({exclude: ['id']}));
+      ], Teammate.objects.filter({age: 41}).values({exclude: ['_id']}));
     });
 
     it('should retrieve an entry at specified index', () => {
       assert.deepEqual(
         {name: 'josh', age: 40, job: 'designer'},
-        Teammate.objects.filter({age: 40}).at(1).values({exclude: ['id']})
+        Teammate.objects.filter({age: 40}).at(1).values({exclude: ['_id']})
       );
     });
 
     it('should retrieve a range of one element', () => {
       assert.deepEqual(
         [{name: 'josh', age: 40, job: 'designer'}],
-        Teammate.objects.filter({age: 40}).range(1, 2).map(e => e.values({exclude: ['id']}))
+        Teammate.objects.filter({age: 40}).range(1, 2).map(e => e.values({exclude: ['_id']}))
       );
     });
 
@@ -144,12 +144,12 @@ describe('QuerySet', () => {
         {name: 'jane', age: 40, job: 'developer'},
         {name: 'josh', age: 40, job: 'designer'},
         {name: 'betty', age: 40, job: 'developer'},
-      ], filter40.values({exclude: ['id']}));
+      ], filter40.values({exclude: ['_id']}));
 
       assert.deepEqual([
         {name: 'jane', age: 40, job: 'developer'},
         {name: 'betty', age: 40, job: 'developer'},
-      ], filterDeveloper.values({exclude: ['id']}));
+      ], filterDeveloper.values({exclude: ['_id']}));
     });
 
     it('should create a copy after an exclude', () => {
@@ -160,12 +160,12 @@ describe('QuerySet', () => {
         {name: 'jane', age: 40, job: 'developer'},
         {name: 'josh', age: 40, job: 'designer'},
         {name: 'betty', age: 40, job: 'developer'},
-      ], exclude30.values({exclude: ['id']}));
+      ], exclude30.values({exclude: ['_id']}));
 
       assert.deepEqual([
         {name: 'jane', age: 40, job: 'developer'},
         {name: 'betty', age: 40, job: 'developer'},
-      ], excludeDesigner.values({exclude: ['id']}));
+      ], excludeDesigner.values({exclude: ['_id']}));
     });
 
     it('should sort by name', () => {
@@ -174,7 +174,7 @@ describe('QuerySet', () => {
         {name: 'jane', age: 40, job: 'developer'},
         {name: 'joe', age: 30, job: 'developer'},
         {name: 'josh', age: 40, job: 'designer'},
-      ], Teammate.objects.orderBy('name').values({exclude: ['id']}));
+      ], Teammate.objects.orderBy('name').values({exclude: ['_id']}));
     });
 
     it('should sort by name (reversed)', () => {
@@ -183,7 +183,7 @@ describe('QuerySet', () => {
         {name: 'joe', age: 30, job: 'developer'},
         {name: 'jane', age: 40, job: 'developer'},
         {name: 'betty', age: 40, job: 'developer'},
-      ], Teammate.objects.orderBy('name', {reversed: true}).values({exclude: ['id']}));
+      ], Teammate.objects.orderBy('name', {reversed: true}).values({exclude: ['_id']}));
     });
 
     it('should sort by age', () => {
@@ -192,7 +192,7 @@ describe('QuerySet', () => {
         {name: 'betty', age: 40, job: 'developer'},
         {name: 'jane', age: 40, job: 'developer'},
         {name: 'josh', age: 40, job: 'designer'},
-      ], Teammate.objects.orderBy('name').orderBy('age').values({exclude: ['id']}));
+      ], Teammate.objects.orderBy('name').orderBy('age').values({exclude: ['_id']}));
     });
 
     it('should sort by age (reversed)', () => {
@@ -201,7 +201,7 @@ describe('QuerySet', () => {
         {name: 'jane', age: 40, job: 'developer'},
         {name: 'josh', age: 40, job: 'designer'},
         {name: 'joe', age: 30, job: 'developer'},
-      ], Teammate.objects.orderBy('name').orderBy('age', {reversed: true}).values({exclude: ['id']}));
+      ], Teammate.objects.orderBy('name').orderBy('age', {reversed: true}).values({exclude: ['_id']}));
     });
 
     it('should sort by age using predicate', () => {
@@ -214,7 +214,7 @@ describe('QuerySet', () => {
         {name: 'jane', age: 40, job: 'developer'},
         {name: 'josh', age: 40, job: 'designer'},
         {name: 'joe', age: 30, job: 'developer'},
-      ], sorted.values({exclude: ['id']}));
+      ], sorted.values({exclude: ['_id']}));
     });
 
     it('should map entries', () => {

@@ -43,7 +43,7 @@ class Schema {
       this._fields[name] = Field.create(fields[name]);
     }
 
-    this._fields.id = new Field({index: true, unique: true});
+    this._fields._id = new Field({index: true, unique: true});
   }
 
   initModel(model) {

@@ -50,7 +50,7 @@ class Model extends EventEmitter.Emittable {
 
   assign(values = {}, keepId = true) {
     const predicate = typeof values === 'function' ? values : null;
-    const id = this.id;
+    const _id = this._id;
 
     if (predicate) {
       predicate(this);
@@ -58,7 +58,7 @@ class Model extends EventEmitter.Emittable {
       Object.assign(this, values);
     }
 
-    if (keepId || !this.objects.isValidId(this.id)) this.id = id;
+    if (keepId || !this.objects.isValidId(this._id)) this._id = _id;
   }
 
   update(values, opts) {

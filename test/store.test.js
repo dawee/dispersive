@@ -135,14 +135,14 @@ describe('Store', () => {
       assert.equal(Fellow.objects.count(), 0);
     });
 
-    it('shoudd not change id through update', () => {
+    it('shoudd not change _id through update', () => {
       const fellow = Fellow.objects.create({age: 20});
-      const id = fellow.id;
+      const _id = fellow._id;
 
-      assert(!!id);
+      assert(!!_id);
 
-      fellow.update({id: null, age: 42});
-      assert.equal(fellow.id, id);
+      fellow.update({_id: null, age: 42});
+      assert.equal(fellow._id, _id);
     })
 
     it('should be able to set schema with using', () => {
@@ -218,15 +218,15 @@ describe('Store', () => {
 
     it('should add values to SetIndex', () => {
       const fellow = Fellow.objects.create({age: 20, name: 'joe'});
-      const values = Fellow.objects.index.id.get(fellow.id);
+      const values = Fellow.objects.index._id.get(fellow._id);
 
-      assert.equal(Fellow.objects.index.age.refs[values.id], 20);
-      assert(Fellow.objects.index.age.sets[20].has(values.id));
+      assert.equal(Fellow.objects.index.age.refs[values._id], 20);
+      assert(Fellow.objects.index.age.sets[20].has(values._id));
     });
 
     it('should remove values from SetIndex', () => {
       const fellow = Fellow.objects.create({age: 20, name: 'joe'});
-      const values = Fellow.objects.index.id.get(fellow.id);
+      const values = Fellow.objects.index._id.get(fellow._id);
 
       fellow.delete();
 
@@ -249,12 +249,12 @@ describe('Store', () => {
 
   describe('emitter', () => {
 
-    it('should emit on all other models pointing on the same entry id', () => {
-      const {id} = Fellow.objects.create();
+    it('should emit on all other models pointing on the same entry _id', () => {
+      const {_id} = Fellow.objects.create();
       const listener = sinon.spy();
 
-      const first = Fellow.objects.get({id});
-      const second = Fellow.objects.get({id});
+      const first = Fellow.objects.get({_id});
+      const second = Fellow.objects.get({_id});
 
       first.changed(listener);
       second.save();
@@ -263,11 +263,11 @@ describe('Store', () => {
     });
 
     it('should be able to unsubscribe an event', () => {
-      const {id} = Fellow.objects.create();
+      const {_id} = Fellow.objects.create();
       const listener = sinon.spy();
 
-      const first = Fellow.objects.get({id});
-      const second = Fellow.objects.get({id});
+      const first = Fellow.objects.get({_id});
+      const second = Fellow.objects.get({_id});
 
       const subscription = first.changed(listener);
 

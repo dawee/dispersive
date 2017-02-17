@@ -15,19 +15,19 @@ class Index {
   }
 
   add(values) {
-    if ((this.name in values) && ('id' in values)) {
+    if ((this.name in values) && ('_id' in values)) {
       this.link(values[this.name], values);
-      this.refs[values.id] = values[this.name];
+      this.refs[values._id] = values[this.name];
     }
   }
 
   delete(values) {
-    if (! (values.id in this.refs)) return;
+    if (! (values._id in this.refs)) return;
 
-    const val = this.refs[values.id];
+    const val = this.refs[values._id];
 
     this.unlink(val, values);
-    delete this.refs[values.id];
+    delete this.refs[values._id];
   }
 
 }
@@ -43,12 +43,12 @@ class SetIndex extends Index {
   link(val, values) {
     if (! (val in this.sets)) this.sets[val] = new Set();
 
-    this.values[values.id] = values;
-    this.sets[val].add(values.id);
+    this.values[values._id] = values;
+    this.sets[val].add(values._id);
   }
 
   unlink(val, values) {
-    this.sets[val].delete(values.id);
+    this.sets[val].delete(values._id);
   }
 
   countOf(val) {
@@ -57,8 +57,8 @@ class SetIndex extends Index {
 
   *allOf(val) {
     if (val in this.sets) {
-      for (const id of this.sets[val]) {
-        yield this.values[id];
+      for (const _id of this.sets[val]) {
+        yield this.values[_id];
       }
     }
   }
@@ -73,7 +73,7 @@ class UniqueIndex extends Index {
   }
 
   link(val, values) {
-    if (val in this.kvs && this.kvs[val].id !== values.id) {
+    if (val in this.kvs && this.kvs[val]._id !== values._id) {
       throw new UniqueIndex.AlreadyExists(this.name, val);
     }
 
@@ -124,7 +124,7 @@ class ObjectManager extends QuerySet {
     this.manager = this;
     this.generator = this.models;
     this.index = this.buildIndex();
-    this.indexNames = Object.keys(this.index).filter(name => name !== 'id');
+    this.indexNames = Object.keys(this.index).filter(name => name !== '_id');
     this.emitters = {};
   }
 
@@ -143,7 +143,7 @@ class ObjectManager extends QuerySet {
   }
 
   *models(prefilters = []) {
-    let base = this.index.id.all();
+    let base = this.index._id.all();
     let lowerCount = Infinity;
 
     for (const prefilter of prefilters) {
@@ -164,7 +164,7 @@ class ObjectManager extends QuerySet {
     const ModelType = this.model;
     const model = new ModelType(values);
 
-    model.emitter = this.emitters[model.id];
+    model.emitter = this.emitters[model._id];
     return model;
   }
 
@@ -225,27 +225,27 @@ class ObjectManager extends QuerySet {
   _syncNew(model, opts = {emitChange: true}) {
     let values = null;
 
-    model.id = hat();
+    model._id = hat();
     model.emitter = EventEmitter.createEmitter();
     values = model.schemaValues();
 
-    this.emitters[model.id] = model.emitter;
-    this.index.id.add(values);
-    this._syncLinks(this.index.id.get(model.id));
+    this.emitters[model._id] = model.emitter;
+    this.index._id.add(values);
+    this._syncLinks(this.index._id.get(model._id));
 
     if (opts.emitChange) this.emitChange({__source__: {values}});
   }
 
   _syncExisting(model, opts = {emitChange: true}) {
     const event = {};
-    const prevalues = clone(this.index.id.get(model.id));
+    const prevalues = clone(this.index._id.get(model._id));
     let values = null;
 
-    if (! this.index.id.get(model.id)) throw new ObjectManager.ModelNotSyncable();
+    if (! this.index._id.get(model._id)) throw new ObjectManager.ModelNotSyncable();
 
     values = model.schemaValues();
 
-    Object.assign(this.index.id.get(model.id), values);
+    Object.assign(this.index._id.get(model._id), values);
     this._syncLinks(values);
 
     if (opts.emitChange) {
@@ -256,12 +256,12 @@ class ObjectManager extends QuerySet {
     }
   }
 
-  isValidId(id) {
-    return this.index.id.hasRef(id);
+  isValidId(_id) {
+    return this.index._id.hasRef(_id);
   }
 
   sync(model, opts = {emitChange: true}) {
-    if (!!model.id) return this._syncExisting(model, opts);
+    if (!!model._id) return this._syncExisting(model, opts);
 
     this._syncNew(model, opts);
   }
@@ -269,13 +269,13 @@ class ObjectManager extends QuerySet {
   unsync(model, opts = {emitChange: true}) {
     let values = null;
 
-    if (!this.index.id.hasRef(model.id)) return;
+    if (!this.index._id.hasRef(model._id)) return;
 
-    values = this.index.id.get(model.id);
+    values = this.index._id.get(model._id);
 
     this._unsyncLinks(values);
-    this.index.id.delete(values);
-    delete this.emitters[model.id];
+    this.index._id.delete(values);
+    delete this.emitters[model._id];
 
     if (opts.emitChange) this.emitChange({__source__: {values}});
   }
