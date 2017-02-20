@@ -12,11 +12,8 @@ Dispersive.Store = require('./store');
  * Alias
  */
 
-Dispersive.IndexedField = Dispersive.Schema.IndexedField;
-Dispersive.createAction = Action.create;
 Dispersive.ActionTree = ActionTree;
 Dispersive.Action = Action;
-Dispersive.usingEventFunnel = Dispersive.EventEmitter.Funnel.using;
 
 // Default instances
 

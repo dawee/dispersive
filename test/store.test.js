@@ -8,7 +8,7 @@ describe('Store', () => {
   let Fellow = null;
 
   const schema = {
-    age: new Dispersive.IndexedField(),
+    age: new Dispersive.Schema.IndexedField(),
     name: null,
   };
 
@@ -297,7 +297,7 @@ describe('Store', () => {
     it('should update set-indexed values without creating others (#19)', () => {
       const store = new Dispersive.Store();
 
-      store.register('fellows', {schema: {age: new Dispersive.IndexedField(), name: null}});
+      store.register('fellows', {schema: {age: new Dispersive.Schema.IndexedField(), name: null}});
 
       const joe = store.fellows.create({age: 20, name: 'joe'});
 

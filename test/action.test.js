@@ -1,7 +1,7 @@
 const assert = require('assert');
 const {expect} = require('chai');
 const sinon = require('sinon');
-const {ActionTree, Action, createAction} = require('./dispersive');
+const {ActionTree, Action} = require('./dispersive');
 
 
 describe('Action', () => {
@@ -12,7 +12,7 @@ describe('Action', () => {
       done();
     };
 
-    const action = createAction((value) => new Promise(resolve => resolve({value})));
+    const action = Action.create((value) => new Promise(resolve => resolve({value})));
 
     action.subscribe(listener);
     action(42);
@@ -20,7 +20,7 @@ describe('Action', () => {
 
   it('should be able to be unsubscribed', done => {
     const listener = sinon.spy();
-    const action = createAction(() => ({}));
+    const action = Action.create(() => ({}));
     const subscription = action.subscribe(listener);
 
     subscription.remove();
@@ -37,7 +37,7 @@ describe('Action', () => {
       done();
     };
 
-    const action = createAction(() => {
+    const action = Action.create(() => {
       return [];
     });
 
@@ -55,9 +55,9 @@ describe('Action', () => {
       done();
     };
 
-    const action1 = createAction((value) => new Promise(resolve => resolve({value})));
-    const action2 = createAction((value) => new Promise(resolve => resolve({value})));
-    const grouped = createAction((value) => action1(value).then(() => action2(value)));
+    const action1 = Action.create((value) => new Promise(resolve => resolve({value})));
+    const action2 = Action.create((value) => new Promise(resolve => resolve({value})));
+    const grouped = Action.create((value) => action1(value).then(() => action2(value)));
 
     action1.subscribe(listener1);
     action2.subscribe(listener2);
@@ -71,7 +71,7 @@ describe('Action', () => {
       done();
     };
 
-    const action = createAction((value) => new Promise((resolve, reject) => reject({value})));
+    const action = Action.create((value) => new Promise((resolve, reject) => reject({value})));
 
     action.error.subscribe(listener);
     action(42);
@@ -88,7 +88,7 @@ describe('Action', () => {
       }
     }
 
-    const action1 = createAction(value => {value}, {type: CustomAction});
+    const action1 = Action.create(value => {value}, {type: CustomAction});
 
     action1();
     assert(check.called);
@@ -96,7 +96,7 @@ describe('Action', () => {
 
   it('should call action.before then the specified handler', done => {
     const checkHandler = sinon.spy();
-    const action1 = createAction(value => {value});
+    const action1 = Action.create(value => {value});
 
     action1.before.subscribe(() => {
       assert(!checkHandler.called);
@@ -110,7 +110,7 @@ describe('Action', () => {
   it('should trigger before the promise resolution (#38)', done => {
     const subscriptionSpy = sinon.spy();
     const resolutionSpy = sinon.spy();
-    const action = createAction(() => new Promise(resolve => setTimeout(resolve, 10)));
+    const action = Action.create(() => new Promise(resolve => setTimeout(resolve, 10)));
 
     action.subscribe(() => {
       assert(!resolutionSpy.called);
@@ -179,7 +179,7 @@ describe('Action', () => {
       const product = new ActionTree();
 
       const add = (name) => ({name});
-      const sub = createAction((name) => ({name}));
+      const sub = Action.create((name) => ({name}));
 
       actions.register({product});
       product.register({add, sub});
