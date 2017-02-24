@@ -6,7 +6,7 @@ const composeModel = ({model, composers}) => {
 
   const composer = composers.get(0);
 
-  return composeModel({model: composer(model), composers: composers.shift(0)});
+  return composeModel({model: composer({model}), composers: composers.shift(0)});
 };
 
 const createModel = (...baseComposers) => {
