@@ -10,11 +10,7 @@ class ModelEntry {
 
   constructor({manager, values}) {
     this.manager = manager;
-    Object.assign(this, values);
-  }
-
-  values() {
-    return this;
+    this.values = values;
   }
 
   save() {

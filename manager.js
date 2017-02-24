@@ -28,14 +28,18 @@ class ObjectManager {
   }
 
   create(values = {}) {
-    const entry = this.deps.model.factory({model: this.deps.model, manager: this, values});
+    const entry = this.deps.model.factory({
+      values,
+      model: this.deps.model,
+      manager: this,
+    });
 
     entry.save();
   }
 
   sync(entry) {
     assert.hasTransaction(this);
-    this.transaction.create(entry.values());
+    this.transaction.create(entry.values);
   }
 
   get length() {
