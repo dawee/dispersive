@@ -15,9 +15,9 @@ const tweets = Tweet.objects.filter({[Tweet.user.name]: 'hopefulcyborg'});
 
 const fetchTweets = createAction(async userName => {
   const user = User.objects.getOrCreate({userName});
-  const tweets = await request.get(`http://twitter/api/user/${userName}/tweets`);
+  const res = await request.get(`http://twitter/api/user/${userName}/tweets`);
 
-  tweets.forEach(tweet => user.tweets.add(tweet));
+  res.body.forEach(tweet => user.tweets.add(tweet));
 });
 
 await fetchTweets('hopefulcyborg');
