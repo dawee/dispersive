@@ -4,8 +4,8 @@ class Transaction {
     this.list = list;
   }
 
-  create(values = {}) {
-    this.list = this.list.push(values);
+  sync(entry) {
+    this.list = this.list.push(entry.values);
   }
 
 }

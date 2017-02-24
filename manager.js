@@ -39,7 +39,7 @@ class ObjectManager {
 
   sync(entry) {
     assert.hasTransaction(this);
-    this.transaction.create(entry.values);
+    this.transaction.sync(entry);
   }
 
   get length() {
