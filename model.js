@@ -1,6 +1,7 @@
 const Immutable = require('immutable');
 const {createObjects} = require('./manager');
 
+
 const composeModel = ({model, composers}) => {
   if (composers.count() === 0) return model;
 
@@ -9,7 +10,9 @@ const composeModel = ({model, composers}) => {
   return composeModel({model: composer({model}), composers: composers.shift(0)});
 };
 
+
 const addObjects = ({model}) => model.set('objects', createObjects());
+
 
 const createModel = (...baseComposers) => {
   const composers = Immutable.List.of(addObjects).concat(baseComposers);
@@ -17,6 +20,7 @@ const createModel = (...baseComposers) => {
 
   return model.toJS();
 };
+
 
 module.exports = {
   createModel,
