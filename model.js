@@ -30,15 +30,8 @@ class ModelEntry {
 const modelFactory = ({model, manager, values}) => new model.constructor({manager, values});
 const addObjects = ({model}) => model.set('objects', createObjects({model}));
 const addEmitter = ({model}) => model.set('emitter', createChangesEmitter());
-const addPrototype = ({model}) => model.set('prototype', ModelEntry.prototype);
 const addFactory = ({model}) => model.set('factory', modelFactory);
-const addConstructor = ({model}) => {
-  const entryConstructor = class extends ModelEntry {};
-  const prototype = model.get('prototype');
-
-  Object.assign(entryConstructor.prototype, prototype);
-  return model.set('constructor', entryConstructor);
-};
+const addConstructor = ({model}) => model.set('constructor', ModelEntry);
 
 /*
  * Model creation
@@ -62,7 +55,6 @@ const createDefaultComposers = () => ([
   addEmitter,
   addConstructor,
   addFactory,
-  addPrototype,
 ]);
 
 const createModel = (...composers) => generateCreateModel({
