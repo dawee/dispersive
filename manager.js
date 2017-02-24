@@ -28,8 +28,14 @@ class ObjectManager {
   }
 
   create(values = {}) {
+    const entry = this.deps.model.factory({model: this.deps.model, manager: this, values});
+
+    entry.save();
+  }
+
+  sync(entry) {
     assert.hasTransaction(this);
-    this.transaction.create(values);
+    this.transaction.create(entry.values());
   }
 
   get length() {
@@ -39,7 +45,7 @@ class ObjectManager {
 }
 
 
-const createObjects = () => new ObjectManager({createTransaction});
+const createObjects = ({model}) => new ObjectManager({createTransaction, model});
 
 
 module.exports = {

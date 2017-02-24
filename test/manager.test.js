@@ -1,17 +1,17 @@
 const {expect} = require('chai');
-const {manager, error} = require('..');
+const {manager, model, error} = require('..');
 
 
 describe('manager', () => {
 
   it('should throw an error if trying to create without a transaction', () => {
-    const objects = manager.createObjects();
+    const objects = manager.createObjects({model: model.createModel()});
 
     expect(() => objects.create()).to.throw(error.TransactionDoesNotExist);
   });
 
   it('should throw an error if trying to create a transaction if one already exists', () => {
-    const objects = manager.createObjects();
+    const objects = manager.createObjects({model: model.createModel()});
 
     objects.createTransaction();
 
@@ -19,7 +19,7 @@ describe('manager', () => {
   });
 
   it('should not create an entry if transaction is aborted', () => {
-    const objects = manager.createObjects();
+    const objects = manager.createObjects({model: model.createModel()});
 
     objects.createTransaction();
     objects.create({foo: 42});
@@ -29,7 +29,7 @@ describe('manager', () => {
   });
 
   it('should create an entry if transaction is commited', () => {
-    const objects = manager.createObjects();
+    const objects = manager.createObjects({model: model.createModel()});
 
     objects.createTransaction();
     objects.create({foo: 42});

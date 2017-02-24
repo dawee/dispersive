@@ -3,12 +3,42 @@ const {createObjects} = require('./manager');
 const {createChangesEmitter} = require('./emitter');
 
 /*
+ * Constructor and prototype for default entries
+ */
+
+class ModelEntry {
+
+  constructor({manager, values}) {
+    this.manager = manager;
+    Object.assign(this, values);
+  }
+
+  values() {
+    return this;
+  }
+
+  save() {
+    this.manager.sync(this);
+  }
+
+}
+
+/*
  * Default composers
  */
 
-const addObjects = ({model}) => model.set('objects', createObjects());
+const modelFactory = ({model, manager, values}) => new model.constructor({manager, values});
+const addObjects = ({model}) => model.set('objects', createObjects({model}));
 const addEmitter = ({model}) => model.set('emitter', createChangesEmitter());
+const addPrototype = ({model}) => model.set('prototype', ModelEntry.prototype);
+const addFactory = ({model}) => model.set('factory', modelFactory);
+const addConstructor = ({model}) => {
+  const entryConstructor = class extends ModelEntry {};
+  const prototype = model.get('prototype');
 
+  Object.assign(entryConstructor.prototype, prototype);
+  return model.set('constructor', entryConstructor);
+};
 
 /*
  * Model creation
@@ -27,8 +57,16 @@ const generateCreateModel = ({composers}) => composeModel({
   composers: Immutable.List.of(...composers),
 }).toJS();
 
+const createDefaultComposers = () => ([
+  addObjects,
+  addEmitter,
+  addConstructor,
+  addFactory,
+  addPrototype,
+]);
+
 const createModel = (...composers) => generateCreateModel({
-  composers: [addObjects, addEmitter].concat(composers),
+  composers: createDefaultComposers().concat(composers),
 });
 
 
