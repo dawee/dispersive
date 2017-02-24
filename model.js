@@ -22,19 +22,20 @@ const composeModel = ({model, composers}) => {
   return composeModel({model: composer({model}), composers: composers.shift(0)});
 };
 
-
-const createModel = (...composers) => composeModel({
+const generateCreateModel = ({composers}) => composeModel({
   model: Immutable.Map(),
-  composers: Immutable.List.of(
-    addObjects,
-    addEmitter,
-  ).concat(composers),
+  composers: Immutable.List.of(...composers),
 }).toJS();
+
+const createModel = (...composers) => generateCreateModel({
+  composers: [addObjects, addEmitter].concat(composers),
+});
 
 
 module.exports = {
   addEmitter,
   addObjects,
   composeModel,
+  generateCreateModel,
   createModel,
 };
