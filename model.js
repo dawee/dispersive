@@ -14,7 +14,7 @@ class ModelEntry {
   }
 
   save() {
-    this.manager.sync(this);
+    this.values = this.manager.sync(this);
   }
 
 }

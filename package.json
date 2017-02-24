@@ -23,7 +23,8 @@
   },
   "homepage": "https://github.com/dawee/dispersive-core#readme",
   "dependencies": {
-    "immutable": "3.8.1"
+    "immutable": "3.8.1",
+    "ulid": "0.1.0"
   },
   "devDependencies": {
     "chai": "3.5.0",

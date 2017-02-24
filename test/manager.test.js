@@ -38,4 +38,15 @@ describe('manager', () => {
     expect(objects.length).to.equal(1);
   });
 
+  it('should return a updatable entry', () => {
+    const objects = manager.createObjects({model: model.createModel()});
+
+    objects.createTransaction();
+    const entry = objects.create({foo: 42});
+    entry.values = entry.values.set('foo', 0);
+    entry.save();
+    objects.commitTransaction();
+
+    expect(objects.map.first().get('foo')).to.equal(0);
+  });
 })

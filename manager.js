@@ -6,7 +6,7 @@ const {createTransaction} = require('./transaction');
 class ObjectManager {
 
   constructor(deps = {createTransaction}) {
-    this.list = Immutable.List();
+    this.map = Immutable.Map();
     this.transaction = null;
     this.deps = deps;
   }
@@ -19,7 +19,7 @@ class ObjectManager {
   }
 
   commitTransaction() {
-    this.list = this.transaction.list;
+    this.map = this.transaction.map;
     this.transaction = null;
   }
 
@@ -29,21 +29,23 @@ class ObjectManager {
 
   create(values = {}) {
     const entry = this.deps.model.factory({
-      values,
+      values: Immutable.Map(values),
       model: this.deps.model,
       manager: this,
     });
 
     entry.save();
+
+    return entry;
   }
 
   sync(entry) {
     assert.hasTransaction(this);
-    this.transaction.sync(entry);
+    return this.transaction.sync(entry);
   }
 
   get length() {
-    return this.list.count();
+    return this.map.count();
   }
 
 }
