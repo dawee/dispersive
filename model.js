@@ -1,5 +1,6 @@
 const Immutable = require('immutable');
 const {createObjects} = require('./manager');
+const {createChangesEmitter} = require('./emitter');
 
 
 const composeModel = ({model, composers}) => {
@@ -12,10 +13,12 @@ const composeModel = ({model, composers}) => {
 
 
 const addObjects = ({model}) => model.set('objects', createObjects());
+const addEmitter = ({model}) => model.set('emitter', createChangesEmitter());
 
+const defaultComposers = [addObjects, addEmitter];
 
 const createModel = (...baseComposers) => {
-  const composers = Immutable.List.of(addObjects).concat(baseComposers);
+  const composers = Immutable.List.of(...defaultComposers).concat(baseComposers);
   const model = composeModel({model: Immutable.Map(), composers});
 
   return model.toJS();
@@ -23,5 +26,9 @@ const createModel = (...baseComposers) => {
 
 
 module.exports = {
+  addEmitter,
+  addObjects,
+  composeModel,
   createModel,
+  defaultComposers,
 };

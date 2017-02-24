@@ -17,4 +17,10 @@ describe('model', () => {
     expect(Foo.objects.length).to.equal(0);
   });
 
+  it('should create a default emitter', () => {
+    const Foo = model.createModel();
+
+    expect(Foo.emitter.subscriptions.count()).to.equal(0);
+  });
+
 })
