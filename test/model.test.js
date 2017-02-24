@@ -11,4 +11,10 @@ describe('model', () => {
     expect(Fake.objects.foo).to.equal(42);
   });
 
+  it('should create a default object manager', () => {
+    const Foo = model.createModel();
+
+    expect(Foo.objects.length).to.equal(0);
+  });
+
 })
