@@ -1,8 +1,8 @@
 ```js
 const {createAction} = require('dispersive-core/action');
-const {createModel} = require('dispersive-core/store/model');
-const {withTextField} = require('dispersive-core/store/schema/text');
-const {withMany} = require('dispersive-core/store/schema/relation');
+const {createModel} = require('dispersive-core/model');
+const {withTextField} = require('dispersive-core/field/text');
+const {withMany} = require('dispersive-core/field/relation');
 
 const Tweet = createModel(withTextField('text'));
 
