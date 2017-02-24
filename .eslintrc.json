@@ -1,0 +1,13 @@
+{
+  "extends": "airbnb",
+  "rules": {
+    "no-shadow": "off",
+    "object-curly-spacing": ["error", "never"],
+    "consistent-return": "off",
+    "no-underscore-dangle": "off",
+    "max-len": ["error", {
+      "ignoreComments": true,
+      "code": 100
+    }]
+  }
+}
