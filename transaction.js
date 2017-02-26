@@ -1,17 +1,17 @@
 const ulid = require('ulid');
 const assert = require('./assert');
 
-const ID_KEY = '_id';
 
 class Transaction {
 
-  constructor({values}) {
+  constructor({values, idKey}) {
     this.values = values;
+    this.idKey = idKey;
   }
 
   syncNew(entry) {
     const id = ulid();
-    const values = entry.values.set(ID_KEY, id);
+    const values = entry.values.set(this.idKey, id);
 
     this.values = this.values.set(id, values);
 
@@ -19,7 +19,7 @@ class Transaction {
   }
 
   syncExisting(entry) {
-    const id = entry.values.get(ID_KEY);
+    const id = entry.values.get(this.idKey);
 
     assert.entryExists(this, id);
 
@@ -31,7 +31,7 @@ class Transaction {
   }
 
   sync(entry) {
-    return entry.values.has(ID_KEY) ? this.syncExisting(entry) : this.syncNew(entry);
+    return entry.values.has(this.idKey) ? this.syncExisting(entry) : this.syncNew(entry);
   }
 
 }

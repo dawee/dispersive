@@ -2,6 +2,8 @@ const Immutable = require('immutable');
 const {createObjects} = require('./manager');
 const {createChangesEmitter} = require('./emitter');
 
+const ID_KEY = '_id';
+
 /*
  * Constructor and prototype for default entries
  */
@@ -27,6 +29,7 @@ const createEntry = ({objects, values, EntryConstructor}) => (
  * Default composers
  */
 
+const addIdKey = ({setup}) => setup.set('idKey', ID_KEY);
 const addObjectsFactory = ({setup}) => setup.set('objectsFactory', createObjects);
 const addEmitterFactory = ({setup}) => setup.set('emitterFactory', createChangesEmitter);
 const addEntryFactory = ({setup}) => setup.set('entryFactory', createEntry);
@@ -62,6 +65,7 @@ const generateCreateModel = ({composers}) => composeModel({
 const createModel = (...composers) => {
   const fixedSetup = generateCreateModel({
     composers: [
+      addIdKey,
       addObjectsFactory,
       addEmitterFactory,
       addEntryFactory,
