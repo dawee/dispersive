@@ -25,6 +25,14 @@ const createEntry = ({objects, values, EntryConstructor}) => (
   new EntryConstructor({objects, values})
 );
 
+const modelFactory = ({setup}) => {
+  const emitter = setup.get('emitterFactory')();
+  const objects = setup.get('objectsFactory')({emitter, setup});
+
+  return {emitter, objects};
+};
+
+
 /*
  * Default composers
  */
@@ -38,12 +46,7 @@ const addEntryConstructor = ({setup}) => setup.set('EntryConstructor', (
   class extends ModelEntry {}
 ));
 
-const addModelFactory = ({setup}) => setup.set('modelFactory', ({fixedSetup}) => {
-  const emitter = fixedSetup.emitterFactory();
-  const objects = fixedSetup.objectsFactory(Object.assign({emitter}, fixedSetup));
-
-  return {emitter, objects};
-});
+const addModelFactory = ({setup}) => setup.set('modelFactory', modelFactory);
 
 /*
  * Model creation
@@ -57,13 +60,13 @@ const composeModel = ({setup, composers}) => {
   return composeModel({setup: composer({setup}), composers: composers.shift(0)});
 };
 
-const generateCreateModel = ({composers}) => composeModel({
+const createModelSetup = ({composers}) => composeModel({
   composers: Immutable.List.of(...composers),
   setup: Immutable.Map(),
-}).toJS();
+});
 
 const createModel = (...composers) => {
-  const fixedSetup = generateCreateModel({
+  const setup = createModelSetup({
     composers: [
       addIdKey,
       addObjectsFactory,
@@ -75,12 +78,12 @@ const createModel = (...composers) => {
     ],
   });
 
-  return fixedSetup.modelFactory({fixedSetup});
+  return setup.get('modelFactory')({setup});
 };
 
 
 module.exports = {
   composeModel,
-  generateCreateModel,
+  createModelSetup,
   createModel,
 };

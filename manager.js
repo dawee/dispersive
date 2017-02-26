@@ -20,14 +20,18 @@ class EntriesGenerator {
 
 class ObjectManager extends QuerySet {
 
-  constructor({idKey, emitter, entryFactory, EntryConstructor}) {
+  constructor({emitter, setup}) {
     super({parent: null});
 
-    this.idKey = idKey;
     this.values = Immutable.Map();
     this.parent = new EntriesGenerator(this);
-    this.transaction = null;
     this.emitter = emitter;
+    this.transaction = null;
+    this.useSetup(setup.toJS());
+  }
+
+  useSetup({idKey, entryFactory, EntryConstructor}) {
+    this.idKey = idKey;
     this.entryFactory = entryFactory;
     this.EntryConstructor = EntryConstructor;
   }
