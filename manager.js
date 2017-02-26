@@ -29,6 +29,7 @@ class ObjectManager extends QuerySet {
     this.values = this.transaction.values;
 
     this.transaction = null;
+    this.deps.model.get('emitter').emitChange();
   }
 
   abortTransaction() {

@@ -1,4 +1,5 @@
-const {expect} = require('chai');
+const {assert, expect} = require('chai');
+const {spy} = require('sinon');
 const {model, error} = require('..');
 
 
@@ -19,22 +20,30 @@ describe('manager', () => {
   });
 
   it('should not create an entry if transaction is aborted', () => {
-    const objects = model.createModel().objects;
+    const {objects, emitter} = model.createModel();
+    const render = spy();
+    const subscription = emitter.changed(render);
 
     objects.createTransaction();
     objects.create({foo: 42});
     objects.abortTransaction();
+    subscription.remove();
 
+    assert(!render.called);
     expect(objects.length).to.equal(0);
   });
 
   it('should create an entry if transaction is commited', () => {
-    const objects = model.createModel().objects;
+    const {objects, emitter} = model.createModel();
+    const render = spy();
+    const subscription = emitter.changed(render);
 
     objects.createTransaction();
     objects.create({foo: 42});
     objects.commitTransaction();
+    subscription.remove();
 
+    assert(render.called);
     expect(objects.length).to.equal(1);
   });
 
