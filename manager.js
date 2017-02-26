@@ -6,12 +6,13 @@ const {QuerySet} = require('./queryset');
 
 class ObjectManager extends QuerySet {
 
-  constructor(deps = {createTransaction}) {
+  constructor({emitter, entryFactory}) {
     super({parent: null});
 
     this.values = Immutable.Map();
     this.transaction = null;
-    this.deps = deps;
+    this.emitter = emitter;
+    this.entryFactory = entryFactory;
   }
 
   get parent() {
@@ -20,7 +21,7 @@ class ObjectManager extends QuerySet {
 
   createTransaction() {
     assert.hasNoTransaction(this);
-    this.transaction = this.deps.createTransaction(this);
+    this.transaction = createTransaction(this);
 
     return this.transaction;
   }
@@ -29,7 +30,7 @@ class ObjectManager extends QuerySet {
     this.values = this.transaction.values;
 
     this.transaction = null;
-    this.deps.model.get('emitter').emitChange();
+    this.emitter.emitChange();
   }
 
   abortTransaction() {
@@ -37,11 +38,9 @@ class ObjectManager extends QuerySet {
   }
 
   create(values = {}) {
-    const createEntry = this.deps.model.get('factory');
-    const entry = createEntry({
+    const entry = this.entryFactory({
       values: Immutable.Map(values),
-      model: this.deps.model,
-      manager: this,
+      objects: this,
     });
 
     entry.save();
@@ -61,7 +60,7 @@ class ObjectManager extends QuerySet {
 }
 
 
-const createObjects = ({model}) => new ObjectManager({createTransaction, model});
+const createObjects = setup => new ObjectManager(setup);
 
 
 module.exports = {

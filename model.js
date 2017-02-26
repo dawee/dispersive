@@ -8,61 +8,67 @@ const {createChangesEmitter} = require('./emitter');
 
 class ModelEntry {
 
-  constructor({manager, values}) {
-    this.manager = manager;
+  constructor({objects, values}) {
+    this.objects = objects;
     this.values = values;
   }
 
   save() {
-    this.values = this.manager.sync(this);
+    this.values = this.objects.sync(this);
   }
 
 }
+
+const createEntry = ({objects, values}) => new ModelEntry({objects, values});
 
 /*
  * Default composers
  */
 
-const modelFactory = ({model, manager, values}) => {
-  const EntryConstructor = model.get('constructor');
-  return new EntryConstructor({manager, values});
-};
+const addObjectsFactory = ({setup}) => setup.set('objectsFactory', createObjects);
+const addEmitterFactory = ({setup}) => setup.set('emitterFactory', createChangesEmitter);
+const addEntryFactory = ({setup}) => setup.set('entryFactory', createEntry);
+const addModelFactory = ({setup}) => setup.set('modelFactory', ({fixedSetup}) => {
+  const emitter = fixedSetup.emitterFactory();
+  const objects = fixedSetup.objectsFactory({emitter, entryFactory: fixedSetup.entryFactory});
 
-const addObjects = ({model}) => model.set('objects', createObjects({model}));
-const addEmitter = ({model}) => model.set('emitter', createChangesEmitter());
-const addFactory = ({model}) => model.set('factory', modelFactory);
-const addConstructor = ({model}) => model.set('constructor', ModelEntry);
+  return {emitter, objects};
+});
 
-const preComposers = Immutable.List.of(addEmitter, addConstructor, addFactory);
-const postComposers = Immutable.List.of(addObjects);
 /*
  * Model creation
  */
 
-const composeModel = ({model, composers}) => {
-  if (composers.count() === 0) return model;
+const composeModel = ({setup, composers}) => {
+  if (composers.count() === 0) return setup;
 
   const composer = composers.get(0);
 
-  return composeModel({model: composer({model}), composers: composers.shift(0)});
+  return composeModel({setup: composer({setup}), composers: composers.shift(0)});
 };
 
 const generateCreateModel = ({composers}) => composeModel({
-  model: Immutable.Map(),
-  composers,
+  setup: Immutable.Map(),
+  composers: Immutable.List.of(...composers),
 }).toJS();
 
-const createModel = (...composers) => generateCreateModel({
-  composers: preComposers.concat(...composers).concat(postComposers),
-});
+const createModel = (...composers) => {
+  const fixedSetup = generateCreateModel({
+    composers: [
+      addObjectsFactory,
+      addEmitterFactory,
+      addEntryFactory,
+      addModelFactory,
+      ...composers,
+    ],
+  });
+
+  return fixedSetup.modelFactory({fixedSetup});
+};
 
 
 module.exports = {
-  addEmitter,
-  addObjects,
   composeModel,
   generateCreateModel,
   createModel,
-  preComposers,
-  postComposers,
 };
