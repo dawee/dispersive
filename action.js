@@ -5,8 +5,8 @@ const callHandler = async (handler, args) => readHandlerResult(handler(...args))
 const createTransactions = models => models.map(model => model.objects.createTransaction());
 const commitTransactions = models => models.map(model => model.objects.commitTransaction());
 
-const callHandlerAndCommit = (handler, models, args) => {
-  const res = callHandler(handler, args);
+const callHandlerAndCommit = async (handler, models, args) => {
+  const res = await callHandler(handler, args);
 
   commitTransactions(models);
   return res;
