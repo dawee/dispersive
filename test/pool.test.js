@@ -23,7 +23,7 @@ describe('pool', () => {
     expect(res).to.equal(42);
   });
 
-  it('should call action', async () => {
+  it('should chain actions', async () => {
     const chainPool = pool.createActionPool();
     const firstSpy = spy();
     const secondSpy = spy();

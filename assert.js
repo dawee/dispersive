@@ -17,7 +17,7 @@ const hasNoTransaction = (manager) => {
 };
 
 const entryExists = (transaction, id) => {
-  if (transaction.map.has(id)) return;
+  if (transaction.values.has(id)) return;
 
   throw new error.LostId({
     message: 'Id lost. Impossible to sync the entry.',

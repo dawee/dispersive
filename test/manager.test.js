@@ -47,6 +47,19 @@ describe('manager', () => {
     entry.save();
     objects.commitTransaction();
 
-    expect(objects.map.first().get('foo')).to.equal(0);
+    expect(objects.values.first().get('foo')).to.equal(0);
   });
+
+  it('should map entries', () => {
+    const objects = model.createModel().objects;
+
+    objects.createTransaction();
+    objects.create({foo: 42});
+    objects.commitTransaction();
+
+    const foos = objects.map(entry => 42);
+
+    expect(foos).to.deep.equal([42]);
+  });
+
 })

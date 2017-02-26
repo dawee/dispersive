@@ -1,14 +1,21 @@
 const Immutable = require('immutable');
 const assert = require('./assert');
 const {createTransaction} = require('./transaction');
+const {QuerySet} = require('./queryset');
 
 
-class ObjectManager {
+class ObjectManager extends QuerySet {
 
   constructor(deps = {createTransaction}) {
-    this.map = Immutable.Map();
+    super({parent: null});
+
+    this.values = Immutable.Map();
     this.transaction = null;
     this.deps = deps;
+  }
+
+  get parent() {
+    return this.values;
   }
 
   createTransaction() {
@@ -19,7 +26,8 @@ class ObjectManager {
   }
 
   commitTransaction() {
-    this.map = this.transaction.map;
+    this.values = this.transaction.values;
+
     this.transaction = null;
   }
 
@@ -46,7 +54,7 @@ class ObjectManager {
   }
 
   get length() {
-    return this.map.count();
+    return this.values.count();
   }
 
 }

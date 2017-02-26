@@ -5,15 +5,15 @@ const ID_KEY = '_id';
 
 class Transaction {
 
-  constructor({map}) {
-    this.map = map;
+  constructor({values}) {
+    this.values = values;
   }
 
   syncNew(entry) {
     const id = ulid();
     const values = entry.values.set(ID_KEY, id);
 
-    this.map = this.map.set(id, values);
+    this.values = this.values.set(id, values);
 
     return values;
   }
@@ -23,8 +23,8 @@ class Transaction {
 
     assert.entryExists(this, id);
 
-    if (entry.values !== this.map.get(id)) {
-      this.map = this.map.set(id, entry.values);
+    if (entry.values !== this.values.get(id)) {
+      this.values = this.values.set(id, entry.values);
     }
 
     return entry.values;
@@ -36,7 +36,7 @@ class Transaction {
 
 }
 
-const createTransaction = ({map}) => new Transaction({map});
+const createTransaction = ({values}) => new Transaction({values});
 
 module.exports = {
   Transaction,

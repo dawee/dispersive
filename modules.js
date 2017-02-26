@@ -12,5 +12,6 @@ module.exports = {
   manager: relative('./manager'),
   model: relative('./model'),
   pool: relative('./pool'),
+  queryset: relative('./queryset'),
   transaction: relative('./transaction'),
 };
