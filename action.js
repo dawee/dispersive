@@ -12,10 +12,16 @@ const callHandlerAndCommit = (handler, models, args) => {
   return res;
 };
 
-const createAction = (handler, models = []) => (async (...args) => {
-  createTransactions(models);
-  return callHandlerAndCommit(handler, models, args);
-});
+const packAction = (handler, models, args) => (
+  async () => {
+    createTransactions(models);
+    return callHandlerAndCommit(handler, models, args);
+  }
+);
+
+const createAction = (handler, models = []) => (
+  async (...args) => packAction(handler, models, args)()
+);
 
 
 module.exports = {
