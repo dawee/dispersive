@@ -11,5 +11,6 @@ module.exports = {
   error: relative('./error'),
   manager: relative('./manager'),
   model: relative('./model'),
+  pool: relative('./pool'),
   transaction: relative('./transaction'),
 };
