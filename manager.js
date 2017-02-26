@@ -28,7 +28,8 @@ class ObjectManager {
   }
 
   create(values = {}) {
-    const entry = this.deps.model.factory({
+    const createEntry = this.deps.model.get('factory');
+    const entry = createEntry({
       values: Immutable.Map(values),
       model: this.deps.model,
       manager: this,
