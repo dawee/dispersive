@@ -1,40 +1,26 @@
-const Immutable = require('immutable');
-
-
-class Subscription {
-
-  constructor({listener, emitter}) {
-    this.emitter = emitter;
-    this.trigger = event => listener(event);
-  }
-
-  remove() {
-    this.emitter.remove(this);
-    this.emitter = null;
-  }
-
-}
+const {EventEmitter} = require('fbemitter');
 
 
 class ChangesEmitter {
 
   constructor() {
-    this.subscriptions = Immutable.Set();
+    this.emitter = new EventEmitter();
   }
 
-  remove(subscription) {
-    this.subscriptions = this.subscriptions.remove(subscription);
+  emitChange(data = {}) {
+    this.emit('change', data);
   }
 
-  changed(listener) {
-    const subscription = new Subscription({listener, emitter: this});
-
-    this.subscriptions = this.subscriptions.add(subscription);
-    return subscription;
+  changed(listener, ctx = null) {
+    return this.on('change', listener, ctx);
   }
 
-  emitChange(event = {}) {
-    this.subscriptions.forEach(subscription => subscription.trigger(event));
+  on(name, listener, ctx = null) {
+    return this.emitter.addListener(name, data => listener.call(ctx, data));
+  }
+
+  emit(name, data = {}) {
+    this.emitter.emit(name, data);
   }
 
 }
@@ -42,7 +28,6 @@ class ChangesEmitter {
 const createChangesEmitter = () => new ChangesEmitter();
 
 module.exports = {
-  Subscription,
   ChangesEmitter,
   createChangesEmitter,
 };

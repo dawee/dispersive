@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/dawee/dispersive-core#readme",
   "dependencies": {
+    "fbemitter": "2.1.1",
     "immutable": "3.8.1",
     "ulid": "0.1.0"
   },
