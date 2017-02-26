@@ -19,7 +19,9 @@ class ModelEntry {
 
 }
 
-const createEntry = ({objects, values}) => new ModelEntry({objects, values});
+const createEntry = ({objects, values, EntryConstructor}) => (
+  new EntryConstructor({objects, values})
+);
 
 /*
  * Default composers
@@ -28,9 +30,14 @@ const createEntry = ({objects, values}) => new ModelEntry({objects, values});
 const addObjectsFactory = ({setup}) => setup.set('objectsFactory', createObjects);
 const addEmitterFactory = ({setup}) => setup.set('emitterFactory', createChangesEmitter);
 const addEntryFactory = ({setup}) => setup.set('entryFactory', createEntry);
+
+const addEntryConstructor = ({setup}) => setup.set('EntryConstructor', (
+  class extends ModelEntry {}
+));
+
 const addModelFactory = ({setup}) => setup.set('modelFactory', ({fixedSetup}) => {
   const emitter = fixedSetup.emitterFactory();
-  const objects = fixedSetup.objectsFactory({emitter, entryFactory: fixedSetup.entryFactory});
+  const objects = fixedSetup.objectsFactory(Object.assign({emitter}, fixedSetup));
 
   return {emitter, objects};
 });
@@ -48,8 +55,8 @@ const composeModel = ({setup, composers}) => {
 };
 
 const generateCreateModel = ({composers}) => composeModel({
-  setup: Immutable.Map(),
   composers: Immutable.List.of(...composers),
+  setup: Immutable.Map(),
 }).toJS();
 
 const createModel = (...composers) => {
@@ -58,6 +65,7 @@ const createModel = (...composers) => {
       addObjectsFactory,
       addEmitterFactory,
       addEntryFactory,
+      addEntryConstructor,
       addModelFactory,
       ...composers,
     ],

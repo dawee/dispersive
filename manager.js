@@ -6,13 +6,14 @@ const {QuerySet} = require('./queryset');
 
 class ObjectManager extends QuerySet {
 
-  constructor({emitter, entryFactory}) {
+  constructor({emitter, entryFactory, EntryConstructor}) {
     super({parent: null});
 
     this.values = Immutable.Map();
     this.transaction = null;
     this.emitter = emitter;
     this.entryFactory = entryFactory;
+    this.EntryConstructor = EntryConstructor;
   }
 
   get parent() {
@@ -39,6 +40,7 @@ class ObjectManager extends QuerySet {
 
   create(values = {}) {
     const entry = this.entryFactory({
+      EntryConstructor: this.EntryConstructor,
       values: Immutable.Map(values),
       objects: this,
     });
