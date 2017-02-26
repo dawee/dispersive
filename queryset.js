@@ -38,6 +38,10 @@ class QuerySet {
     return res;
   }
 
+  first() {
+    return this.entries().next().value;
+  }
+
 }
 
 module.exports = {

@@ -10,10 +10,10 @@ describe('model', () => {
     );
 
     Foo.objects.createTransaction();
-    const entry = Foo.objects.create();
+    Foo.objects.create();
     Foo.objects.commitTransaction();
 
-    expect(entry.bar).to.equal(42);
+    expect(Foo.objects.first().bar).to.equal(42);
   });
 
 })
