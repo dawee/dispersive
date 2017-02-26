@@ -1,23 +1,19 @@
 const {expect, assert} = require('chai');
-const {model, error} = require('..');
+const {model, field, error} = require('..');
 
 
 describe('model', () => {
 
-  it('should create a default object manager', () => {
-    const Foo = model.createModel();
+  it('should init field value', () => {
+    const Foo = model.createModel(
+      field.withField('bar', {initial: 42})
+    );
 
     Foo.objects.createTransaction();
-    Foo.objects.create();
+    const entry = Foo.objects.create();
     Foo.objects.commitTransaction();
 
-    expect(Foo.objects.length).to.equal(1);
-  });
-
-  it('should create a default emitter', () => {
-    const Foo = model.createModel();
-
-    assert(Foo.emitter);
+    expect(entry.bar).to.equal(42);
   });
 
 })
