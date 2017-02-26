@@ -9,6 +9,14 @@ const withField = (name, options = {}) => (
         if ('initial' in options) this[name] = options.initial;
       }
 
+      set [name](value) {
+        this.values = this.values.set(name, value);
+      }
+
+      get [name]() {
+        return this.values.get(name);
+      }
+
     };
 
     return setup.set('EntryConstructor', ExtendedConstructor);
