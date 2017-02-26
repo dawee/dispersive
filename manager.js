@@ -3,6 +3,20 @@ const assert = require('./assert');
 const {createTransaction} = require('./transaction');
 const {QuerySet} = require('./queryset');
 
+class EntriesGenerator {
+
+  constructor(manager) {
+    this.manager = manager;
+  }
+
+  * entries() {
+    for (const keyValues of this.manager.values.entries()) {
+      const values = keyValues[1];
+      yield this.manager.initEntryFromValues(values);
+    }
+  }
+
+}
 
 class ObjectManager extends QuerySet {
 
@@ -10,14 +24,11 @@ class ObjectManager extends QuerySet {
     super({parent: null});
 
     this.values = Immutable.Map();
+    this.parent = new EntriesGenerator(this);
     this.transaction = null;
     this.emitter = emitter;
     this.entryFactory = entryFactory;
     this.EntryConstructor = EntryConstructor;
-  }
-
-  get parent() {
-    return this.values;
   }
 
   createTransaction() {
@@ -38,15 +49,18 @@ class ObjectManager extends QuerySet {
     this.transaction = null;
   }
 
-  create(values = {}) {
-    const entry = this.entryFactory({
+  initEntryFromValues(values) {
+    return this.entryFactory({
       EntryConstructor: this.EntryConstructor,
       values: Immutable.Map(values),
       objects: this,
     });
+  }
+
+  create(values = {}) {
+    const entry = this.initEntryFromValues(values);
 
     entry.save();
-
     return entry;
   }
 
