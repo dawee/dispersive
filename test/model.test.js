@@ -16,4 +16,16 @@ describe('model', () => {
     expect(Foo.objects.first().bar).to.equal(42);
   });
 
+  it('should be patchable', () => {
+    const Foo = model.createModel();
+
+    Foo.patch(field.withField('bar', {initial: 42}));
+
+    Foo.objects.createTransaction();
+    Foo.objects.create();
+    Foo.objects.commitTransaction();
+
+    expect(Foo.objects.first().bar).to.equal(42);
+  });
+
 })

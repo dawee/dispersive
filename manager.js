@@ -27,10 +27,15 @@ class ObjectManager extends QuerySet {
     this.parent = new EntriesGenerator(this);
     this.emitter = emitter;
     this.transaction = null;
-    this.useSetup(setup.toJS());
+    this.useSetup(setup);
   }
 
-  useSetup({idKey, entryFactory, EntryConstructor}) {
+  useSetup(setup) {
+    this.extractAndUseSetup(setup.toJS());
+    this.setup = setup;
+  }
+
+  extractAndUseSetup({idKey, entryFactory, EntryConstructor}) {
     this.idKey = idKey;
     this.entryFactory = entryFactory;
     this.EntryConstructor = EntryConstructor;

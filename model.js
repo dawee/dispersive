@@ -25,11 +25,27 @@ const createEntry = ({objects, values, EntryConstructor}) => (
   new EntryConstructor({objects, values})
 );
 
+const composeSetup = ({setup, composers}) => {
+  if (composers.count() === 0) return setup;
+
+  const composer = composers.get(0);
+
+  return composeSetup({setup: composer({setup}), composers: composers.shift(0)});
+};
+
 const modelFactory = ({setup}) => {
   const emitter = setup.get('emitterFactory')();
   const objects = setup.get('objectsFactory')({emitter, setup});
+  const patch = (...composers) => {
+    const newSetup = composeSetup({
+      setup: objects.setup,
+      composers: Immutable.List.of(...composers),
+    });
 
-  return {emitter, objects};
+    objects.useSetup(newSetup);
+  };
+
+  return {emitter, objects, patch};
 };
 
 
@@ -52,15 +68,7 @@ const addModelFactory = ({setup}) => setup.set('modelFactory', modelFactory);
  * Model creation
  */
 
-const composeModel = ({setup, composers}) => {
-  if (composers.count() === 0) return setup;
-
-  const composer = composers.get(0);
-
-  return composeModel({setup: composer({setup}), composers: composers.shift(0)});
-};
-
-const createModelSetup = ({composers}) => composeModel({
+const createModelSetup = ({composers}) => composeSetup({
   composers: Immutable.List.of(...composers),
   setup: Immutable.Map(),
 });
@@ -83,7 +91,7 @@ const createModel = (...composers) => {
 
 
 module.exports = {
-  composeModel,
+  composeSetup,
   createModelSetup,
   createModel,
 };
