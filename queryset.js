@@ -4,7 +4,7 @@ const createFilterPredicate = expression => (
 
 const getFilterPredicate = expression => (
   typeof expression === 'function' ? expression : createFilterPredicate(expression)
-)
+);
 
 
 class QuerySet {
@@ -18,7 +18,7 @@ class QuerySet {
     return !this.predicate || this.predicate(entry);
   }
 
-  *entries() {
+  * entries() {
     for (const entry of this.parent.entries()) {
       if (this.validate(entry)) yield entry;
     }
