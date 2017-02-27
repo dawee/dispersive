@@ -24,13 +24,15 @@ const createWithField = (name, proto) => (
   )
 );
 
-const withField = (name, options = {}) => (
+const withInitializedField = (name, {initial = null}) => (
   createWithField(name, {
-    init: () => options.initial,
+    init: () => initial,
     set: ({entry, value}) => entry.values.set(name, value),
     get: ({entry}) => entry.values.get(name),
   })
 );
+
+const withField = (name, options = {}) => withInitializedField(name, options);
 
 module.exports = {
   extendWithField,
