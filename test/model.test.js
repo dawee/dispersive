@@ -16,10 +16,10 @@ describe('model', () => {
     expect(Foo.objects.first().bar).to.equal(42);
   });
 
-  it('should be patchable', () => {
+  it('should be injectable', () => {
     const Foo = model.createModel();
 
-    Foo.patch(field.withField('bar', {initial: 42}));
+    Foo.inject(field.withField('bar', {initial: 42}));
 
     Foo.objects.createTransaction();
     Foo.objects.create();

@@ -36,7 +36,7 @@ const composeSetup = ({setup, composers}) => {
 const modelFactory = ({setup}) => {
   const emitter = setup.get('emitterFactory')();
   const objects = setup.get('objectsFactory')({emitter, setup});
-  const patch = (...composers) => {
+  const inject = (...composers) => {
     const newSetup = composeSetup({
       setup: objects.setup,
       composers: Immutable.List.of(...composers),
@@ -45,7 +45,7 @@ const modelFactory = ({setup}) => {
     objects.useSetup(newSetup);
   };
 
-  return {emitter, objects, patch};
+  return {emitter, objects, inject};
 };
 
 
