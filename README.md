@@ -11,7 +11,7 @@ const User = createModel(
   withMany('tweets', {model: Tweet, relatedName: 'user'}),
 );
 
-const tweets = Tweet.objects.filter({[Tweet.user.name]: 'hopefulcyborg'});
+const tweets = User.objects.filter({name: 'hopefulcyborg'}).tweets;
 
 const fetchTweets = createAction(async userName => {
   const user = User.objects.getOrCreate({userName});
