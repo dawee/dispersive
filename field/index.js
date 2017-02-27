@@ -1,28 +1,34 @@
-const withField = (name, options = {}) => (
-  ({setup}) => {
-    const EntryConstructor = setup.get('EntryConstructor');
-    const ExtendedConstructor = class extends EntryConstructor {
+const extendWithField = (EntryConstructor, field) => (
+  class extends EntryConstructor {
 
-      constructor(...args) {
-        super(...args);
+    constructor(...args) {
+      super(...args);
+      this[field.name] = field.init ? field.init({entry: this, args}) : null;
+    }
 
-        if ('initial' in options) this[name] = options.initial;
-      }
+    set [field.name](value) {
+      this.values = field.set ? field.set({entry: this, set: super.set, value}) : null;
+    }
 
-      set [name](value) {
-        this.values = this.values.set(name, value);
-      }
+    get [field.name]() {
+      return field.get ? field.get({entry: this, get: super.get}) : null;
+    }
 
-      get [name]() {
-        return this.values.get(name);
-      }
-
-    };
-
-    return setup.set('EntryConstructor', ExtendedConstructor);
   }
 );
 
+const withField = (name, options = {}) => (
+  ({setup}) => (
+    setup.set('EntryConstructor', extendWithField(setup.get('EntryConstructor'), {
+      name,
+      init: () => options.initial,
+      set: ({entry, value}) => entry.values.set(name, value),
+      get: ({entry}) => entry.values.get(name),
+    }))
+  )
+);
+
 module.exports = {
+  extendWithField,
   withField,
 };
