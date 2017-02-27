@@ -19,7 +19,15 @@ describe('model', () => {
   it('should be injectable', () => {
     const Foo = model.createModel();
 
-    Foo.inject(field.withField('bar', {initial: 42}));
+    const injector = model.createInjector(
+      EntryConstructor => class extends EntryConstructor {
+        get bar() {
+          return 42;
+        }
+      }
+    );
+
+    Foo.inject(injector);
 
     Foo.objects.createTransaction();
     Foo.objects.create();

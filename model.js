@@ -33,17 +33,16 @@ const composeSetup = ({setup, composers}) => {
   return composeSetup({setup: composer({setup}), composers: composers.shift(0)});
 };
 
+const applyExtension = ({setup, extension}) => extension(setup.get('EntryConstructor'));
+
+const createInjector = extension => ({setup}) => (
+  setup.set('EntryConstructor', applyExtension({setup, extension}))
+);
+
 const modelFactory = ({setup}) => {
   const emitter = setup.get('emitterFactory')();
   const objects = setup.get('objectsFactory')({emitter, setup});
-  const inject = (...composers) => {
-    const newSetup = composeSetup({
-      setup: objects.setup,
-      composers: Immutable.List.of(...composers),
-    });
-
-    objects.useSetup(newSetup);
-  };
+  const inject = injector => objects.useSetup(injector({setup}));
 
   return {emitter, objects, inject};
 };
@@ -91,6 +90,7 @@ const createModel = (...composers) => {
 
 
 module.exports = {
+  createInjector,
   composeSetup,
   createModelSetup,
   createModel,
