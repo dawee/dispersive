@@ -1,4 +1,4 @@
-const extendWithField = (EntryConstructor, field) => (
+const extendWithField = ({EntryConstructor, field}) => (
   class extends EntryConstructor {
     constructor(...args) {
       super(...args);
@@ -15,15 +15,17 @@ const extendWithField = (EntryConstructor, field) => (
   }
 );
 
-const createWithField = field => (
+const createWithField = (name, proto) => (
   ({setup}) => (
-    setup.set('EntryConstructor', extendWithField(setup.get('EntryConstructor'), field))
+    setup.set('EntryConstructor', extendWithField({
+      EntryConstructor: setup.get('EntryConstructor'),
+      field: Object.assign({name}, proto),
+    }))
   )
 );
 
 const withField = (name, options = {}) => (
-  createWithField({
-    name,
+  createWithField(name, {
     init: () => options.initial,
     set: ({entry, value}) => entry.values.set(name, value),
     get: ({entry}) => entry.values.get(name),
