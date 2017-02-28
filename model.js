@@ -2,11 +2,12 @@ const Immutable = require('immutable');
 const {ObjectManager} = require('./manager');
 const {createChangesEmitter} = require('./emitter');
 
+/*
+ * Default setup
+ */
+
 const ID_KEY = '_id';
 
-/*
- * Constructor and prototype for default entries
- */
 
 class Entry {
 
@@ -38,14 +39,16 @@ class Model {
 
 }
 
-const composeSetup = ({setup, composers}) => {
-  const composer = composers.get(0);
-
-  return composer ? composeSetup({
-    setup: composer({setup}),
-    composers: composers.shift(0),
-  }) : setup;
+const defaultSetup = {
+  ObjectManagerConstructor: ObjectManager,
+  EntryConstructor: Entry,
+  idKey: ID_KEY,
 };
+
+
+/*
+ * Mixins
+ */
 
 const applyMixin = ({name, setup, mixin}) => mixin(setup.get(name));
 
@@ -56,34 +59,26 @@ const createMixin = ({name, mixin}) => (
 const createEntryMixin = mixin => createMixin({name: 'EntryConstructor', mixin});
 const createObjectManagerMixin = mixin => createMixin({name: 'ObjectManagerConstructor', mixin});
 
-/*
- * Default composers
- */
-
-const addIdKey = ({setup}) => setup.set('idKey', ID_KEY);
 
 /*
  * Model creation
  */
 
+const composeSetup = ({setup, composers}) => {
+  const composer = composers.get(0);
+
+  return composer ? composeSetup({
+    setup: composer({setup}),
+    composers: composers.shift(0),
+  }) : setup;
+};
+
 const createModelSetup = ({composers}) => composeSetup({
   composers: Immutable.List.of(...composers),
-  setup: Immutable.Map({
-    EntryConstructor: Entry,
-    ObjectManagerConstructor: ObjectManager,
-  }),
+  setup: Immutable.Map(defaultSetup),
 });
 
-const createModel = (composers = []) => {
-  const setup = createModelSetup({
-    composers: [
-      addIdKey,
-      ...composers,
-    ],
-  });
-
-  return new Model({setup});
-};
+const createModel = (composers = []) => new Model({setup: createModelSetup({composers})});
 
 
 module.exports = {
