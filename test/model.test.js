@@ -68,4 +68,17 @@ describe('model', () => {
 
     expect(Foo.objects.bar).to.equal(42);
   });
+
+  it('should connect a many relation', () => {
+    const Book = model.createModel();
+    const Author = model.createModel([
+      field.many.withMany('books', Book),
+    ]);
+
+    Author.objects.createTransaction();
+    Author.objects.create();
+    Author.objects.commitTransaction();
+
+    assert(Author.objects.first().books);
+  });
 })

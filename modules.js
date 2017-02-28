@@ -9,7 +9,10 @@ module.exports = {
   assert: relative('./assert'),
   emitter: relative('./emitter'),
   error: relative('./error'),
-  field: relative('./field'),
+  field: {
+    index: relative('./field'),
+    many: relative('./field/many'),
+  },
   manager: relative('./manager'),
   model: relative('./model'),
   pool: relative('./pool'),

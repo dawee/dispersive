@@ -7,7 +7,7 @@ const {createChangesEmitter} = require('./emitter');
  * Default setup
  */
 
-const PRIMARY_KEY_NAME = '_id';
+const PRIMARY_KEY_NAME = '_pk';
 
 
 class Entry {
@@ -58,7 +58,7 @@ const defaultSetup = {
  */
 
 
-const applyMixin = ({name, setup, mixin}) => mixin(setup.get(name));
+const applyMixin = ({name, setup, mixin}) => mixin(setup.get(name), {setup});
 
 const createMixin = ({name, mixin}) => (
   ({setup}) => setup.set(name, applyMixin({name, setup, mixin}))
