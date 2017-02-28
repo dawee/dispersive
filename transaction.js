@@ -4,9 +4,9 @@ const assert = require('./assert');
 
 class Transaction {
 
-  constructor({values, idKey}) {
+  constructor({values, setup}) {
     this.values = values;
-    this.idKey = idKey;
+    this.idKey = setup.get('idKey');
   }
 
   syncNew(entry) {
@@ -36,9 +36,6 @@ class Transaction {
 
 }
 
-const createTransaction = ({values}) => new Transaction({values});
-
 module.exports = {
   Transaction,
-  createTransaction,
 };

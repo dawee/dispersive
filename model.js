@@ -33,7 +33,7 @@ class Model {
 
   inject(composer) {
     this.setup = composer({setup: this.setup});
-    this.objects.useSetup(this.setup);
+    this.objects = this.objects.useSetup(this.setup);
   }
 
 }

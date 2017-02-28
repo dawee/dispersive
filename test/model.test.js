@@ -2,6 +2,23 @@ const {expect, assert} = require('chai');
 const {model, field, error} = require('..');
 
 
+const withEntryBar = () => model.createEntryMixin(
+  Base => class extends Base {
+    get bar() {
+      return 42;
+    }
+  }
+);
+
+const withObjectsBar = () => model.createObjectManagerMixin(
+  Base => class extends Base {
+    get bar() {
+      return 42;
+    }
+  }
+);
+
+
 describe('model', () => {
 
   it('should init field value', () => {
@@ -16,18 +33,10 @@ describe('model', () => {
     expect(Foo.objects.first().bar).to.equal(42);
   });
 
-  it('should be injectable', () => {
+  it('should inject objects mixins', () => {
     const Foo = model.createModel();
 
-    const withBar = () => model.createEntryMixin(
-      Base => class extends Base {
-        get bar() {
-          return 42;
-        }
-      }
-    );
-
-    Foo.inject(withBar());
+    Foo.inject(withEntryBar());
 
     Foo.objects.createTransaction();
     Foo.objects.create();
@@ -37,17 +46,17 @@ describe('model', () => {
   });
 
   it('should use manager mixins', () => {
-    const withBar = () => model.createObjectManagerMixin(
-      Base => class extends Base {
-        get bar() {
-          return 42;
-        }
-      }
-    );
-
     const Foo = model.createModel([
-      withBar(),
+      withObjectsBar(),
     ]);
+
+    expect(Foo.objects.bar).to.equal(42);
+  });
+
+  it('should inject manager mixins', () => {
+    const Foo = model.createModel();
+
+    Foo.inject(withObjectsBar());
 
     expect(Foo.objects.bar).to.equal(42);
   });

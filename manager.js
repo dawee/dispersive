@@ -1,6 +1,6 @@
 const Immutable = require('immutable');
 const assert = require('./assert');
-const {createTransaction} = require('./transaction');
+const {Transaction} = require('./transaction');
 const {QuerySet} = require('./queryset');
 
 class EntriesGenerator {
@@ -20,30 +20,24 @@ class EntriesGenerator {
 
 class ObjectManager extends QuerySet {
 
-  constructor({emitter, setup}) {
+  constructor({emitter, setup, values = Immutable.Map()}) {
     super({parent: null});
 
-    this.values = Immutable.Map();
+    this.values = values;
     this.parent = new EntriesGenerator(this);
     this.emitter = emitter;
     this.transaction = null;
-    this.useSetup(setup);
-  }
-
-  useSetup(setup) {
-    this.extractAndUseSetup(setup.toJS());
     this.setup = setup;
   }
 
-  extractAndUseSetup({idKey, entryFactory, EntryConstructor}) {
-    this.idKey = idKey;
-    this.entryFactory = entryFactory;
-    this.EntryConstructor = EntryConstructor;
+  useSetup(setup) {
+    const ObjectManagerConstructor = setup.get('ObjectManagerConstructor');
+    return new ObjectManagerConstructor({emitter: this.emitter, values: this.values, setup});
   }
 
   createTransaction() {
     assert.hasNoTransaction(this);
-    this.transaction = createTransaction(this);
+    this.transaction = new Transaction({values: this.values, setup: this.setup});
 
     return this.transaction;
   }
@@ -60,7 +54,8 @@ class ObjectManager extends QuerySet {
   }
 
   initEntryFromValues(values) {
-    return new this.EntryConstructor({values: Immutable.Map(values), objects: this});
+    const EntryConstructor = this.setup.get('EntryConstructor');
+    return new EntryConstructor({values: Immutable.Map(values), objects: this});
   }
 
   create(values = {}) {
@@ -81,11 +76,6 @@ class ObjectManager extends QuerySet {
 
 }
 
-
-const createObjects = setup => new ObjectManager(setup);
-
-
 module.exports = {
   ObjectManager,
-  createObjects,
 };
