@@ -7,18 +7,24 @@ const {createChangesEmitter} = require('./emitter');
  * Default setup
  */
 
-const ID_KEY = '_id';
+const PRIMARY_KEY_NAME = '_id';
 
 
 class Entry {
 
-  constructor({objects, values}) {
-    this.objects = objects;
+  constructor({manager, values, setup}) {
+    this.manager = manager;
     this.values = values;
+    this.setup = setup;
+  }
+
+  get pk() {
+    const pkName = this.setup.get('primaryKeyName');
+    return this.values.get(pkName);
   }
 
   save() {
-    this.values = this.objects.sync(this);
+    this.values = this.manager.sync(this);
   }
 
 }
@@ -43,7 +49,7 @@ class Model {
 const defaultSetup = {
   ObjectManagerConstructor: ObjectManager,
   EntryConstructor: Entry,
-  idKey: ID_KEY,
+  primaryKeyName: PRIMARY_KEY_NAME,
 };
 
 

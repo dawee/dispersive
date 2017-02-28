@@ -55,7 +55,7 @@ class ObjectManager extends QuerySet {
 
   initEntryFromValues(values) {
     const EntryConstructor = this.setup.get('EntryConstructor');
-    return new EntryConstructor({values: Immutable.Map(values), objects: this});
+    return new EntryConstructor({values: Immutable.Map(values), manager: this, setup: this.setup});
   }
 
   create(values = {}) {

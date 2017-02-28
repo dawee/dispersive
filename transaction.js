@@ -6,7 +6,7 @@ class Transaction {
 
   constructor({values, setup}) {
     this.values = values;
-    this.idKey = setup.get('idKey');
+    this.idKey = setup.get('primaryKeyName');
   }
 
   syncNew(entry) {
