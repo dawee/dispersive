@@ -1,7 +1,6 @@
 const Immutable = require('immutable');
 const assert = require('./assert');
 const {Transaction} = require('./transaction');
-const {QuerySet} = require('./queryset');
 
 class EntriesGenerator {
 
@@ -12,13 +11,13 @@ class EntriesGenerator {
   * entries() {
     for (const keyValues of this.manager.values.entries()) {
       const values = keyValues[1];
-      yield this.manager.initEntryFromValues(values);
+      yield this.manager.build(values);
     }
   }
 
 }
 
-class ObjectManager extends QuerySet {
+const createObjectManager = QuerySetBase => class extends QuerySetBase {
 
   constructor({emitter, setup, values = Immutable.Map()}) {
     super({parent: null});
@@ -53,29 +52,26 @@ class ObjectManager extends QuerySet {
     this.transaction = null;
   }
 
-  initEntryFromValues(values) {
+  build(values) {
     const EntryConstructor = this.setup.get('EntryConstructor');
     return new EntryConstructor({values: Immutable.Map(values), manager: this, setup: this.setup});
   }
 
   create(values = {}) {
-    const entry = this.initEntryFromValues(values);
-
-    entry.save();
-    return entry;
+    return this.build(values).save();
   }
 
-  sync(entry) {
+  sync(values) {
     assert.hasTransaction(this);
-    return this.transaction.sync(entry);
+    return this.transaction.sync(values);
   }
 
   get length() {
     return this.values.count();
   }
 
-}
+};
 
 module.exports = {
-  ObjectManager,
+  createObjectManager,
 };

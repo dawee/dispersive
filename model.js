@@ -1,6 +1,7 @@
 const Immutable = require('immutable');
 const assert = require('./assert');
-const {ObjectManager} = require('./manager');
+const {QuerySet} = require('./queryset');
+const {createObjectManager} = require('./manager');
 const {createChangesEmitter} = require('./emitter');
 
 /*
@@ -24,7 +25,8 @@ class Entry {
   }
 
   save() {
-    this.values = this.manager.sync(this);
+    this.values = this.manager.sync(this.values);
+    return this;
   }
 
 }
@@ -47,7 +49,7 @@ class Model {
 }
 
 const defaultSetup = {
-  ObjectManagerConstructor: ObjectManager,
+  ObjectManagerConstructor: createObjectManager(QuerySet),
   EntryConstructor: Entry,
   primaryKeyName: PRIMARY_KEY_NAME,
 };

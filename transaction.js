@@ -9,29 +9,29 @@ class Transaction {
     this.idKey = setup.get('primaryKeyName');
   }
 
-  syncNew(entry) {
+  syncNew(values) {
     const id = ulid();
-    const values = entry.values.set(this.idKey, id);
+    const newValues = values.set(this.idKey, id);
 
-    this.values = this.values.set(id, values);
+    this.values = this.values.set(id, newValues);
+
+    return newValues;
+  }
+
+  syncExisting(values) {
+    const id = values.get(this.idKey);
+
+    assert.entryExists(this, id);
+
+    if (values !== this.values.get(id)) {
+      this.values = this.values.set(id, values);
+    }
 
     return values;
   }
 
-  syncExisting(entry) {
-    const id = entry.values.get(this.idKey);
-
-    assert.entryExists(this, id);
-
-    if (entry.values !== this.values.get(id)) {
-      this.values = this.values.set(id, entry.values);
-    }
-
-    return entry.values;
-  }
-
-  sync(entry) {
-    return entry.values.has(this.idKey) ? this.syncExisting(entry) : this.syncNew(entry);
+  sync(values) {
+    return values.has(this.idKey) ? this.syncExisting(values) : this.syncNew(values);
   }
 
 }
