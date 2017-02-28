@@ -60,11 +60,7 @@ class ObjectManager extends QuerySet {
   }
 
   initEntryFromValues(values) {
-    return this.entryFactory({
-      EntryConstructor: this.EntryConstructor,
-      values: Immutable.Map(values),
-      objects: this,
-    });
+    return new this.EntryConstructor({values: Immutable.Map(values), objects: this});
   }
 
   create(values = {}) {

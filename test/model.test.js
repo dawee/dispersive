@@ -19,7 +19,7 @@ describe('model', () => {
   it('should be injectable', () => {
     const Foo = model.createModel();
 
-    const injector = model.createInjector(
+    const injector = model.createEntryMixin(
       EntryConstructor => class extends EntryConstructor {
         get bar() {
           return 42;
