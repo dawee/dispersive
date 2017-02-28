@@ -1,4 +1,5 @@
 const Immutable = require('immutable');
+const assert = require('./assert');
 const {ObjectManager} = require('./manager');
 const {createChangesEmitter} = require('./emitter');
 
@@ -47,8 +48,9 @@ const defaultSetup = {
 
 
 /*
- * Mixins
+ * Composition
  */
+
 
 const applyMixin = ({name, setup, mixin}) => mixin(setup.get(name));
 
@@ -56,33 +58,37 @@ const createMixin = ({name, mixin}) => (
   ({setup}) => setup.set(name, applyMixin({name, setup, mixin}))
 );
 
-const createEntryMixin = mixin => createMixin({name: 'EntryConstructor', mixin});
-const createObjectManagerMixin = mixin => createMixin({name: 'ObjectManagerConstructor', mixin});
-
-
-/*
- * Model creation
- */
-
-const composeSetup = ({setup, composers}) => {
-  const composer = composers.get(0);
+const composeSetup = ({setup = Immutable.Map(defaultSetup), composers = []}) => {
+  const composer = Immutable.List(composers).get(0);
 
   return composer ? composeSetup({
     setup: composer({setup}),
-    composers: composers.shift(0),
+    composers: Immutable.List(composers).shift(0),
   }) : setup;
 };
 
-const createModelSetup = ({composers}) => composeSetup({
-  composers: Immutable.List.of(...composers),
-  setup: Immutable.Map(defaultSetup),
-});
 
-const createModel = (composers = []) => new Model({setup: createModelSetup({composers})});
+/*
+ * API
+ */
 
+const createEntryMixin = mixin => createMixin({name: 'EntryConstructor', mixin});
+
+const createObjectManagerMixin = mixin => createMixin({name: 'ObjectManagerConstructor', mixin});
+
+const createModel = (composers = []) => {
+  assert.composersAreArray(composers);
+
+  return new Model({setup: composeSetup({composers})});
+};
+
+const mixModelComposers = (composers = []) => (
+  ({setup}) => composeSetup({setup, composers})
+);
 
 module.exports = {
   createEntryMixin,
   createObjectManagerMixin,
   createModel,
+  mixModelComposers,
 };

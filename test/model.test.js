@@ -18,6 +18,8 @@ const withObjectsBar = () => model.createObjectManagerMixin(
   }
 );
 
+const withMix = () => model.mixModelComposers([withEntryBar(), withObjectsBar()]);
+
 
 describe('model', () => {
 
@@ -61,4 +63,9 @@ describe('model', () => {
     expect(Foo.objects.bar).to.equal(42);
   });
 
+  it('should mix composers', () => {
+    const Foo = model.createModel([withMix()]);
+
+    expect(Foo.objects.bar).to.equal(42);
+  });
 })
