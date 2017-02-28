@@ -9,9 +9,10 @@ const getFilterPredicate = expression => (
 
 class QuerySet {
 
-  constructor({parent = null, predicate = null}) {
-    if (parent) this.parent = parent;
-    if (predicate) this.predicate = predicate;
+  constructor({parent = null, predicate = null, QuerySetConstructor = QuerySet}) {
+    this.parent = parent;
+    this.predicate = predicate;
+    this.QuerySetConstructor = QuerySetConstructor;
   }
 
   validate(entry) {
@@ -25,7 +26,10 @@ class QuerySet {
   }
 
   filter(expression) {
-    return new QuerySet({parent: this, predicate: getFilterPredicate(expression)});
+    return new this.QuerySetConstructor({
+      parent: this,
+      predicate: getFilterPredicate(expression),
+    });
   }
 
   map(transform) {

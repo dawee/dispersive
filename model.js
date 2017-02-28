@@ -1,7 +1,7 @@
 const Immutable = require('immutable');
 const assert = require('./assert');
 const {QuerySet} = require('./queryset');
-const {createObjectManager} = require('./manager');
+const {createObjectManagerConstructor} = require('./manager');
 const {createChangesEmitter} = require('./emitter');
 
 /*
@@ -34,7 +34,8 @@ class Entry {
 class Model {
 
   constructor({setup}) {
-    const ObjectManagerConstructor = setup.get('ObjectManagerConstructor');
+    const QuerySetConstructor = setup.get('QuerySetConstructor');
+    const ObjectManagerConstructor = createObjectManagerConstructor(QuerySetConstructor);
     const emitter = createChangesEmitter();
     const objects = new ObjectManagerConstructor({emitter, setup});
 
@@ -49,8 +50,8 @@ class Model {
 }
 
 const defaultSetup = {
-  ObjectManagerConstructor: createObjectManager(QuerySet),
   EntryConstructor: Entry,
+  QuerySetConstructor: QuerySet,
   primaryKeyName: PRIMARY_KEY_NAME,
 };
 
@@ -82,7 +83,7 @@ const composeSetup = ({setup = Immutable.Map(defaultSetup), composers = []}) => 
 
 const createEntryMixin = mixin => createMixin({name: 'EntryConstructor', mixin});
 
-const createObjectManagerMixin = mixin => createMixin({name: 'ObjectManagerConstructor', mixin});
+const createQuerySetMixin = mixin => createMixin({name: 'QuerySetConstructor', mixin});
 
 const createModel = (composers = []) => {
   assert.composersAreArray(composers);
@@ -96,7 +97,7 @@ const mixModelComposers = (composers = []) => (
 
 module.exports = {
   createEntryMixin,
-  createObjectManagerMixin,
+  createQuerySetMixin,
   createModel,
   mixModelComposers,
 };

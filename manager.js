@@ -17,10 +17,10 @@ class EntriesGenerator {
 
 }
 
-const createObjectManager = QuerySetBase => class extends QuerySetBase {
+const createObjectManagerConstructor = QuerySetConstructor => class extends QuerySetConstructor {
 
   constructor({emitter, setup, values = Immutable.Map()}) {
-    super({parent: null});
+    super({parent: null, QuerySetConstructor});
 
     this.values = values;
     this.parent = new EntriesGenerator(this);
@@ -30,7 +30,8 @@ const createObjectManager = QuerySetBase => class extends QuerySetBase {
   }
 
   useSetup(setup) {
-    const ObjectManagerConstructor = setup.get('ObjectManagerConstructor');
+    const NewQuerySetConstructor = setup.get('QuerySetConstructor');
+    const ObjectManagerConstructor = createObjectManagerConstructor(NewQuerySetConstructor);
     return new ObjectManagerConstructor({emitter: this.emitter, values: this.values, setup});
   }
 
@@ -73,5 +74,5 @@ const createObjectManager = QuerySetBase => class extends QuerySetBase {
 };
 
 module.exports = {
-  createObjectManager,
+  createObjectManagerConstructor,
 };
