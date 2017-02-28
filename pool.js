@@ -10,7 +10,7 @@ class ActionPool {
 
   addDelegation(action, resolve, reject) {
     this.delegations.push({action, resolve, reject});
-    if (this.delegations.length === 1) this.runNext();
+    return this.delegations.length === 1 ? this.runNext() : null;
   }
 
   delegate(action) {
@@ -33,13 +33,13 @@ class ActionPool {
   }
 
   runAction({action, resolve, reject}) {
-    action()
+    return action()
       .catch(error => this.onActionRejected(reject, error))
       .then(res => this.onActionResolved(resolve, res));
   }
 
   runNext() {
-    if (this.delegations.length > 0) this.runAction(this.delegations[0]);
+    return this.delegations.length > 0 ? this.runAction(this.delegations[0]) : null;
   }
 
 }
