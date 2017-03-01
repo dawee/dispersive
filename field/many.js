@@ -20,6 +20,20 @@ const createManyRelation = ({QuerySetConstructor, relation, pk}) => {
   return new ManyRelation({parent: relation.model.objects.filter({[relation.pkName]: pk})});
 };
 
+const withRelationField = ({model, relation, name}) => (
+  createEntryMixin(({Base}) => class extends Base {
+
+    set [relation.fieldName](entry) {
+      entry[name].add(this);
+    }
+
+    get [relation.fieldName]() {
+      return model.objects.get({pk: this[relation.pkName]});
+    }
+
+  })
+);
+
 const withMany = (name, {model = null, relatedName = null}) => {
   const relation = {
     model,
@@ -31,6 +45,10 @@ const withMany = (name, {model = null, relatedName = null}) => {
 
   return createEntryMixin(({Base, setup}) => {
     const QuerySetConstructor = setup.get('QuerySetConstructor');
+
+    if (relation.fieldName) {
+      relation.model.inject(withRelationField({model: setup.get('model'), name, relation}));
+    }
 
     return class extends Base {
       get [name]() {

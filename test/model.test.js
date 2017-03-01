@@ -1,6 +1,9 @@
 const {expect, assert} = require('chai');
 const {model, field, error} = require('..');
 
+const {withField} = field;
+const {withMany} = field.many;
+const {createModel} = model;
 
 const withEntryBar = () => model.createEntryMixin(
   ({Base}) => class extends Base {
@@ -70,21 +73,27 @@ describe('model', () => {
   });
 
   it('should connect a many relation', () => {
-    const Book = model.createModel();
-    const Author = model.createModel([
-      field.many.withMany('books', {model: Book, relatedName: 'author'}),
+    const Book = createModel([
+      withField('title'),
+    ]);
+
+    const Author = createModel([
+      withField('name'),
+      withMany('books', {model: Book, relatedName: 'author'}),
     ]);
 
     Author.objects.createTransaction();
     Book.objects.createTransaction();
-    const book = Book.objects.create();
-    const author = Author.objects.create();
 
-    author.books.add(book);
+    const diana = Author.objects.create({name: 'Diana Wynne Jones'});
+    const book = Book.objects.create({
+      author: diana,
+      title: 'Howl\'s Moving Castle',
+    });
+
     Book.objects.commitTransaction();
     Author.objects.commitTransaction();
 
-    assert(Book.objects.first()._author_pk);
-    expect(Author.objects.first().books.length).to.equal(1);
+    expect(diana.books.first().title).to.equal('Howl\'s Moving Castle');
   });
 })

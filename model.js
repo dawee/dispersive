@@ -18,6 +18,10 @@ class Entry {
     this.setup = setup;
   }
 
+  assign(rawValues = {}) {
+    Object.assign(this, rawValues);
+  }
+
   get pk() {
     const pkName = this.setup.get('primaryKeyName');
     return this.values.get(pkName);
@@ -29,7 +33,7 @@ class Entry {
   }
 
   update(rawValues = {}) {
-    Object.assign(this, rawValues);
+    this.assign(rawValues);
     return this.save();
   }
 

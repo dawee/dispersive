@@ -44,7 +44,6 @@ const createObjectManagerConstructor = QuerySetConstructor => class extends Quer
 
   commitTransaction() {
     this.values = this.transaction.values;
-
     this.transaction = null;
     this.emitter.emitChange();
   }
@@ -53,13 +52,17 @@ const createObjectManagerConstructor = QuerySetConstructor => class extends Quer
     this.transaction = null;
   }
 
-  build(values) {
+  build(values = Immutable.Map()) {
     const EntryConstructor = this.setup.get('EntryConstructor');
-    return new EntryConstructor({values: Immutable.Map(values), manager: this, setup: this.setup});
+    return new EntryConstructor({values, manager: this, setup: this.setup});
   }
 
-  create(values = {}) {
-    return this.build(values).save();
+  create(rawValues = {}) {
+    const entry = this.build();
+
+    entry.assign(rawValues);
+    entry.save();
+    return entry;
   }
 
   sync(values) {
