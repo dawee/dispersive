@@ -35,26 +35,8 @@ class Entry {
 
 }
 
-class Model {
-
-  constructor({setup}) {
-    const QuerySetConstructor = setup.get('QuerySetConstructor');
-    const ObjectManagerConstructor = createObjectManagerConstructor(QuerySetConstructor);
-    const emitter = createChangesEmitter();
-    const objects = new ObjectManagerConstructor({emitter, setup});
-
-    Object.assign(this, {setup, emitter, objects});
-  }
-
-  inject(composer) {
-    this.setup = composer({setup: this.setup});
-    this.objects = this.objects.useSetup(this.setup);
-  }
-
-}
 
 const defaultSetup = {
-  ModelConstructor: Model,
   EntryConstructor: Entry,
   QuerySetConstructor: QuerySet,
   primaryKeyName: PRIMARY_KEY_NAME,
@@ -87,16 +69,28 @@ const composeSetup = ({setup = Immutable.Map(defaultSetup), composers = []}) => 
  */
 
 const createEntryMixin = mixin => createMixin({name: 'EntryConstructor', mixin});
-
 const createQuerySetMixin = mixin => createMixin({name: 'QuerySetConstructor', mixin});
 
-const createModelMixin = mixin => createMixin({name: 'ModelConstructor', mixin});
-
 const createModel = (composers) => {
-  const setup = composeSetup({composers: Array.isArray(composers) ? composers : [composers]});
-  const ModelConstructor = setup.get('ModelConstructor');
+  const model = {};
 
-  return new ModelConstructor({setup});
+  model.setup = composeSetup({
+    setup: Immutable.Map(defaultSetup).set('model', model),
+    composers: Array.isArray(composers) ? composers : [composers],
+  });
+
+  model.inject = (composer) => {
+    model.setup = composer({setup: model.setup});
+    model.objects = model.objects.useSetup(model.setup);
+  };
+
+  const QuerySetConstructor = model.setup.get('QuerySetConstructor');
+  const ObjectManagerConstructor = createObjectManagerConstructor(QuerySetConstructor);
+
+  model.emitter = createChangesEmitter();
+  model.objects = new ObjectManagerConstructor(model);
+
+  return model;
 };
 
 const mixModelComposers = (composers = []) => (
@@ -106,7 +100,6 @@ const mixModelComposers = (composers = []) => (
 module.exports = {
   createEntryMixin,
   createQuerySetMixin,
-  createModelMixin,
   createModel,
   mixModelComposers,
 };
