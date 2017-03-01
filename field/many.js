@@ -9,11 +9,13 @@ const withMany = (name, relatedModel) => {
 
   relatedModel.inject(relatedComposer);
 
-  return createEntryMixin(Base => class extends Base {
-    get [name]() {
-      return relatedModel.objects.filter({[relatedPk]: this.pk});
+  return createEntryMixin(({Base}) => (
+    class extends Base {
+      get [name]() {
+        return relatedModel.objects.filter({[relatedPk]: this.pk});
+      }
     }
-  });
+  ));
 };
 
 module.exports = {

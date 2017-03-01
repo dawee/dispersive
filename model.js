@@ -62,7 +62,7 @@ const defaultSetup = {
  */
 
 
-const applyMixin = ({name, setup, mixin}) => mixin(setup.get(name), {setup});
+const applyMixin = ({name, setup, mixin}) => mixin({Base: setup.get(name), setup}, {setup});
 
 const createMixin = ({name, mixin}) => (
   ({setup}) => setup.set(name, applyMixin({name, setup, mixin}))

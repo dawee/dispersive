@@ -3,7 +3,7 @@ const {model, field, error} = require('..');
 
 
 const withEntryBar = () => model.createEntryMixin(
-  Base => class extends Base {
+  ({Base}) => class extends Base {
     get bar() {
       return 42;
     }
@@ -11,7 +11,7 @@ const withEntryBar = () => model.createEntryMixin(
 );
 
 const withObjectsBar = () => model.createQuerySetMixin(
-  Base => class extends Base {
+  ({Base}) => class extends Base {
     get bar() {
       return 42;
     }
