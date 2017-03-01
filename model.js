@@ -50,6 +50,7 @@ class Model {
 }
 
 const defaultSetup = {
+  ModelConstructor: Model,
   EntryConstructor: Entry,
   QuerySetConstructor: QuerySet,
   primaryKeyName: PRIMARY_KEY_NAME,
@@ -85,10 +86,15 @@ const createEntryMixin = mixin => createMixin({name: 'EntryConstructor', mixin})
 
 const createQuerySetMixin = mixin => createMixin({name: 'QuerySetConstructor', mixin});
 
+const createModelMixin = mixin => createMixin({name: 'ModelConstructor', mixin});
+
 const createModel = (composers = []) => {
   assert.composersAreArray(composers);
 
-  return new Model({setup: composeSetup({composers})});
+  const setup = composeSetup({composers});
+  const ModelConstructor = setup.get('ModelConstructor');
+
+  return new ModelConstructor({setup});
 };
 
 const mixModelComposers = (composers = []) => (
