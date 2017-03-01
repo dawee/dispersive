@@ -46,6 +46,10 @@ class QuerySet {
     return this.entries().next().value;
   }
 
+  get(expression) {
+    return this.filter(expression).first();
+  }
+
   get length() {
     return this.map(entry => entry).length;
   }

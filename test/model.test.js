@@ -72,7 +72,7 @@ describe('model', () => {
   it('should connect a many relation', () => {
     const Book = model.createModel();
     const Author = model.createModel([
-      field.many.withMany('books', Book),
+      field.many.withMany('books', {model: Book, relatedName: 'author'}),
     ]);
 
     Author.objects.createTransaction();
@@ -84,6 +84,7 @@ describe('model', () => {
     Book.objects.commitTransaction();
     Author.objects.commitTransaction();
 
+    assert(Book.objects.first()._author_pk);
     expect(Author.objects.first().books.length).to.equal(1);
   });
 })

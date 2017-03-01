@@ -24,15 +24,8 @@ const entryExists = (transaction, id) => {
   });
 };
 
-const composersAreArray = (composers) => {
-  if (Array.isArray(composers)) return;
-
-  throw new error.ComposersShouldBeArray(composers);
-};
-
 module.exports = {
   hasTransaction,
   hasNoTransaction,
   entryExists,
-  composersAreArray,
 };
