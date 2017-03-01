@@ -29,6 +29,11 @@ class Entry {
     return this;
   }
 
+  update(rawValues = {}) {
+    Object.assign(this, rawValues);
+    return this.save();
+  }
+
 }
 
 class Model {

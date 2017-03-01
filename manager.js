@@ -67,10 +67,6 @@ const createObjectManagerConstructor = QuerySetConstructor => class extends Quer
     return this.transaction.sync(values);
   }
 
-  get length() {
-    return this.values.count();
-  }
-
 };
 
 module.exports = {

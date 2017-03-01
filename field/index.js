@@ -2,7 +2,10 @@ const extendWithField = ({EntryConstructor, field}) => (
   class extends EntryConstructor {
     constructor(...args) {
       super(...args);
-      this[field.name] = field.init ? field.init({entry: this, args}) : null;
+
+      if (!this.values.has(field.name) && field.init) {
+        this[field.name] = field.init ? field.init({entry: this, args}) : null;
+      }
     }
 
     set [field.name](value) {

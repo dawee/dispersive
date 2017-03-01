@@ -76,9 +76,14 @@ describe('model', () => {
     ]);
 
     Author.objects.createTransaction();
-    Author.objects.create();
+    Book.objects.createTransaction();
+    const book = Book.objects.create();
+    const author = Author.objects.create();
+
+    author.books.add(book);
+    Book.objects.commitTransaction();
     Author.objects.commitTransaction();
 
-    assert(Author.objects.first().books);
+    expect(Author.objects.first().books.length).to.equal(1);
   });
 })
