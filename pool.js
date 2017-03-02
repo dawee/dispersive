@@ -28,8 +28,8 @@ class ActionPool {
   }
 
   onActionDone() {
-    this.runNext();
     this.delegations.shift();
+    this.runNext();
   }
 
   runAction({action, resolve, reject}) {

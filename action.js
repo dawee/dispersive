@@ -1,3 +1,5 @@
+const {dispatch} = require('./dispatcher');
+
 const readHandlerResult = async res => res;
 
 const callHandler = async (handler, args) => readHandlerResult(handler(...args));
@@ -20,7 +22,10 @@ const packAction = (handler, args = [], models = []) => (
 );
 
 const createAction = (handler, models = []) => (
-  async (...args) => packAction(handler, args, models)()
+  async (...args) => {
+    const action = packAction(handler, args, models);
+    return dispatch(action, models);
+  }
 );
 
 
