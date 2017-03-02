@@ -1,4 +1,5 @@
 const Immutable = require('immutable');
+const ulid = require('ulid');
 const {QuerySet} = require('./queryset');
 const {createObjectManagerConstructor} = require('./manager');
 const {createChangesEmitter} = require('./emitter');
@@ -76,7 +77,7 @@ const createEntryMixin = mixin => createMixin({name: 'EntryConstructor', mixin})
 const createQuerySetMixin = mixin => createMixin({name: 'QuerySetConstructor', mixin});
 
 const createModel = (composers) => {
-  const model = {};
+  const model = {id: ulid()};
 
   model.setup = composeSetup({
     setup: Immutable.Map(defaultSetup).set('model', model),
