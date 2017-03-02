@@ -8,6 +8,7 @@ module.exports = {
   action: relative('./action'),
   assert: relative('./assert'),
   emitter: relative('./emitter'),
+  dispatcher: relative('./dispatcher'),
   error: relative('./error'),
   field: {
     index: relative('./field'),
