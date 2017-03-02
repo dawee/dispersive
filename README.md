@@ -1,10 +1,6 @@
 # dispersive
 
-_ flux
-
-_ less code
-
-_ period.
+Flux with less code.
 
 ## Usage
 
