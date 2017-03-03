@@ -1,20 +1,17 @@
-const modules = require('./modules');
+/* eslint global-require: "off" */
 
-const applySubModule = subModule => (
-  typeof subModule === 'object' ? mapSubModules(subModule) : require(subModule)
-)
-
-const mapSubModules = (subModules) => {
-  const mapping = {};
-
-  Object.keys(subModules).forEach((key) => {
-    if (key === 'index') return Object.assign(mapping, applySubModule(subModules[key]));
-
-    mapping[key] = applySubModule(subModules[key]);
-  });
-
-  return mapping;
+module.exports = {
+  action: require('./action'),
+  assert: require('./assert'),
+  emitter: require('./emitter'),
+  dispatcher: require('./dispatcher'),
+  error: require('./error'),
+  field: Object.assign({
+    many: require('./field/many'),
+  }, require('./field')),
+  manager: require('./manager'),
+  model: require('./model'),
+  pool: require('./pool'),
+  queryset: require('./queryset'),
+  transaction: require('./transaction'),
 };
-
-
-module.exports = mapSubModules(modules);
