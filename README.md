@@ -1,4 +1,4 @@
-# dispersive
+![Dispersive](https://raw.githubusercontent.com/dawee/dispersive-logo/master/dispersive-white-bg.png)
 
 Flux with less code.
 
