@@ -29,4 +29,20 @@ describe('action', () => {
     expect(Book.objects.length).to.equal(1);
   });
 
+  it('should emit events before resolving the promise', async () => {
+    const Book = model.createModel();
+    const renderer = spy();
+    const createBook = action.createAction(() => Book.objects.create(), [Book]);
+
+    const subscription = Book.emitter.changed(() => renderer(Book.objects.length));
+
+    await createBook();
+
+    subscription.remove();
+
+    assert(renderer.called);
+    assert(renderer.calledWith(1));
+  });
+
+
 })
