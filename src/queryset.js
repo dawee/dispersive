@@ -60,6 +60,11 @@ class QuerySet {
     return this.entries().next().value;
   }
 
+  last() {
+    const array = this.toArray();
+    return array[array.length - 1];
+  }
+
 }
 
 module.exports = {

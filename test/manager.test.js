@@ -1,7 +1,8 @@
 const {assert, expect} = require('chai');
 const {spy} = require('sinon');
-const {model, error} = require('..');
+const {model, field, error} = require('..');
 
+const {withField} = field;
 
 describe('manager', () => {
 
@@ -69,6 +70,32 @@ describe('manager', () => {
     const foos = objects.map(entry => 42);
 
     expect(foos).to.deep.equal([42]);
+  });
+
+  it('should retreive first', () => {
+    const objects = model.createModel([
+      withField('text'),
+    ]).objects;
+
+    objects.createTransaction();
+    objects.create({text: 'foo'});
+    objects.create({text: 'bar'});
+    objects.commitTransaction();
+
+    expect(objects.first().text).to.equal('foo');
+  });
+
+  it('should retreive last', () => {
+    const objects = model.createModel([
+      withField('text'),
+    ]).objects;
+
+    objects.createTransaction();
+    objects.create({text: 'foo'});
+    objects.create({text: 'bar'});
+    objects.commitTransaction();
+
+    expect(objects.last().text).to.equal('bar');
   });
 
 })
