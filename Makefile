@@ -4,6 +4,8 @@ eslint := $(shell npm bin)/eslint
 sources := $(shell find src -name "*.js")
 libs := $(patsubst src/%,%,${sources})
 
+validate: clean lint test
+
 clean:
 	@rm -rf *.js field
 
