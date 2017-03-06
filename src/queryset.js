@@ -32,26 +32,32 @@ class QuerySet {
     });
   }
 
-  map(transform) {
-    const res = [];
-
-    for (const entry of this.entries()) {
-      res.push(transform(entry));
-    }
-
-    return res;
-  }
-
-  first() {
-    return this.entries().next().value;
-  }
-
   get(expression) {
     return this.filter(expression).first();
   }
 
   get length() {
-    return this.map(entry => entry).length;
+    return this.toArray().length;
+  }
+
+  map(transform) {
+    let index = 0;
+    const res = [];
+
+    for (const entry of this.entries()) {
+      res.push(transform(entry, index));
+      index += 1;
+    }
+
+    return res;
+  }
+
+  toArray() {
+    return this.map(entry => entry);
+  }
+
+  first() {
+    return this.entries().next().value;
   }
 
 }
