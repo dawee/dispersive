@@ -52,11 +52,13 @@ const createPool = () => {
   return pool;
 };
 
-const findPool = models => (
-  Object.keys(pools).find(poolId => (
+const findPool = (models) => {
+  const foundId = Object.keys(pools).find(poolId => (
     models.some(model => pools[poolId].locked(model))
-  ))
-);
+  ));
+
+  return foundId ? pools[foundId] : null;
+};
 
 const getOrCreatePool = models => findPool(models) || createPool();
 
