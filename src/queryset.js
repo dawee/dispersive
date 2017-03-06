@@ -33,7 +33,7 @@ class QuerySet {
   }
 
   get(expression) {
-    return this.filter(expression).first();
+    return expression ? this.filter(expression).first() : this.first();
   }
 
   get length() {
@@ -63,6 +63,10 @@ class QuerySet {
   last() {
     const array = this.toArray();
     return array[array.length - 1];
+  }
+
+  delete() {
+    return this.map(entry => entry.delete());
   }
 
 }

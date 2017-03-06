@@ -34,6 +34,11 @@ class Transaction {
     return values.has(this.idKey) ? this.syncExisting(values) : this.syncNew(values);
   }
 
+  unsync(values) {
+    this.values = this.values.remove(values.get(this.idKey));
+    return values.remove(this.idKey);
+  }
+
 }
 
 module.exports = {

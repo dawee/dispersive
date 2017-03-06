@@ -38,6 +38,11 @@ class Entry {
     return this.save();
   }
 
+  delete() {
+    this.values = this.manager.unsync(this.values);
+    return this;
+  }
+
 }
 
 

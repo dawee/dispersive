@@ -70,6 +70,11 @@ const createObjectManagerConstructor = QuerySetConstructor => class extends Quer
     return this.transaction.sync(values);
   }
 
+  unsync(values) {
+    assert.hasTransaction(this);
+    return this.transaction.unsync(values);
+  }
+
 };
 
 module.exports = {

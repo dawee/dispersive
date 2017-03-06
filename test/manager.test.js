@@ -98,4 +98,23 @@ describe('manager', () => {
     expect(objects.last().text).to.equal('bar');
   });
 
+  it('should delete filtered entries', () => {
+    const objects = model.createModel([
+      withField('text'),
+    ]).objects;
+
+    objects.createTransaction();
+    objects.create({text: 'foo'});
+    objects.create({text: 'bar'});
+    objects.create({text: 'foobar'});
+    objects.commitTransaction();
+
+    objects.createTransaction();
+    objects.filter(entry => entry.text.length <= 3).delete();
+    objects.commitTransaction();
+
+
+    expect(objects.length).to.equal(1);
+    expect(objects.get().text).to.equal('foobar');
+  });
 })
