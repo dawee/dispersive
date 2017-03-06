@@ -107,9 +107,6 @@ describe('manager', () => {
     objects.create({text: 'foo'});
     objects.create({text: 'bar'});
     objects.create({text: 'foobar'});
-    objects.commitTransaction();
-
-    objects.createTransaction();
     objects.filter(entry => entry.text.length <= 3).delete();
     objects.commitTransaction();
 

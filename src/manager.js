@@ -9,7 +9,7 @@ class EntriesGenerator {
   }
 
   * entries() {
-    for (const keyValues of this.manager.values.entries()) {
+    for (const keyValues of this.manager.stageValues.entries()) {
       const values = keyValues[1];
       yield this.manager.build(values);
     }
@@ -27,6 +27,10 @@ const createObjectManagerConstructor = QuerySetConstructor => class extends Quer
     this.emitter = emitter;
     this.transaction = null;
     this.setup = setup;
+  }
+
+  get stageValues() {
+    return this.transaction ? this.transaction.values : this.values;
   }
 
   useSetup(setup) {
