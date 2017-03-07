@@ -2,17 +2,16 @@ import React, { Component } from 'react';
 import { createModel } from 'dispersive/model';
 import { withField } from 'dispersive/field';
 import { createAction } from 'dispersive/action';
-import './App.css';
-import Post from './Post';
+import { Watcher } from 'react-dispersive';
 
-const PostModel = createModel([
+const Post = createModel([
   withField('pseudo'),
   withField('location'),
   withField('avatar'),
   withField('img')
 ]);
 
-const posts = [
+const addFakePosts = createAction(() => [
   {
     pseudo: 'mallowlechat',
     location: 'Paris',
@@ -26,6 +25,7 @@ const posts = [
   },
   {
     pseudo: 'greemtattoo',
+    location: 'Seoul',
     avatar: 'https://scontent-cdg2-1.cdninstagram.com/t51.2885-19/11326424_1583068125290569_1786294491_a.jpg',
     img: 'https://scontent-cdg2-1.cdninstagram.com/t51.2885-15/s1080x1080/e35/17126072_637863106415204_2090361476316397568_n.jpg',
   },
@@ -34,24 +34,35 @@ const posts = [
     avatar: 'https://scontent-cdg2-1.cdninstagram.com/t51.2885-19/s150x150/13355421_884939954974514_1656681233_a.jpg',
     img: 'https://scontent-cdg2-1.cdninstagram.com/t51.2885-15/e35/17077022_180948965739674_323376415657426944_n.jpg',
   },
-];
+].forEach(post => Post.objects.create(post)), [Post]);
 
-const addFakePosts = createAction(() => {
-  posts.forEach(post => PostModel.objects.create(post))
-}, [PostModel]);
 
-class App extends Component {
-  constructor(props) {
-    super(props);
-    PostModel.emitter.changed(() => this.forceUpdate());
-  }
-
-  render = () => (
-    <div className="App">
-      {PostModel.objects.map(post => <Post key={post.pk} post={post} />)}
+const PostItem = ({post}) => (
+  <div className="post">
+    <div className="post__info_bar">
+      <img className="post__info_bar__avatar" alt={post.pseudo} src={post.avatar} />
+      <div className="post__info_bar__text">
+        <p className="post__info_bar__text__pseudo">{post.pseudo}</p>
+        {post.location ? <p className="post__info_bar__text__location">{post.location}</p> : null}
+      </div>
     </div>
-  )
-}
+    <img className="post__img" alt={post.pseudo} src={post.img} />
+  </div>
+);
+
+const PostsFeed = ({posts}) => (
+  <div className="posts-feed">
+    {posts.map(post => <PostItem post={post} key={post.pk} />)}
+  </div>
+);
+
+const App = () => (
+  <div className="app">
+    <Watcher sources={[Post]}>
+      <PostsFeed posts={Post.objects} />
+    </Watcher>
+  </div>
+);
 
 addFakePosts();
 
