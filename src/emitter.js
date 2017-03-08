@@ -1,5 +1,6 @@
 const {EventEmitter} = require('fbemitter');
 
+const CHANGE_EVENT = 'change';
 
 class ChangesEmitter {
 
@@ -8,19 +9,11 @@ class ChangesEmitter {
   }
 
   emitChange(data = {}) {
-    this.emit('change', data);
+    this.emitter.emit(CHANGE_EVENT, data);
   }
 
-  changed(listener, ctx = null) {
-    return this.on('change', listener, ctx);
-  }
-
-  on(name, listener, ctx = null) {
-    return this.emitter.addListener(name, data => listener.call(ctx, data));
-  }
-
-  emit(name, data = {}) {
-    this.emitter.emit(name, data);
+  changed(listener) {
+    return this.emitter.addListener(CHANGE_EVENT, listener);
   }
 
 }
