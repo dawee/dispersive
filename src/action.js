@@ -4,27 +4,27 @@ const readHandlerResult = async res => res;
 
 const callHandler = async (handler, args) => readHandlerResult(handler(...args));
 
-const createTransactions = models => models.map(model => model.objects.createTransaction());
-const commitTransactions = models => models.map(model => model.objects.commitTransaction());
+const createTransactions = sources => sources.map(source => source.objects.createTransaction());
+const commitTransactions = sources => sources.map(source => source.objects.commitTransaction());
 
-const callHandlerAndCommit = async (handler, models, args) => {
+const callHandlerAndCommit = async (handler, sources, args) => {
   const res = await callHandler(handler, args);
 
-  commitTransactions(models);
+  commitTransactions(sources);
   return res;
 };
 
-const packAction = (handler, args = [], models = []) => (
+const packAction = (handler, args = [], sources = []) => (
   async () => {
-    createTransactions(models);
-    return callHandlerAndCommit(handler, models, args);
+    createTransactions(sources);
+    return callHandlerAndCommit(handler, sources, args);
   }
 );
 
-const createAction = (handler, models = []) => (
+const createAction = (handler, sources = []) => (
   async (...args) => {
-    const action = packAction(handler, args, models);
-    return dispatch(action, models);
+    const action = packAction(handler, args, sources);
+    return dispatch(action, sources);
   }
 );
 

@@ -11,36 +11,36 @@ class LockedPool extends ActionPool {
     this.locks = {};
   }
 
-  incrementLock(model) {
-    if (!(model.id in this.locks)) this.locks[model.id] = 0;
+  incrementLock(source) {
+    if (!(source.id in this.locks)) this.locks[source.id] = 0;
 
-    this.locks[model.id] += 1;
+    this.locks[source.id] += 1;
   }
 
-  decrementLock(model) {
-    if (!(model.id in this.locks)) return;
+  decrementLock(source) {
+    if (!(source.id in this.locks)) return;
 
-    this.locks[model.id] -= 1;
+    this.locks[source.id] -= 1;
 
-    if (this.locks[model.id] === 0) {
-      delete this.locks[model.id];
+    if (this.locks[source.id] === 0) {
+      delete this.locks[source.id];
     }
   }
 
-  locked(model) {
-    return model.id in this.locks;
+  locked(source) {
+    return source.id in this.locks;
   }
 
   hasAnyLock() {
     return Object.keys(this.locks) > 0;
   }
 
-  lock(models = []) {
-    models.forEach(model => this.incrementLock(model));
+  lock(sources = []) {
+    sources.forEach(source => this.incrementLock(source));
   }
 
-  unlock(models = []) {
-    models.forEach(model => this.decrementLock(model));
+  unlock(sources = []) {
+    sources.forEach(source => this.decrementLock(source));
   }
 
 }
@@ -52,26 +52,26 @@ const createPool = () => {
   return pool;
 };
 
-const findPool = (models) => {
+const findPool = (sources) => {
   const foundId = Object.keys(pools).find(poolId => (
-    models.some(model => pools[poolId].locked(model))
+    sources.some(source => pools[poolId].locked(source))
   ));
 
   return foundId ? pools[foundId] : null;
 };
 
-const getOrCreatePool = models => findPool(models) || createPool();
+const getOrCreatePool = sources => findPool(sources) || createPool();
 
 const cleanPool = (pool) => {
   if (!pool.hasAnyLock()) delete pools[pool.id];
 };
 
-const dispatch = async (action, models) => {
-  const pool = getOrCreatePool(models);
+const dispatch = async (action, sources) => {
+  const pool = getOrCreatePool(sources);
 
-  pool.lock(models);
+  pool.lock(sources);
   const res = await pool.delegate(action);
-  pool.unlock(models);
+  pool.unlock(sources);
 
   cleanPool(pool);
 
