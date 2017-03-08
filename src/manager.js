@@ -9,8 +9,7 @@ class EntriesGenerator {
   }
 
   * entries() {
-    for (const keyValues of this.manager.stageValues.entries()) {
-      const values = keyValues[1];
+    for (const [, values] of this.manager.stageValues.entries()) {
       yield this.manager.build(values);
     }
   }
