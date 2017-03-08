@@ -40,14 +40,29 @@ class QuerySet {
     return this.toArray().length;
   }
 
-  map(transform) {
+  every(predicate) {
+    let res = true;
     let index = 0;
-    const res = [];
 
     for (const entry of this.entries()) {
-      res.push(transform(entry, index));
+      if (!predicate(entry, index)) {
+        res = false;
+        break;
+      }
+
       index += 1;
     }
+
+    return res;
+  }
+
+  map(predicate) {
+    const res = [];
+
+    this.every((entry, index) => {
+      res.push(predicate(entry, index));
+      return true;
+    });
 
     return res;
   }
