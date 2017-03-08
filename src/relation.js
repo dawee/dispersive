@@ -1,6 +1,6 @@
 const ulid = require('ulid');
-const {createEntryMixin} = require('../model');
-const {withField} = require('.');
+const {createEntryMixin} = require('./model');
+const {withField} = require('./field');
 
 const createManyRelation = ({QuerySetConstructor, relation, pk}) => {
   const ManyRelation = class extends QuerySetConstructor {

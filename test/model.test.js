@@ -1,8 +1,8 @@
 const {expect, assert} = require('chai');
-const {model, field, error} = require('..');
+const {model, field, relation, error} = require('..');
 
 const {withField} = field;
-const {withMany} = field.many;
+const {withMany} = relation;
 const {createModel} = model;
 
 const withEntryBar = () => model.createEntryMixin(

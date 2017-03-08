@@ -1,17 +1,28 @@
-/* eslint global-require: "off" */
+const action = require('./action');
+const assert = require('./assert');
+const emitter = require('./emitter');
+const dispatcher = require('./dispatcher');
+const error = require('./error');
+const field = require('./field');
+const relation = require('./relation');
+const manager = require('./manager');
+const model = require('./model');
+const pool = require('./pool');
+const queryset = require('./queryset');
+const transaction = require('./transaction');
+
 
 module.exports = {
-  action: require('./action'),
-  assert: require('./assert'),
-  emitter: require('./emitter'),
-  dispatcher: require('./dispatcher'),
-  error: require('./error'),
-  field: Object.assign({
-    many: require('./field/many'),
-  }, require('./field')),
-  manager: require('./manager'),
-  model: require('./model'),
-  pool: require('./pool'),
-  queryset: require('./queryset'),
-  transaction: require('./transaction'),
+  action,
+  assert,
+  emitter,
+  dispatcher,
+  error,
+  field,
+  relation,
+  manager,
+  model,
+  pool,
+  queryset,
+  transaction,
 };
