@@ -28,3 +28,107 @@ describe('emitter', () => {
   });
 
 })
+
+describe('funnel', () => {
+
+  it('should emit change on each emitters', () => {
+    const emitter1 = emitter.createChangesEmitter();
+    const emitter2 = emitter.createChangesEmitter();
+    const listener1 = spy();
+    const listener2 = spy();
+
+    emitter1.changed(listener1);
+    emitter2.changed(listener2);
+
+    emitter.createChangesFunnelEmitter({emitters: [emitter1, emitter2]}).emitChange();
+
+    assert(listener1.calledOnce);
+    assert(listener2.calledOnce);
+  });
+
+  it('should emit change on each sources', () => {
+    const source1 = {emitter: emitter.createChangesEmitter()};
+    const source2 = {emitter: emitter.createChangesEmitter()};
+    const listener1 = spy();
+    const listener2 = spy();
+
+    source1.emitter.changed(listener1);
+    source2.emitter.changed(listener2);
+
+    emitter.createChangesFunnelEmitter({sources: [source1, source2]}).emitChange();
+
+    assert(listener1.calledOnce);
+    assert(listener2.calledOnce);
+  });
+
+  it('should receive changes once', () => {
+    const source1 = {emitter: emitter.createChangesEmitter()};
+    const source2 = {emitter: emitter.createChangesEmitter()};
+    const funnel = emitter.createChangesFunnelEmitter({sources: [source1, source2]});
+    const listener1 = spy();
+    const listener2 = spy();
+
+    funnel.changed(listener1);
+    funnel.changed(listener2);
+
+    emitter.createChangesFunnelEmitter({sources: [source1, source2]}).emitChange();
+
+    assert(listener1.calledOnce);
+    assert(listener2.calledOnce);
+  });
+
+  it('should work with different set of sources (3 for 2)', () => {
+    const source1 = {emitter: emitter.createChangesEmitter()};
+    const source2 = {emitter: emitter.createChangesEmitter()};
+    const source3 = {emitter: emitter.createChangesEmitter()};
+    const funnel = emitter.createChangesFunnelEmitter({sources: [source1, source2, source3]});
+    const listener1 = spy();
+    const listener2 = spy();
+
+    funnel.changed(listener1);
+    funnel.changed(listener2);
+
+    emitter.createChangesFunnelEmitter({sources: [source1, source2]}).emitChange();
+
+    assert(listener1.calledOnce);
+    assert(listener2.calledOnce);
+  });
+
+  it('should work with different set of sources (2 for 3)', () => {
+    const source1 = {emitter: emitter.createChangesEmitter()};
+    const source2 = {emitter: emitter.createChangesEmitter()};
+    const source3 = {emitter: emitter.createChangesEmitter()};
+    const funnel = emitter.createChangesFunnelEmitter({sources: [source1, source2]});
+    const listener1 = spy();
+    const listener2 = spy();
+
+    funnel.changed(listener1);
+    funnel.changed(listener2);
+
+    emitter.createChangesFunnelEmitter({sources: [source1, source2, source3]}).emitChange();
+
+    assert(listener1.calledOnce);
+    assert(listener2.calledOnce);
+  });
+
+  it('should be able to remove subscription', () => {
+    const source1 = {emitter: emitter.createChangesEmitter()};
+    const source2 = {emitter: emitter.createChangesEmitter()};
+    const funnel = emitter.createChangesFunnelEmitter({sources: [source1, source2]});
+    const listener1 = spy();
+    const listener2 = spy();
+
+    const subscription1 = funnel.changed(listener1);
+    const subscription2 = funnel.changed(listener2);
+
+    subscription1.remove();
+    subscription2.remove();
+
+    emitter.createChangesFunnelEmitter({sources: [source1, source2]}).emitChange();
+
+    assert(!listener1.called);
+    assert(!listener2.called);
+    expect(funnel.subscriptionsCount()).to.equal(0);
+  });
+
+});
