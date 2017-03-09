@@ -71,6 +71,10 @@ class QuerySet {
     return this.map(entry => entry);
   }
 
+  toJSON() {
+    return this.map(entry => entry.toJSON());
+  }
+
   first() {
     return this.entries().next().value;
   }
