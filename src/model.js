@@ -72,11 +72,12 @@ const createMixin = ({name, mixin}) => (
   ({setup}) => setup.set(name, applyMixin({name, setup, mixin}))
 );
 
-const composeSetup = ({setup = Immutable.Map(defaultSetup), composers = []}) => {
+const composeSetup = ({model, setup = Immutable.Map(defaultSetup), composers = []}) => {
   const composer = Immutable.List(composers).get(0);
 
   return composer ? composeSetup({
-    setup: composer({setup}),
+    model,
+    setup: composer({model, setup}),
     composers: Immutable.List(composers).shift(0),
   }) : setup;
 };
@@ -93,12 +94,13 @@ const createModel = (composers) => {
   const model = {id: ulid()};
 
   model.setup = composeSetup({
-    setup: Immutable.Map(defaultSetup).set('model', model),
+    model,
+    setup: Immutable.Map(defaultSetup),
     composers: Array.isArray(composers) ? composers : [composers],
   });
 
   model.inject = (composer) => {
-    model.setup = composer({setup: model.setup});
+    model.setup = composer({model, setup: model.setup});
     model.objects = model.objects.useSetup(model.setup);
   };
 
