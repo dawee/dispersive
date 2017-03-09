@@ -69,6 +69,10 @@ const createObjectManagerConstructor = QuerySetConstructor => class extends Quer
     return entry;
   }
 
+  getOrCreate(expression) {
+    return this.get(expression) || this.create(expression);
+  }
+
   sync(values) {
     assert.hasTransaction(this);
     return this.transaction.sync(values);
