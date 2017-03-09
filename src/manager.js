@@ -63,8 +63,9 @@ const createObjectManagerConstructor = QuerySetConstructor => class extends Quer
   create(rawValues = {}) {
     const entry = this.build();
 
-    entry.assign(rawValues);
     entry.save();
+    entry.update(rawValues);
+
     return entry;
   }
 
