@@ -50,10 +50,12 @@ const createRelation = (name, opts) => (
   ('model' in opts) ? parseRelation(name, opts) : createRelationFromModel(name, opts)
 );
 
+const injectRelatedField = relation => relation.model.inject(withField(relation.pkName));
+
 const withMany = (name, opts = {}) => {
   const relation = createRelation(name, opts);
 
-  relation.model.inject(withField(relation.pkName));
+  injectRelatedField(relation);
 
   return createEntryMixin(({Base, setup}) => {
     const QuerySetConstructor = setup.get('QuerySetConstructor');
