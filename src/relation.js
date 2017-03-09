@@ -34,12 +34,24 @@ const withRelationField = ({model, relation, name}) => (
   })
 );
 
-const withMany = (name, {model = null, relatedName = null}) => {
-  const relation = {
-    model,
-    fieldName: relatedName,
-    pkName: relatedName ? `_${relatedName}_pk` : `_many_${name}_pk_${ulid()}`,
-  };
+const createPkField = ({name, relatedName = null}) => (
+  relatedName ? `_${relatedName}_pk` : `_many_${name}_pk_${ulid()}`
+);
+
+const createRelationFromModel = (name, model) => ({model, pkName: createPkField(name)});
+
+const parseRelation = (name, {model, relatedName = null}) => ({
+  model,
+  fieldName: relatedName,
+  pkName: createPkField(name),
+});
+
+const createRelation = (name, opts) => (
+  ('model' in opts) ? parseRelation(name, opts) : createRelationFromModel(name, opts)
+);
+
+const withMany = (name, opts = {}) => {
+  const relation = createRelation(name, opts);
 
   relation.model.inject(withField(relation.pkName));
 
