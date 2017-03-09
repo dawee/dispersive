@@ -22,9 +22,7 @@ describe('relation', () => {
 
     const diana = await createAction(() => {
       const author = Author.objects.create({name: 'Diana Wynne Jones'});
-      const howlsMovingCastle = Book.objects.create({
-        title: 'Howl\'s Moving Castle',
-      });
+      const howlsMovingCastle = Book.objects.create({title: 'Howl\'s Moving Castle'});
 
       author.books.add(howlsMovingCastle);
 
