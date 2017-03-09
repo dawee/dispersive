@@ -36,8 +36,12 @@ class QuerySet {
     return expression ? this.filter(expression).first() : this.first();
   }
 
-  get length() {
+  count() {
     return this.toArray().length;
+  }
+
+  get length() {
+    return this.count();
   }
 
   every(predicate) {
