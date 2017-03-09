@@ -1,5 +1,5 @@
 const {expect, assert} = require('chai');
-const {model, field, relation, error} = require('..');
+const {model, field, relation, error} = require('../src/index');
 
 const {withField} = field;
 const {withMany} = relation;

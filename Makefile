@@ -24,6 +24,6 @@ field/%.js: src/field/%.js
 	@${babel} $< -o $@
 
 test: lib
-	@${mocha} --compilers js:babel-core/register
+	@${mocha} -b -R nyan
 
 .PHONY: test

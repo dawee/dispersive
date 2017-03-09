@@ -1,6 +1,6 @@
 const {assert, expect} = require('chai');
 const {spy} = require('sinon');
-const {model, field, error} = require('..');
+const {model, field, error} = require('../src/index');
 
 const {withField} = field;
 

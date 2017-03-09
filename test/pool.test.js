@@ -1,6 +1,6 @@
 const {assert, expect} = require('chai');
 const {spy} = require('sinon');
-const {pool, action, error} = require('..');
+const {pool, action, error} = require('../src/index');
 
 
 const createDeferedAction = (handler) => {

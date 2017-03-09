@@ -1,6 +1,6 @@
 const {assert, expect} = require('chai');
 const {spy} = require('sinon');
-const {emitter, error} = require('..');
+const {emitter, error} = require('../src/index');
 
 
 describe('emitter', () => {
