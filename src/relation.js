@@ -71,6 +71,19 @@ const createManyQuerysetConstructor = QuerySetConstructor => (
       this.association.model.objects.commitTransaction();
     }
 
+    remove(entry) {
+      this.association.model.objects.createTransaction();
+
+      const associatedEntry = this.association.model.objects.get({
+        [this.association.src.pkField]: this.originEntry.pk,
+        [this.association.dest.pkField]: entry.pk,
+      });
+
+      if (associatedEntry) associatedEntry.delete();
+
+      this.association.model.objects.commitTransaction();
+    }
+
   }
 );
 

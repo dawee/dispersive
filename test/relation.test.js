@@ -32,6 +32,28 @@ describe('relation', () => {
     expect(diana.books.first().title).to.equal('Howl\'s Moving Castle');
   });
 
+  it('should remove a one-to-many relation', async () => {
+    const Book = createModel([
+      withField('title'),
+    ]);
+
+    const Author = createModel([
+      withField('name'),
+      withMany('books', Book),
+    ]);
+
+    const diana = await createAction(() => {
+      const author = Author.objects.create({name: 'Diana Wynne Jones'});
+      const howlsMovingCastle = Book.objects.create({title: 'Howl\'s Moving Castle'});
+
+      author.books.add(howlsMovingCastle);
+      author.books.remove(howlsMovingCastle);
+
+      return author;
+    }, [Author, Book])();
+
+    expect(diana.books.count()).to.equal(0);
+  });
 
   it('should connect a one-to-many relation (relation declaration + related setter)', async () => {
     const Book = createModel([
