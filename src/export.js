@@ -1,3 +1,6 @@
+const {getFilterPredicate} = require('./query');
+
+
 const withExporters = Base => class extends Base {
 
   * entriesWithIndex() {
@@ -26,6 +29,20 @@ const withExporters = Base => class extends Base {
 
     for (const [entry, index] of this.entriesWithIndex()) {
       res.push(predicate(entry, index));
+    }
+
+    return res;
+  }
+
+  every(expression) {
+    const predicate = getFilterPredicate(expression);
+    let res = true;
+
+    for (const [entry, index] of this.entriesWithIndex()) {
+      if (!predicate(entry, index)) {
+        res = false;
+        break;
+      }
     }
 
     return res;

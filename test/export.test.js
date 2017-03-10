@@ -10,7 +10,7 @@ const {createAction} = action;
 
 describe('queryset with exporters', () => {
 
-  it('should map entries', async () => {
+  it('should [map] entries', async () => {
     const titles = [
       'Peter Pan',
       'Neverending Story',
@@ -25,4 +25,19 @@ describe('queryset with exporters', () => {
     expect(Book.objects.map(entry => entry.title)).to.deep.equal(titles);
   });
 
+  it('should return if [every] expression are corrects', async () => {
+    const Cat = createModel([
+      withField('color'),
+      withField('hasMustache', {initial: true}),
+    ]);
+
+    await createAction(
+      colors => colors.map(color => Cat.objects.create({color}))
+    , [Cat])(['black', 'white']);
+
+    expect(Cat.objects.every({color: 'black'})).to.equal(false);
+    expect(Cat.objects.every(cat => cat.color === 'black')).to.equal(false);
+    expect(Cat.objects.every({hasMustache: true})).to.equal(true);
+    expect(Cat.objects.every(cat => cat.hasMustache)).to.equal(true);
+  });
 });

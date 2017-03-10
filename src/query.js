@@ -40,4 +40,6 @@ const withQueries = Base => class extends Base {
 
 module.exports = {
   withQueries,
+  getFilterPredicate,
+  getExcludePredicate,
 };
