@@ -3,8 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "dispersive": "2.0.0-alpha.1",
     "react": "^15.4.2",
-    "react-dom": "^15.4.2"
+    "react-dispersive": "1.0.1",
+    "react-dom": "^15.4.2",
+    "request-promise-json": "1.0.4"
   },
   "devDependencies": {
     "react-scripts": "0.9.5"

@@ -1,19 +1,100 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { createAction } from 'dispersive/action';
+import { createModel } from 'dispersive/model';
+import { withField } from 'dispersive/field';
+import { withOne, withMany } from 'dispersive/relation';
+import { Watcher } from 'react-dispersive';
+import request from 'request-promise-json';
+
+const MAX_NUM = 151;  // limiting to first generation
+const POKEDEX_URL = 'http://pokeapi.co/api/v2/pokemon/';
+
+
+/*
+ * Models
+ */
+
+const Pokemon = createModel([
+  withField('name'),
+  withField('sprite'),
+  withField('seen', { initial: false }),
+  withField('captured', { initial: false }),
+]);
+
+const PokedexSlot = createModel([
+  withField('num'),
+  withField('url'),
+  withOne('pokemon', Pokemon),
+]);
+
+const Pokedex = createModel([
+  withOne('activePokemon', Pokemon),
+  withMany('slots', PokedexSlot),
+]);
+
+/*
+ * Actions
+ */
+
+const createPokedex = createAction(async ({limit}) => {
+  const pokedex = Pokedex.objects.create();
+  let nextUrl = POKEDEX_URL;
+
+  while (pokedex.slots.length < limit && nextUrl) {
+    const {next, results} = await request.get(nextUrl);
+
+    results.forEach(({url}) => {
+      if (pokedex.slots.length === limit) return;
+
+      pokedex.slots.add(PokedexSlot.objects.create(
+        { url, num: pokedex.slots.length + 1 }
+      ));
+    })
+
+    nextUrl = next;
+  }
+
+  return pokedex;
+}, [Pokemon, Pokedex, PokedexSlot]);
+
+/*
+ * Components
+ */
+
+const PokedexListSlot = ({slot}) => (
+  <li>
+  </li>
+);
+
+const PokedexLoader = () => (
+  <span>Pokedex is loading ...</span>
+);
+
+const PokedexList = ({pokedex}) => (
+  <ul>
+  {pokedex ? pokedex.slots.map(slot => (
+    <PokedexListSlot slot={slot} key={slot.pk} />)
+  ) : <PokedexLoader />}
+  </ul>
+);
+
+const PokedexApp = () => (
+  <div className="pokedex-app">
+    <PokedexList pokedex={Pokedex.objects.get()} />
+  </div>
+);
 
 class App extends Component {
+
+  componentDidMount() {
+    createPokedex({limit: MAX_NUM});
+  }
+
   render() {
     return (
-      <div className="App">
-        <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h2>Welcome to React</h2>
-        </div>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div>
+      <Watcher sources={[Pokemon, Pokedex, PokedexSlot]}>
+        <PokedexApp />
+      </Watcher>
     );
   }
 }
