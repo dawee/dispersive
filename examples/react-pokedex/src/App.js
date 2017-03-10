@@ -7,7 +7,7 @@ import { Watcher } from 'react-dispersive';
 import request from 'request-promise-json';
 
 const MAX_NUM = 151;  // limiting to first generation
-const POKEDEX_URL = 'http://pokeapi.co/api/v2/pokemon/';
+const POKEMON_URL = 'http://pokeapi.co/api/v2/pokemon';
 
 
 /*
@@ -17,13 +17,14 @@ const POKEDEX_URL = 'http://pokeapi.co/api/v2/pokemon/';
 const Pokemon = createModel([
   withField('name'),
   withField('sprite'),
-  withField('seen', { initial: false }),
-  withField('captured', { initial: false }),
 ]);
 
 const PokedexSlot = createModel([
   withField('num'),
   withField('active'),
+  withField('loading', { initial: false }),
+  withField('seen', { initial: false }),
+  withField('captured', { initial: false }),
   withOne('pokemon', Pokemon),
 ]);
 
@@ -43,23 +44,49 @@ const createPokedex = createAction(({limit}) => {
   }
 
   return pokedex;
-}, [Pokemon, Pokedex, PokedexSlot]);
+}, [Pokedex, PokedexSlot]);
 
-const setActiveSlot = createAction(async (slot) => {
+const setActiveSlot = createAction((slot) => {
   slot.pokedex.slots.filter({active: true}).update({update: false});
   slot.update({active: true});
-}, [Pokedex, PokedexSlot]);
+}, [PokedexSlot]);
+
+const setSlotDownloading = createAction((slot, downloading) => slot.update({downloading}), [PokedexSlot]);
+
+const addPokemonOnSlot = createAction(async (slot) => {
+  const data = await request(`${POKEMON_URL}/${slot.num}`);
+
+  slot.pokemon = Pokemon.objects.create(data);
+}, [Pokemon, PokedexSlot])
+
+const setSlotVisible = async (slot) => {
+  if (!slot.pokemon) {
+    await setSlotDownloading(slot, true);
+    await addPokemonOnSlot(slot);
+    await setSlotDownloading(slot, false);
+  }
+}
 
 /*
  * Components
  */
 
-const PokedexListSlot = ({slot}) => (
-  <li onClick={() => setActiveSlot(slot)}>
-    <span>{`#${slot.num}`}</span>
-    {slot.pokemon ? <span>{slot.pokemon.name}</span> : null}
-  </li>
-);
+class PokedexListSlot extends Component {
+
+  shouldComponentUpdate() {
+    return false;
+  }
+
+  render() {
+    console.log('render');
+
+    return (
+      <li>
+      </li>
+    );
+  }
+
+}
 
 const PokedexList = ({pokedex}) => (
   <ul>
@@ -69,11 +96,24 @@ const PokedexList = ({pokedex}) => (
   </ul>
 );
 
-const PokedexApp = () => (
-  <div className="pokedex-app">
-    <PokedexList pokedex={Pokedex.objects.get()} />
-  </div>
-);
+class PokedexApp extends Component {
+
+  componentWillUpdate() {
+    this.t0 = Date.now();
+  }
+
+  componentDidUpdate() {
+    if (this.t0) console.log('full update time :', Date.now() - this.t0);
+  }
+
+  render() {
+    return (
+      <div className="pokedex-app">
+        <PokedexList pokedex={Pokedex.objects.get()} />
+      </div>
+    );
+  }
+}
 
 class App extends Component {
 
