@@ -20,6 +20,10 @@ class QuerySetBase {
     }
   }
 
+  clone(opts = {}) {
+    return new this.QuerySetConstructor(Object.assign({parent: this}, opts));
+  }
+
   delete() {
     return this.map(entry => entry.delete());
   }
