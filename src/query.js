@@ -1,3 +1,5 @@
+const REVERSED = 1;
+
 /*
  * Filter
  */
@@ -75,6 +77,10 @@ const withQueries = Base => class extends Base {
 
   sort(sortComparator) {
     return this.clone({sortComparator});
+  }
+
+  reverse() {
+    return this.clone({sortComparator: () => REVERSED});
   }
 
 };
