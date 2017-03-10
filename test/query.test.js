@@ -10,6 +10,16 @@ const {createAction} = action;
 
 describe('queryset with queries', () => {
 
+  it('should return all objects', async () => {
+    const Book = createModel([
+      withField('title'),
+    ]);
+
+    const peterPan = await createAction(() => Book.objects.create({title: 'Peter Pan'}), [Book])();
+
+    expect(Book.objects.all().map(book => book.title)).to.deep.equal(['Peter Pan']);
+  });
+
   it('should filter using object', async () => {
     const Book = createModel([
       withField('title'),

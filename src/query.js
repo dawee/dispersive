@@ -97,6 +97,10 @@ const withQueries = Base => class extends Base {
     return this.clone(null, withNonEntriesGenerator(this.QuerySetConstructor));
   }
 
+  all() {
+    return this.clone();
+  }
+
 };
 
 module.exports = {
