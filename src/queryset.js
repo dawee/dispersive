@@ -13,6 +13,10 @@ class QuerySetBase {
     return new QuerySetConstructor(Object.assign({parent: this}, opts));
   }
 
+  update(rawValues) {
+    return this.map(entry => entry.update(rawValues));
+  }
+
   delete() {
     return this.map(entry => entry.delete());
   }

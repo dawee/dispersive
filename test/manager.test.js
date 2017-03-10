@@ -127,4 +127,20 @@ describe('manager', () => {
     expect(objects.length).to.equal(1);
     expect(objects.get().text).to.equal('foobar');
   });
+
+  it('should update entries', () => {
+    const objects = model.createModel([
+      withField('text'),
+    ]).objects;
+
+    objects.createTransaction();
+    objects.create({text: 'foo'});
+    objects.create({text: 'bar'});
+    objects.create({text: 'foobar'});
+    objects.update({text: 'baz'});
+    objects.commitTransaction();
+
+    expect(objects.map(entry => entry.text)).to.deep.equal(['baz', 'baz', 'baz']);
+  });
+
 })
