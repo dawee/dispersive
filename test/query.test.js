@@ -36,12 +36,12 @@ describe('queryset with queries', () => {
     ]);
 
     const peterPan = await createAction(() => {
-      Book.objects.create({title: 'Series Of Unfortunate Events'});
+      Book.objects.create({title: 'A Series Of Unfortunate Events'});
 
       return Book.objects.create({title: 'Peter Pan'});
     }, [Book])();
 
-    expect(Book.objects.exclude({title: 'Series Of Unfortunate Events'}).get().pk).to.equal(peterPan.pk);
+    expect(Book.objects.exclude({title: 'A Series Of Unfortunate Events'}).get().pk).to.equal(peterPan.pk);
   });
 
   it('should exclude using object', async () => {
@@ -50,11 +50,11 @@ describe('queryset with queries', () => {
     ]);
 
     const peterPan = await createAction(() => {
-      Book.objects.create({title: 'Series Of Unfortunate Events'});
+      Book.objects.create({title: 'A Series Of Unfortunate Events'});
 
       return Book.objects.create({title: 'Peter Pan'});
     }, [Book])();
 
-    expect(Book.objects.exclude(entry => entry.title !== 'Series Of Unfortunate Events').get().pk).to.equal(peterPan.pk);
+    expect(Book.objects.exclude(entry => entry.title !== 'A Series Of Unfortunate Events').get().pk).to.equal(peterPan.pk);
   });
 });
