@@ -43,12 +43,22 @@ class SortedEntriesGenerator {
 
 }
 
+const withNonEntriesGenerator = Base => class extends Base {
+
+  constructor(...args) {
+    super(...args);
+
+    this.source = [];
+  }
+
+};
+
 const withQueries = Base => class extends Base {
 
   constructor({QuerySetConstructor, parent = null, predicate = null, sortComparator = null}) {
     super({parent, QuerySetConstructor});
     this.predicate = predicate;
-    this.sortGenerator = sortComparator ? new SortedEntriesGenerator(this, sortComparator) : null;
+    this.source = sortComparator ? new SortedEntriesGenerator(this, sortComparator) : null;
   }
 
   validate(entry) {
@@ -60,7 +70,7 @@ const withQueries = Base => class extends Base {
   }
 
   * entries() {
-    const source = this.getFallbackSource(this.sortGenerator);
+    const source = this.getFallbackSource(this.source);
 
     for (const entry of source.entries()) {
       if (this.validate(entry)) yield entry;
@@ -81,6 +91,10 @@ const withQueries = Base => class extends Base {
 
   reverse() {
     return this.clone({sortComparator: () => REVERSED});
+  }
+
+  none() {
+    return this.clone(null, withNonEntriesGenerator(this.QuerySetConstructor));
   }
 
 };

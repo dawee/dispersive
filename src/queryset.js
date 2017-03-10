@@ -9,8 +9,8 @@ class QuerySetBase {
     this.QuerySetConstructor = QuerySetConstructor;
   }
 
-  clone(opts = {}) {
-    return new this.QuerySetConstructor(Object.assign({parent: this}, opts));
+  clone(opts = {}, QuerySetConstructor = this.QuerySetConstructor) {
+    return new QuerySetConstructor(Object.assign({parent: this}, opts));
   }
 
   delete() {
