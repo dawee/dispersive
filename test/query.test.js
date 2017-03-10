@@ -57,4 +57,19 @@ describe('queryset with queries', () => {
 
     expect(Book.objects.exclude(entry => entry.title !== 'A Series Of Unfortunate Events').get().pk).to.equal(peterPan.pk);
   });
+
+  it('should sort using comparator', async () => {
+    const Buddy = createModel([
+      withField('name'),
+      withField('age'),
+    ]);
+
+    await createAction(() => {
+      Buddy.objects.create({name: 'betty', age: 30});
+      Buddy.objects.create({name: 'jack', age: 50});
+      Buddy.objects.create({name: 'john', age: 20});
+    }, [Buddy])();
+
+    expect(Buddy.objects.sort((bud1, bud2) => bud1.age - bud2.age).map(bud => bud.name)).to.deep.equal(['john', 'betty', 'jack']);
+  });
 });

@@ -26,7 +26,44 @@ const getExcludePredicate = expression => (
  * Mixin
  */
 
+class SortedEntriesGenerator {
+
+  constructor(queryset, sortComparator) {
+    this.sortComparator = sortComparator;
+    this.parent = queryset.parent;
+  }
+
+  * entries() {
+    for (const [, entry] of this.parent.toArray().sort(this.sortComparator).entries()) {
+      yield entry;
+    }
+  }
+
+}
+
 const withQueries = Base => class extends Base {
+
+  constructor({QuerySetConstructor, parent = null, predicate = null, sortComparator = null}) {
+    super({parent, QuerySetConstructor});
+    this.predicate = predicate;
+    this.sortGenerator = sortComparator ? new SortedEntriesGenerator(this, sortComparator) : null;
+  }
+
+  validate(entry) {
+    return !this.predicate || this.predicate(entry);
+  }
+
+  getFallbackSource(source = null) {
+    return source || this.parent;
+  }
+
+  * entries() {
+    const source = this.getFallbackSource(this.sortGenerator);
+
+    for (const entry of source.entries()) {
+      if (this.validate(entry)) yield entry;
+    }
+  }
 
   filter(expression) {
     return this.clone({predicate: getFilterPredicate(expression)});
@@ -34,6 +71,10 @@ const withQueries = Base => class extends Base {
 
   exclude(expression) {
     return this.clone({predicate: getExcludePredicate(expression)});
+  }
+
+  sort(sortComparator) {
+    return this.clone({sortComparator});
   }
 
 };
