@@ -1,5 +1,14 @@
 const withExporters = Base => class extends Base {
 
+  * entriesWithIndex() {
+    let index = 0;
+
+    for (const entry of this.entries()) {
+      yield [entry, index];
+      index += 1;
+    }
+  }
+
   get(expression) {
     return expression ? this.filter(expression).first() : this.first();
   }
@@ -12,29 +21,12 @@ const withExporters = Base => class extends Base {
     return this.count();
   }
 
-  every(predicate) {
-    let res = true;
-    let index = 0;
-
-    for (const entry of this.entries()) {
-      if (!predicate(entry, index)) {
-        res = false;
-        break;
-      }
-
-      index += 1;
-    }
-
-    return res;
-  }
-
   map(predicate) {
     const res = [];
 
-    this.every((entry, index) => {
+    for (const [entry, index] of this.entriesWithIndex()) {
       res.push(predicate(entry, index));
-      return true;
-    });
+    }
 
     return res;
   }
