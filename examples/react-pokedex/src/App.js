@@ -23,13 +23,12 @@ const Pokemon = createModel([
 
 const PokedexSlot = createModel([
   withField('num'),
-  withField('url'),
+  withField('active'),
   withOne('pokemon', Pokemon),
 ]);
 
 const Pokedex = createModel([
-  withOne('activePokemon', Pokemon),
-  withMany('slots', PokedexSlot),
+  withMany('slots', {model: PokedexSlot, relatedName: 'pokedex'}),
 ]);
 
 /*
@@ -40,17 +39,16 @@ const createPokedex = createAction(({limit}) => {
   const pokedex = Pokedex.objects.create();
 
   for (const num = 1; num <= limit; ++num) {
-    pokedex.slots.add(PokedexSlot.objects.create(
-      { url: `http://pokeapi.co/api/v2/pokemon/${num}`, num }
-    ))
+    pokedex.slots.add(PokedexSlot.objects.create({ num }))
   }
 
   return pokedex;
 }, [Pokemon, Pokedex, PokedexSlot]);
 
-const setActiveSlot = createAction(async (slot) => (
-  slot.pokemon = slot.pokemon || Pokemon.objects.create(await request.get(slot.url))
-), [Pokemon, PokedexSlot]);
+const setActiveSlot = createAction(async (slot) => {
+  slot.pokedex.slots.filter({active: true}).update({update: false});
+  slot.update({active: true});
+}, [Pokedex, PokedexSlot]);
 
 /*
  * Components

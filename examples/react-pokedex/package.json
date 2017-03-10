@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "dispersive": "2.0.0-alpha.2",
+    "dispersive": "2.0.0-alpha.3",
     "react": "^15.4.2",
     "react-dispersive": "1.0.1",
     "react-dom": "^15.4.2",
