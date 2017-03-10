@@ -1,3 +1,5 @@
+const sortBy = require('sort-by');
+
 const REVERSED = 1;
 
 /*
@@ -87,6 +89,10 @@ const withQueries = Base => class extends Base {
 
   sort(sortComparator) {
     return this.clone({sortComparator});
+  }
+
+  orderBy(...fields) {
+    return this.sort(sortBy(...fields));
   }
 
   reverse() {

@@ -18,10 +18,11 @@
   },
   "homepage": "https://github.com/dawee/dispersive#readme",
   "dependencies": {
+    "babel-runtime": "^6.18.0",
     "fbemitter": "2.1.1",
     "immutable": "3.8.1",
-    "ulid": "0.1.0",
-    "babel-runtime": "^6.18.0"
+    "sort-by": "1.2.0",
+    "ulid": "0.1.0"
   },
   "devDependencies": {
     "babel-cli": "6.23.0",

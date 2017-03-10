@@ -109,4 +109,30 @@ describe('queryset with queries', () => {
     expect(Buddy.objects.sort((bud1, bud2) => bud1.age - bud2.age).reverse().map(bud => bud.name))
       .to.deep.equal(['jack', 'betty', 'john']);
   });
+
+  it('should order using field name', async () => {
+    const Buddy = createModel([
+      withField('name'),
+      withField('age'),
+    ]);
+
+    await createAction(() => {
+      Buddy.objects.create({name: 'betty', age: 30});
+      Buddy.objects.create({name: 'jack', age: 50});
+      Buddy.objects.create({name: 'john', age: 20});
+    }, [Buddy])();
+
+    expect(Buddy.objects.orderBy('name').map(bud => bud.name))
+      .to.deep.equal(['betty', 'jack', 'john']);
+
+    expect(Buddy.objects.orderBy('-name').map(bud => bud.name))
+      .to.deep.equal(['john', 'jack', 'betty']);
+
+    expect(Buddy.objects.orderBy('age').map(bud => bud.name))
+      .to.deep.equal(['john', 'betty', 'jack']);
+
+    expect(Buddy.objects.orderBy('-age').map(bud => bud.name))
+      .to.deep.equal(['jack', 'betty', 'john']);
+  });
+
 });
