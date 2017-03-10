@@ -36,45 +36,38 @@ const Pokedex = createModel([
  * Actions
  */
 
-const createPokedex = createAction(async ({limit}) => {
+const createPokedex = createAction(({limit}) => {
   const pokedex = Pokedex.objects.create();
-  let nextUrl = POKEDEX_URL;
 
-  while (pokedex.slots.length < limit && nextUrl) {
-    const {next, results} = await request.get(nextUrl);
-
-    results.forEach(({url}) => {
-      if (pokedex.slots.length === limit) return;
-
-      pokedex.slots.add(PokedexSlot.objects.create(
-        { url, num: pokedex.slots.length + 1 }
-      ));
-    })
-
-    nextUrl = next;
+  for (const num = 1; num <= limit; ++num) {
+    pokedex.slots.add(PokedexSlot.objects.create(
+      { url: `http://pokeapi.co/api/v2/pokemon/${num}`, num }
+    ))
   }
 
   return pokedex;
 }, [Pokemon, Pokedex, PokedexSlot]);
+
+const setActiveSlot = createAction(async (slot) => (
+  slot.pokemon = slot.pokemon || Pokemon.objects.create(await request.get(slot.url))
+), [Pokemon, PokedexSlot]);
 
 /*
  * Components
  */
 
 const PokedexListSlot = ({slot}) => (
-  <li>
+  <li onClick={() => setActiveSlot(slot)}>
+    <span>{`#${slot.num}`}</span>
+    {slot.pokemon ? <span>{slot.pokemon.name}</span> : null}
   </li>
-);
-
-const PokedexLoader = () => (
-  <span>Pokedex is loading ...</span>
 );
 
 const PokedexList = ({pokedex}) => (
   <ul>
-  {pokedex ? pokedex.slots.map(slot => (
+  {pokedex ? pokedex.slots.toArray().sort((s1, s2) => s1.num - s2.num).map(slot => (
     <PokedexListSlot slot={slot} key={slot.pk} />)
-  ) : <PokedexLoader />}
+  ) : null}
   </ul>
 );
 
