@@ -40,4 +40,24 @@ describe('queryset with exporters', () => {
     expect(Cat.objects.every({hasMustache: true})).to.equal(true);
     expect(Cat.objects.every(cat => cat.hasMustache)).to.equal(true);
   });
+
+  it('should return if [any/some] expression are corrects', async () => {
+    const Cat = createModel([
+      withField('color'),
+      withField('hasMustache', {initial: true}),
+    ]);
+
+    await createAction(
+      colors => colors.map(color => Cat.objects.create({color}))
+    , [Cat])(['black', 'white']);
+
+    [Cat.objects.any, Cat.objects.some]
+      .map(some => some.bind(Cat.objects))
+      .forEach(some => {
+        expect(some({color: 'black'})).to.equal(true);
+        expect(some(cat => cat.color === 'black')).to.equal(true);
+        expect(some({hasMustache: false})).to.equal(false);
+        expect(some(cat => !cat.hasMustache)).to.equal(false);
+      });
+  });
 });

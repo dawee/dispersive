@@ -48,6 +48,24 @@ const withExporters = Base => class extends Base {
     return res;
   }
 
+  some(expression) {
+    const predicate = getFilterPredicate(expression);
+    let res = false;
+
+    for (const [entry, index] of this.entriesWithIndex()) {
+      if (predicate(entry, index)) {
+        res = true;
+        break;
+      }
+    }
+
+    return res;
+  }
+
+  any(expression) {
+    return this.some(expression);
+  }
+
   toArray() {
     return this.map(entry => entry);
   }
