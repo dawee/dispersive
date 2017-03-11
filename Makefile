@@ -23,7 +23,7 @@ field:
 field/%.js: src/field/%.js
 	@${babel} $< -o $@
 
-test: lib
+test:
 	@${mocha} -b -R nyan
 
 .PHONY: test
