@@ -60,6 +60,12 @@ const createObjectManagerConstructor = QuerySetConstructor => class extends Quer
     return new EntryConstructor({values, manager: this, setup: this.setup});
   }
 
+  get(expression) {
+    return typeof expression === 'string'
+      ? this.build(this.values.get(expression))
+      : super.get(expression);
+  }
+
   create(rawValues = {}) {
     const entry = this.build();
 

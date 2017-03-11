@@ -56,7 +56,7 @@ const createManyQuerysetConstructor = QuerySetConstructor => (
 
     * entries() {
       for (const entry of super.entries()) {
-        yield this.association.dest.model.objects.get({pk: entry[this.association.dest.pkField]});
+        yield this.association.dest.model.objects.get(entry[this.association.dest.pkField]);
       }
     }
 
@@ -110,9 +110,9 @@ const createWithOneAccessor = ({fieldName, association}) => (
     get [fieldName]() {
       const associatedEntry = association.model.objects.get({[association.src.pkField]: this.pk});
 
-      return associatedEntry ? association.dest.model.objects.get({
-        pk: associatedEntry[association.dest.pkField],
-      }) : null;
+      return associatedEntry
+        ? association.dest.model.objects.get(associatedEntry[association.dest.pkField])
+        : null;
     }
 
     set [fieldName](entry) {

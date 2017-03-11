@@ -13,6 +13,8 @@ const withExporters = Base => class extends Base {
   }
 
   get(expression) {
+    if (typeof expression === 'string') this.parent.get(expression);
+
     return expression ? this.filter(expression).first() : this.first();
   }
 
