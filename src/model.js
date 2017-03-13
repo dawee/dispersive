@@ -111,12 +111,11 @@ const createModel = (composers) => {
 
   Object.defineProperty(model, 'objects', {
     get() {
-      const values = objects ? objects.values : Immutable.Map();
-      const transaction = objects ? objects.transaction : null;
+      const opts = objects || {setup, emitter, values: Immutable.Map()};
       const QuerySetConstructor = setup.get('QuerySetConstructor');
       const ObjectManagerConstructor = createObjectManagerConstructor(QuerySetConstructor);
 
-      objects = new ObjectManagerConstructor({emitter, setup, values, transaction});
+      objects = new ObjectManagerConstructor(opts);
 
       return objects;
     },
