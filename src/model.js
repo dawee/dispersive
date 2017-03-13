@@ -53,10 +53,16 @@ class Entry {
 
 }
 
+const createObjectsConstructor = ({setup}) => {
+  const QuerySetConstructor = setup.get('QuerySetConstructor');
+  return createObjectManagerConstructor(QuerySetConstructor);
+};
+
 
 const defaultSetup = {
   EntryConstructor: Entry,
   QuerySetConstructor: QuerySet,
+  objectsConstructorFactory: createObjectsConstructor,
   primaryKeyName: PRIMARY_KEY_NAME,
 };
 
@@ -112,8 +118,9 @@ const createModel = (composers) => {
   Object.defineProperty(model, 'objects', {
     get() {
       const opts = objects || {setup, emitter, values: Immutable.Map()};
-      const QuerySetConstructor = setup.get('QuerySetConstructor');
-      const ObjectManagerConstructor = createObjectManagerConstructor(QuerySetConstructor);
+
+      const objectsConstructorFactory = setup.get('objectsConstructorFactory');
+      const ObjectManagerConstructor = objectsConstructorFactory({setup, model});
 
       objects = new ObjectManagerConstructor(opts);
 
