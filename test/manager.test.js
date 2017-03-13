@@ -1,146 +1,144 @@
 const {assert, expect} = require('chai');
 const {spy} = require('sinon');
-const {model, field, error} = require('../src/index');
-
-const {withField} = field;
+const {createModel} = require('../src/model');
+const {withField} = require('../src/field');
+const error = require('../src/error');
 
 describe('manager', () => {
 
   it('should throw an error if trying to create without a transaction', () => {
-    const objects = model.createModel().objects;
+    const model = createModel();
 
-    expect(() => objects.create()).to.throw(error.TransactionDoesNotExist);
+    expect(() => model.objects.create()).to.throw(error.TransactionDoesNotExist);
   });
 
   it('should throw an error if trying to create a transaction if one already exists', () => {
-    const objects = model.createModel().objects;
+    const model = createModel();
 
-    objects.createTransaction();
+    model.objects.createTransaction();
 
-    expect(() => objects.createTransaction()).to.throw(error.TransactionAlreadyExists);
+    expect(() => model.objects.createTransaction()).to.throw(error.TransactionAlreadyExists);
   });
 
   it('should not create an entry if transaction is aborted', () => {
-    const {objects, emitter} = model.createModel();
+    const model = createModel();
     const render = spy();
-    const subscription = emitter.changed(render);
 
-    objects.createTransaction();
-    objects.create({foo: 42});
-    objects.abortTransaction();
-    subscription.remove();
+    model.emitter.changed(render);
+    model.objects.createTransaction();
+    model.objects.create({foo: 42});
+    model.objects.abortTransaction();
 
     assert(!render.called);
-    expect(objects.length).to.equal(0);
+    expect(model.objects.length).to.equal(0);
   });
 
   it('should create an entry if transaction is commited', () => {
-    const {objects, emitter} = model.createModel();
+    const model = createModel();
     const render = spy();
-    const subscription = emitter.changed(render);
 
-    objects.createTransaction();
-    objects.create({foo: 42});
-    objects.commitTransaction();
-    subscription.remove();
+    model.emitter.changed(render);
+    model.objects.createTransaction();
+    model.objects.create({foo: 42});
+    model.objects.commitTransaction();
 
     assert(render.called);
-    expect(objects.length).to.equal(1);
+    expect(model.objects.length).to.equal(1);
   });
 
   it('should return a updatable entry', () => {
-    const objects = model.createModel().objects;
+    const model = createModel();
 
-    objects.createTransaction();
-    const entry = objects.create({foo: 42});
+    model.objects.createTransaction();
+    const entry = model.objects.create({foo: 42});
     entry.values = entry.values.set('foo', 0);
     entry.save();
-    objects.commitTransaction();
+    model.objects.commitTransaction();
 
-    expect(objects.values.first().get('foo')).to.equal(0);
+    expect(model.objects.values.first().get('foo')).to.equal(0);
   });
 
   it('should map entries', () => {
-    const objects = model.createModel().objects;
+    const model = createModel();
 
-    objects.createTransaction();
-    objects.create({foo: 42});
-    objects.commitTransaction();
+    model.objects.createTransaction();
+    model.objects.create({foo: 42});
+    model.objects.commitTransaction();
 
-    const foos = objects.map(entry => 42);
+    const foos = model.objects.map(entry => 42);
 
     expect(foos).to.deep.equal([42]);
   });
 
   it('should retreive first', () => {
-    const objects = model.createModel([
+    const model = createModel([
       withField('text'),
-    ]).objects;
+    ]);
 
-    objects.createTransaction();
-    objects.create({text: 'foo'});
-    objects.create({text: 'bar'});
-    objects.commitTransaction();
+    model.objects.createTransaction();
+    model.objects.create({text: 'foo'});
+    model.objects.create({text: 'bar'});
+    model.objects.commitTransaction();
 
-    expect(objects.first().text).to.equal('foo');
+    expect(model.objects.first().text).to.equal('foo');
   });
 
   it('should retreive last', () => {
-    const objects = model.createModel([
+    const model = createModel([
       withField('text'),
-    ]).objects;
+    ]);
 
-    objects.createTransaction();
-    objects.create({text: 'foo'});
-    objects.create({text: 'bar'});
-    objects.commitTransaction();
+    model.objects.createTransaction();
+    model.objects.create({text: 'foo'});
+    model.objects.create({text: 'bar'});
+    model.objects.commitTransaction();
 
-    expect(objects.last().text).to.equal('bar');
+    expect(model.objects.last().text).to.equal('bar');
   });
 
   it('should export to JSON', () => {
-    const objects = model.createModel([
+    const model = createModel([
       withField('text'),
-    ]).objects;
+    ]);
 
-    objects.createTransaction();
-    objects.create({text: 'foo'});
-    objects.create({text: 'bar'});
-    objects.commitTransaction();
+    model.objects.createTransaction();
+    model.objects.create({text: 'foo'});
+    model.objects.create({text: 'bar'});
+    model.objects.commitTransaction();
 
-    expect(objects.toJSON()).to.deep.equal([{text: 'foo'}, {text: 'bar'}]);
+    expect(model.objects.toJSON()).to.deep.equal([{text: 'foo'}, {text: 'bar'}]);
   });
 
   it('should delete filtered entries', () => {
-    const objects = model.createModel([
+    const model = createModel([
       withField('text'),
-    ]).objects;
+    ]);
 
-    objects.createTransaction();
-    objects.create({text: 'foo'});
-    objects.create({text: 'bar'});
-    objects.create({text: 'foobar'});
-    objects.filter(entry => entry.text.length <= 3).delete();
-    objects.commitTransaction();
+    model.objects.createTransaction();
+    model.objects.create({text: 'foo'});
+    model.objects.create({text: 'bar'});
+    model.objects.create({text: 'foobar'});
+    model.objects.filter(entry => entry.text.length <= 3).delete();
+    model.objects.commitTransaction();
 
 
-    expect(objects.length).to.equal(1);
-    expect(objects.get().text).to.equal('foobar');
+    expect(model.objects.length).to.equal(1);
+    expect(model.objects.get().text).to.equal('foobar');
   });
 
   it('should update entries', () => {
-    const objects = model.createModel([
+    const model = createModel([
       withField('text'),
-    ]).objects;
+    ]);
 
-    objects.createTransaction();
-    objects.create({text: 'foo'});
-    objects.create({text: 'bar'});
-    objects.create({text: 'foobar'});
-    objects.update({text: 'baz'});
-    objects.commitTransaction();
+    model.objects.createTransaction();
+    model.objects.create({text: 'foo'});
+    model.objects.create({text: 'bar'});
+    model.objects.create({text: 'foobar'});
+    model.objects.update({text: 'baz'});
+    model.objects.commitTransaction();
 
-    expect(objects.map(entry => entry.text)).to.deep.equal(['baz', 'baz', 'baz']);
+    expect(model.objects.map(entry => entry.text)).to.deep.equal(['baz', 'baz', 'baz']);
   });
 
 })
