@@ -91,24 +91,36 @@ const createEntryMixin = mixin => createMixin({name: 'EntryConstructor', mixin})
 const createQuerySetMixin = mixin => createMixin({name: 'QuerySetConstructor', mixin});
 
 const createModel = (composers) => {
-  const model = {id: ulid()};
+  const emitter = createChangesEmitter();
+  const model = {emitter, id: ulid()};
 
-  model.setup = composeSetup({
+  let objects = null;
+  let setup = composeSetup({
     model,
     setup: Immutable.Map(defaultSetup),
     composers: Array.isArray(composers) ? composers : [composers],
   });
 
-  model.inject = (composer) => {
-    model.setup = composer({model, setup: model.setup});
-    model.objects = model.objects.useSetup(model.setup);
+  model.inject = (injected) => {
+    setup = composeSetup({
+      model,
+      setup,
+      composers: Array.isArray(injected) ? injected : [injected],
+    });
   };
 
-  const QuerySetConstructor = model.setup.get('QuerySetConstructor');
-  const ObjectManagerConstructor = createObjectManagerConstructor(QuerySetConstructor);
+  Object.defineProperty(model, 'objects', {
+    get() {
+      const values = objects ? objects.values : Immutable.Map();
+      const transaction = objects ? objects.transaction : null;
+      const QuerySetConstructor = setup.get('QuerySetConstructor');
+      const ObjectManagerConstructor = createObjectManagerConstructor(QuerySetConstructor);
 
-  model.emitter = createChangesEmitter();
-  model.objects = new ObjectManagerConstructor(model);
+      objects = new ObjectManagerConstructor({emitter, setup, values, transaction});
+
+      return objects;
+    },
+  });
 
   return model;
 };

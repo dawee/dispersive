@@ -2,6 +2,7 @@ const {assert, expect} = require('chai');
 const {spy} = require('sinon');
 const {createModel} = require('../src/model');
 const {withField} = require('../src/field');
+const {createAction} = require('../src/action');
 const error = require('../src/error');
 
 describe('manager', () => {
@@ -118,6 +119,9 @@ describe('manager', () => {
     model.objects.create({text: 'foo'});
     model.objects.create({text: 'bar'});
     model.objects.create({text: 'foobar'});
+    model.objects.commitTransaction();
+
+    model.objects.createTransaction();
     model.objects.filter(entry => entry.text.length <= 3).delete();
     model.objects.commitTransaction();
 
@@ -135,10 +139,24 @@ describe('manager', () => {
     model.objects.create({text: 'foo'});
     model.objects.create({text: 'bar'});
     model.objects.create({text: 'foobar'});
+    model.objects.commitTransaction();
+
+    model.objects.createTransaction();
     model.objects.update({text: 'baz'});
     model.objects.commitTransaction();
 
     expect(model.objects.map(entry => entry.text)).to.deep.equal(['baz', 'baz', 'baz']);
+  });
+
+  it('should be immutable', async () => {
+    const model = createModel();
+
+    const beforeObjects = model.objects;
+
+    await createAction(() => model.objects.create(), [model])()
+
+    expect(beforeObjects.length).to.equal(0);
+    expect(model.objects.length).to.equal(1);
   });
 
 })
