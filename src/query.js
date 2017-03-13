@@ -30,81 +30,84 @@ const getExcludePredicate = expression => (
  * Mixin
  */
 
-class SortedEntriesGenerator {
-
-  constructor(queryset, sortComparator) {
-    this.sortComparator = sortComparator;
-    this.parent = queryset.parent;
-  }
+const withSortedEntries = ({Base, sortComparator}) => class extends Base {
 
   * entries() {
-    for (const [, entry] of this.parent.toArray().sort(this.sortComparator).entries()) {
+    for (const [, entry] of this.parent.toArray().sort(sortComparator).entries()) {
       yield entry;
     }
   }
 
-}
+};
 
-const withNonEntriesGenerator = Base => class extends Base {
+const withFilteredEntries = ({Base, predicate}) => class extends Base {
 
-  constructor(...args) {
-    super(...args);
-
-    this.source = [];
+  * entries() {
+    for (const entry of this.parent.entries()) {
+      if (predicate(entry)) yield entry;
+    }
   }
 
 };
 
-const withQueries = Base => class extends Base {
-
-  constructor({QuerySetConstructor, parent = null, predicate = null, sortComparator = null}) {
-    super({parent, QuerySetConstructor});
-    this.predicate = predicate;
-    this.source = sortComparator ? new SortedEntriesGenerator(this, sortComparator) : null;
-  }
-
-  validate(entry) {
-    return !this.predicate || this.predicate(entry);
-  }
-
-  getFallbackSource(source = null) {
-    return source || this.parent;
-  }
+const withEmptyGenerator = ({Base}) => class extends Base {
 
   * entries() {
-    const source = this.getFallbackSource(this.source);
-
-    for (const entry of source.entries()) {
-      if (this.validate(entry)) yield entry;
+    for (const [, entry] of [].entries()) {
+      yield entry;
     }
   }
 
+};
+
+const withQueries = QuerySetBase => class extends QuerySetBase {
+
   filter(expression) {
-    return this.clone({predicate: getFilterPredicate(expression)});
+    const Base = this.QuerySetConstructor;
+    const predicate = getFilterPredicate(expression);
+    const QuerySetConstructor = withFilteredEntries({Base, predicate});
+
+    return this.clone({QuerySetConstructor});
   }
 
   exclude(expression) {
-    return this.clone({predicate: getExcludePredicate(expression)});
+    const Base = this.QuerySetConstructor;
+    const predicate = getExcludePredicate(expression);
+    const QuerySetConstructor = withFilteredEntries({Base, predicate});
+
+    return this.clone({QuerySetConstructor});
   }
 
   sort(sortComparator) {
-    return this.clone({sortComparator});
-  }
+    const Base = this.QuerySetConstructor;
+    const QuerySetConstructor = withSortedEntries({Base, sortComparator});
 
-  orderBy(...fields) {
-    return this.sort(sortBy(...fields));
+    return this.clone({QuerySetConstructor});
   }
 
   reverse() {
-    return this.clone({sortComparator: () => REVERSED});
+    const Base = this.QuerySetConstructor;
+    const sortComparator = () => REVERSED;
+    const QuerySetConstructor = withSortedEntries({Base, sortComparator});
+
+    return this.clone({QuerySetConstructor});
   }
 
   none() {
-    return this.clone(null, withNonEntriesGenerator(this.QuerySetConstructor));
+    const Base = this.QuerySetConstructor;
+    const QuerySetConstructor = withEmptyGenerator({Base});
+
+    return this.clone({QuerySetConstructor});
+  }
+
+  orderBy(...fields) {
+    const sortComparator = sortBy(...fields);
+
+    return this.sort(sortComparator);
   }
 
   all() {
-    return this.clone();
+    return this.clone({QuerySetConstructor: this.QuerySetConstructor});
   }
 
 };

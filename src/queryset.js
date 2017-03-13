@@ -9,16 +9,26 @@ class QuerySetBase {
     this.QuerySetConstructor = QuerySetConstructor;
   }
 
-  clone(opts = {}, QuerySetConstructor = this.QuerySetConstructor) {
-    return new QuerySetConstructor(Object.assign({parent: this}, opts));
+  * entries() {
+    for (const entry of this.parent.entries()) {
+      yield entry;
+    }
   }
 
   update(rawValues) {
-    return this.map(entry => entry.update(rawValues));
+    for (const entry of this.entries()) {
+      entry.update(rawValues);
+    }
   }
 
   delete() {
-    return this.map(entry => entry.delete());
+    for (const entry of this.entries()) {
+      entry.delete();
+    }
+  }
+
+  clone({QuerySetConstructor = this.QuerySetConstructor}) {
+    return new QuerySetConstructor({parent: this, QuerySetConstructor: this.QuerySetConstructor});
   }
 
 }
