@@ -95,6 +95,15 @@ const composeSetup = ({model, setup = Immutable.Map(defaultSetup), composers = [
 
 const createEntryMixin = mixin => createMixin({name: 'EntryConstructor', mixin});
 const createQuerySetMixin = mixin => createMixin({name: 'QuerySetConstructor', mixin});
+const createObjectManagerMixin = mixin => (
+  ({setup}) => {
+    const parentFactory = setup.get('objectsConstructorFactory');
+
+    return setup.set('objectsConstructorFactory', ({newSetup = setup, model}) => (
+      mixin({Base: parentFactory({setup: newSetup}), setup: newSetup, model})
+    ));
+  }
+);
 
 const createModel = (composers) => {
   const emitter = createChangesEmitter();
@@ -138,6 +147,7 @@ const mixModelComposers = (composers = []) => (
 module.exports = {
   createEntryMixin,
   createQuerySetMixin,
+  createObjectManagerMixin,
   createModel,
   mixModelComposers,
 };

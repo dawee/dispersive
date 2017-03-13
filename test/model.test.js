@@ -13,7 +13,7 @@ const withEntryBar = () => model.createEntryMixin(
   }
 );
 
-const withObjectsBar = () => model.createQuerySetMixin(
+const withObjectsBar = () => model.createObjectManagerMixin(
   ({Base}) => class extends Base {
     get bar() {
       return 42;
