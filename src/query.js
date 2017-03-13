@@ -52,11 +52,7 @@ const withFilteredEntries = ({Base, predicate}) => class extends Base {
 
 const withEmptyGenerator = ({Base}) => class extends Base {
 
-  * entries() {
-    for (const [, entry] of [].entries()) {
-      yield entry;
-    }
-  }
+  * entries() {}
 
 };
 
