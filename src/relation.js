@@ -1,4 +1,4 @@
-const {createModel, createEntryMixin} = require('./model');
+const {createModel, createEntryMixin, createObjectManagerMixin} = require('./model');
 const {withField} = require('./field');
 
 
@@ -23,6 +23,84 @@ const parseRelation = (name, opts = {}) => (
  * Association
  */
 
+const withPkSetEntries = ({Base, pkSet, manager}) => class extends Base {
+
+  * entries() {
+    for (const [, entry] of pkSet.entries()) {
+      yield manager.build(entry);
+    }
+  }
+
+};
+
+const withAssociationIndex = (pk1, pk2) => (
+  createObjectManagerMixin(({Base}) => class extends Base {
+    constructor(opts) {
+      super(opts);
+      this.indexes = this.getIndexes(opts);
+    }
+
+    getIndexes({indexes = {[pk1]: {}, [pk2]: {}}}) {
+      return indexes;
+    }
+
+    unlink(values) {
+      const pk1Value = values.get(pk1);
+      const pk2Value = values.get(pk2);
+
+      if (pk1Value in this.indexes[pk1]) this.indexes[pk1][pk1Value].delete(values);
+      if (pk2Value in this.indexes[pk2]) this.indexes[pk2][pk2Value].delete(values);
+    }
+
+    link(values) {
+      const pk1Value = values.get(pk1);
+      const pk2Value = values.get(pk2);
+
+      if (!(pk1Value in this.indexes[pk1])) this.indexes[pk1][pk1Value] = new Set();
+      if (!(pk2Value in this.indexes[pk2])) this.indexes[pk2][pk2Value] = new Set();
+
+      if (pk1Value && pk2Value) {
+        this.indexes[pk1][pk1Value].add(values);
+        this.indexes[pk2][pk2Value].add(values);
+      }
+    }
+
+    unsync(values) {
+      this.unlink(values);
+      return super.unsync(values);
+    }
+
+    sync(values) {
+      this.unlink(values);
+
+      const newValues = super.sync(values);
+
+      this.link(newValues);
+      return newValues;
+    }
+
+    filterPkSet(expression = {}, pk) {
+      const pkValue = expression[pk];
+
+      return pkValue ? this.indexes[pk][pkValue] : null;
+    }
+
+    filter(expression) {
+      const pk1Set = this.filterPkSet(expression, pk1);
+      const pk2Set = this.filterPkSet(expression, pk2);
+      const pkSet = (pk1Set && (!pk2Set || pk2Set.size > pk1Set.size)) ? pk1Set : pk2Set;
+
+      return pkSet ? this.clone({
+        QuerySetConstructor: withPkSetEntries({
+          pkSet,
+          Base: this.QuerySetConstructor,
+          manager: this,
+        }),
+      }).filter(expression) : super.filter(expression);
+    }
+  })
+);
+
 const createAssociation = ({root, target}) => ({
   src: {
     model: root,
@@ -35,6 +113,7 @@ const createAssociation = ({root, target}) => ({
   model: createModel([
     withField(ROOT_PK_FIELD),
     withField(TARGET_PK_FIELD),
+    withAssociationIndex(ROOT_PK_FIELD, TARGET_PK_FIELD),
   ]),
 });
 

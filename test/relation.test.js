@@ -42,15 +42,16 @@ describe('relation', () => {
       withMany('books', Book),
     ]);
 
-    const diana = await createAction(() => {
+    const [diana, howlsMovingCastle]  = await createAction(() => {
       const author = Author.objects.create({name: 'Diana Wynne Jones'});
-      const howlsMovingCastle = Book.objects.create({title: 'Howl\'s Moving Castle'});
+      const book = Book.objects.create({title: 'Howl\'s Moving Castle'});
 
-      author.books.add(howlsMovingCastle);
-      author.books.remove(howlsMovingCastle);
+      author.books.add(book);
 
-      return author;
+      return [author, book];
     }, [Author, Book])();
+
+    await createAction(() => diana.books.remove(howlsMovingCastle), [Author, Book])();
 
     expect(diana.books.count()).to.equal(0);
   });
