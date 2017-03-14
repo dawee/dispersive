@@ -73,4 +73,16 @@ describe('model', () => {
     expect(Foo.objects.bar).to.equal(42);
   });
 
+  it('should test if values are equal', async () => {
+    const Foo = createModel([
+      withField('bar'),
+    ]);
+
+    const fooV1 = await createAction(() => Foo.objects.create({bar: 0}), [Foo])();
+    const fooV2 = await createAction(() => Foo.objects.get().update({bar: 42}), [Foo])();
+
+    expect(fooV1.equals(fooV2)).to.equal(false);
+    expect(fooV2.equals(Foo.objects.get())).to.equal(true);
+  });
+
 })

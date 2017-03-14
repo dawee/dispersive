@@ -51,6 +51,10 @@ class Entry {
     return this.toCleanValues().toJS();
   }
 
+  equals({values}) {
+    return this.values === values;
+  }
+
 }
 
 const createObjectsConstructor = ({setup}) => {
