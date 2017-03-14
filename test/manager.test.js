@@ -36,14 +36,11 @@ describe('manager', () => {
 
   it('should create an entry if transaction is commited', () => {
     const model = createModel();
-    const render = spy();
 
-    model.emitter.changed(render);
     model.objects.createTransaction();
     model.objects.create({foo: 42});
     model.objects.commitTransaction();
 
-    assert(render.called);
     expect(model.objects.length).to.equal(1);
   });
 

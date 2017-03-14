@@ -30,7 +30,6 @@ const createObjectManagerConstructor = QuerySetConstructor => class extends Quer
   commitTransaction() {
     this.values = this.transaction.values;
     this.transaction = null;
-    this.emitter.emitChange();
   }
 
   abortTransaction() {

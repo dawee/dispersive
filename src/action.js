@@ -6,11 +6,14 @@ const callHandler = async (handler, args) => readHandlerResult(handler(...args))
 
 const createTransactions = sources => sources.map(source => source.objects.createTransaction());
 const commitTransactions = sources => sources.map(source => source.objects.commitTransaction());
+const emitChanges = sources => sources.map(source => source.emitter.emitChange());
 
 const callHandlerAndCommit = async (handler, sources, args) => {
   const res = await callHandler(handler, args);
 
   commitTransactions(sources);
+  emitChanges(sources);
+
   return res;
 };
 
