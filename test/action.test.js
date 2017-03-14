@@ -33,6 +33,17 @@ describe('action', () => {
     expect(Book.objects.length).to.equal(1);
   });
 
+  it('should update a given entry', async () => {
+    const Book = createModel([
+      withField('title'),
+    ]);
+
+    const emptyBook = await createAction(() => Book.objects.create(), [Book])();
+    const peterPan = await createAction(book => book.update({title: 'Peter Pan'}), [Book])(emptyBook);
+
+    expect(Book.objects.get().title).to.equal('Peter Pan');
+  });
+
   it('should emit events before resolving the promise', async () => {
     const Book = createModel();
     const renderer = spy();
