@@ -1,5 +1,7 @@
-body {
-  margin: 0;
-  padding: 0;
-  font-family: sans-serif;
+.active-slot-panel {
+  position: fixed;
+  right: 40vw;
+  top: 40vh;
+  font-size: 3em;
+  text-align: right;
 }
