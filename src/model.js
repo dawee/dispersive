@@ -43,12 +43,8 @@ class Entry {
     return this;
   }
 
-  toCleanValues() {
-    return this.values.remove(this.setup.get('primaryKeyName'));
-  }
-
   toJSON() {
-    return this.toCleanValues().toJS();
+    return {};
   }
 
   equals({values}) {

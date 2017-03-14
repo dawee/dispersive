@@ -15,6 +15,14 @@ const extendWithField = ({EntryConstructor, field}) => (
     get [field.name]() {
       return field.get ? field.get({entry: this, get: super.get}) : null;
     }
+
+    toJSON() {
+      const base = super.toJSON();
+
+      return field.serialize ? Object.assign(base, {
+        [field.name]: field.serialize({entry: this}),
+      }) : base;
+    }
   }
 );
 
@@ -32,6 +40,7 @@ const withInitializedField = (name, {initial = null}) => (
     init: () => initial,
     set: ({entry, value}) => entry.values.set(name, value),
     get: ({entry}) => entry.values.get(name),
+    serialize: ({entry}) => entry.values.get(name),
   })
 );
 
