@@ -140,7 +140,7 @@ const createModel = (composers) => {
   return model;
 };
 
-const mixModelComposers = (composers = []) => (
+const mix = (composers = []) => (
   ({setup}) => composeSetup({setup, composers})
 );
 
@@ -149,5 +149,5 @@ module.exports = {
   createQuerySetMixin,
   createObjectManagerMixin,
   createModel,
-  mixModelComposers,
+  mix,
 };

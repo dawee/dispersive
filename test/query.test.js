@@ -1,11 +1,9 @@
 
 const {expect, assert} = require('chai');
-const {model, field, relation, action, error} = require('../src/index');
-
-const {withField} = field;
-const {withOne, withMany} = relation;
-const {createModel} = model;
-const {createAction} = action;
+const {createModel, createAction} = require('../src');
+const {withOne, withMany} = require('../src/relation');
+const {withField} = require('../src/field');
+const error = require('../src/error');
 
 
 describe('queryset with queries', () => {

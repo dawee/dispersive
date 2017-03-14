@@ -1,11 +1,12 @@
 const {expect, assert} = require('chai');
-const {model, field, relation, error} = require('../src/index');
+const {createModel, createAction} = require('../src');
+const {withOne, withMany} = require('../src/relation');
+const {createEntryMixin, createObjectManagerMixin, mix} = require('../src/model');
+const {withField} = require('../src/field');
+const error = require('../src/error');
 
-const {withField} = field;
-const {withMany} = relation;
-const {createModel} = model;
 
-const withEntryBar = () => model.createEntryMixin(
+const withEntryBar = () => createEntryMixin(
   ({Base}) => class extends Base {
     get bar() {
       return 42;
@@ -13,7 +14,7 @@ const withEntryBar = () => model.createEntryMixin(
   }
 );
 
-const withObjectsBar = () => model.createObjectManagerMixin(
+const withObjectsBar = () => createObjectManagerMixin(
   ({Base}) => class extends Base {
     get bar() {
       return 42;
@@ -21,14 +22,14 @@ const withObjectsBar = () => model.createObjectManagerMixin(
   }
 );
 
-const withMix = () => model.mixModelComposers([withEntryBar(), withObjectsBar()]);
+const withMix = () => mix([withEntryBar(), withObjectsBar()]);
 
 
 describe('model', () => {
 
   it('should init field value', () => {
-    const Foo = model.createModel([
-      field.withField('bar', {initial: 42}),
+    const Foo = createModel([
+      withField('bar', {initial: 42}),
     ]);
 
     Foo.objects.createTransaction();
@@ -39,7 +40,7 @@ describe('model', () => {
   });
 
   it('should inject objects mixins', () => {
-    const Foo = model.createModel();
+    const Foo = createModel();
 
     Foo.inject(withEntryBar());
 
@@ -51,7 +52,7 @@ describe('model', () => {
   });
 
   it('should use manager mixins', () => {
-    const Foo = model.createModel([
+    const Foo = createModel([
       withObjectsBar(),
     ]);
 
@@ -59,7 +60,7 @@ describe('model', () => {
   });
 
   it('should inject manager mixins', () => {
-    const Foo = model.createModel();
+    const Foo = createModel();
 
     Foo.inject(withObjectsBar());
 
@@ -67,7 +68,7 @@ describe('model', () => {
   });
 
   it('should mix composers', () => {
-    const Foo = model.createModel([withMix()]);
+    const Foo = createModel([withMix()]);
 
     expect(Foo.objects.bar).to.equal(42);
   });

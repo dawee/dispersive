@@ -1,12 +1,16 @@
 const {assert, expect} = require('chai');
 const {spy} = require('sinon');
-const {action, model, error} = require('../src/index');
+const {createModel, createAction} = require('../src');
+const {withOne, withMany} = require('../src/relation');
+const {withField} = require('../src/field');
+const error = require('../src/error');
+
 
 
 describe('action', () => {
 
   it('should always be asynchronous', async () => {
-    const greet = action.createAction(name => `Hello ${name}`);
+    const greet = createAction(name => `Hello ${name}`);
     const res = await greet('Paul');
 
     expect(res).to.equal('Hello Paul');
@@ -14,15 +18,15 @@ describe('action', () => {
 
   it('should wait for async handler', async () => {
     const asyncAdd = async (a, b) => a + b;
-    const add = action.createAction(async (a, b) => await asyncAdd(a, b));
+    const add = createAction(async (a, b) => await asyncAdd(a, b));
     const res = await add(20, 22);
 
     expect(res).to.equal(42);
   });
 
   it('should commit change to models', async () => {
-    const Book = model.createModel();
-    const createBook = action.createAction(() => Book.objects.create(), [Book]);
+    const Book = createModel();
+    const createBook = createAction(() => Book.objects.create(), [Book]);
 
     await createBook();
 
@@ -30,9 +34,9 @@ describe('action', () => {
   });
 
   it('should emit events before resolving the promise', async () => {
-    const Book = model.createModel();
+    const Book = createModel();
     const renderer = spy();
-    const createBook = action.createAction(() => Book.objects.create(), [Book]);
+    const createBook = createAction(() => Book.objects.create(), [Book]);
 
     const subscription = Book.emitter.changed(() => renderer(Book.objects.length));
 

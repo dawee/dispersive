@@ -1,10 +1,12 @@
 const {assert, expect} = require('chai');
 const {spy} = require('sinon');
-const {pool, action, error} = require('../src/index');
+const error = require('../src/error');
+const {createActionPool} = require('../src/pool');
+const {packAction} = require('../src/action');
 
 
 const createDeferedAction = (handler) => {
-  return action.packAction(() => new Promise(
+  return packAction(() => new Promise(
     resolve => process.nextTick(() => {
       handler();
       resolve();
@@ -15,8 +17,8 @@ const createDeferedAction = (handler) => {
 describe('pool', () => {
 
   it('should call action', async () => {
-    const addPool = pool.createActionPool();
-    const packedAdd = action.packAction(((a, b) => a + b), [20, 22]);
+    const addPool = createActionPool();
+    const packedAdd = packAction(((a, b) => a + b), [20, 22]);
 
     const res = await addPool.delegate(packedAdd);
 
@@ -24,7 +26,7 @@ describe('pool', () => {
   });
 
   it('should chain actions', async () => {
-    const chainPool = pool.createActionPool();
+    const chainPool = createActionPool();
     const firstSpy = spy();
     const secondSpy = spy();
 
