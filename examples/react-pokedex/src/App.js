@@ -73,47 +73,38 @@ const setSlotVisible = async (slot) => {
 
 class PokedexListSlot extends Component {
 
-  shouldComponentUpdate() {
-    return false;
+  shouldComponentUpdate({slot}) {
+    return !this.props.slot.equals(slot);
   }
 
   render() {
-    console.log('render');
+    console.log('render', Date.now())
+    const {slot} = this.props;
 
     return (
-      <li>
+      <li onMouseDown={() => {console.log('click', Date.now());setActiveSlot(slot)} }>
+        {`#${slot.num}`}
+        <span>{slot.active ? 'active' : null}</span>
       </li>
     );
   }
-
 }
 
-const PokedexList = ({pokedex}) => (
+const PokedexList = ({pokedex}) => {
+
+  return (
   <ul>
   {pokedex ? pokedex.slots.orderBy('num').map(slot => (
     <PokedexListSlot slot={slot} key={slot.pk} />)
   ) : null}
   </ul>
+)};
+
+const PokedexApp = () => (
+  <div className="pokedex-app">
+    <PokedexList pokedex={Pokedex.objects.get()} />
+  </div>
 );
-
-class PokedexApp extends Component {
-
-  componentWillUpdate() {
-    this.t0 = Date.now();
-  }
-
-  componentDidUpdate() {
-    if (this.t0) console.log('full update time :', Date.now() - this.t0);
-  }
-
-  render() {
-    return (
-      <div className="pokedex-app">
-        <PokedexList pokedex={Pokedex.objects.get()} />
-      </div>
-    );
-  }
-}
 
 class App extends Component {
 
