@@ -1,4 +1,5 @@
 const {dispatch} = require('./dispatcher');
+const {createChangesFunnelEmitter} = require('./emitter');
 
 const readHandlerResult = async res => res;
 
@@ -6,7 +7,7 @@ const callHandler = async (handler, args) => readHandlerResult(handler(...args))
 
 const createTransactions = sources => sources.map(source => source.objects.createTransaction());
 const commitTransactions = sources => sources.map(source => source.objects.commitTransaction());
-const emitChanges = sources => sources.map(source => source.emitter.emitChange());
+const emitChanges = sources => createChangesFunnelEmitter({sources}).emitChange();
 
 const callHandlerAndCommit = async (handler, sources, args) => {
   const res = await callHandler(handler, args);

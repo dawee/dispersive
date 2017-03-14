@@ -3,6 +3,7 @@ const {spy} = require('sinon');
 const {createModel, createAction} = require('../src');
 const {withOne, withMany} = require('../src/relation');
 const {withField} = require('../src/field');
+const {createChangesFunnelEmitter} = require('../src/emitter');
 const error = require('../src/error');
 
 
@@ -59,5 +60,30 @@ describe('action', () => {
     assert(renderer.calledWith(1));
   });
 
+
+  it('should trig a funnel just once', async () => {
+    const Book = createModel([
+      withField('title'),
+    ]);
+    const Author = createModel([
+      withField('name'),
+      withMany('books', Book),
+    ]);
+
+    const store = [Book, Author];
+    const render = spy();
+
+    createChangesFunnelEmitter({sources: store}).changed(() => (
+      render(Book.objects.length, Author.objects.length)
+    ));
+
+    await createAction(() => {
+      const jmBarrie = Author.objects.getOrCreate({name: 'J.M. Barrie'});
+      const peterPan = Book.objects.create({author: jmBarrie, title: 'Peter Pan'});
+    }, store)();
+
+    assert(render.calledOnce);
+    assert(render.calledWith(1, 1));
+  })
 
 })
