@@ -21,7 +21,7 @@ const Pokemon = createModel([
 
 const PokedexSlot = createModel([
   withField('num'),
-  withField('active'),
+  withField('active', { initial: false }),
   withField('loading', { initial: false }),
   withField('seen', { initial: false }),
   withField('captured', { initial: false }),
@@ -47,7 +47,7 @@ const createPokedex = createAction(({limit}) => {
 }, [Pokedex, PokedexSlot]);
 
 const setActiveSlot = createAction((slot) => {
-  slot.pokedex.slots.filter({active: true}).update({update: false});
+  slot.pokedex.slots.filter({active: true}).update({active: false});
   slot.update({active: true});
 }, [PokedexSlot]);
 
@@ -72,33 +72,26 @@ const setSlotVisible = async (slot) => {
  */
 
 class PokedexListSlot extends Component {
-
-  shouldComponentUpdate({slot}) {
-    return !this.props.slot.equals(slot);
-  }
+  setActive = () => setActiveSlot(this.props.slot)
 
   render() {
-    console.log('render', Date.now())
-    const {slot} = this.props;
-
+    console.log('render');
     return (
-      <li onMouseDown={() => {console.log('click', Date.now());setActiveSlot(slot)} }>
-        {`#${slot.num}`}
-        <span>{slot.active ? 'active' : null}</span>
+      <li onMouseDown={this.setActive}>
+        {`#${this.props.slot.num}`}
+        <input type="checkbox" checked={this.props.slot.active} />
       </li>
     );
   }
 }
 
-const PokedexList = ({pokedex}) => {
-
-  return (
+const PokedexList = ({pokedex}) => (
   <ul>
   {pokedex ? pokedex.slots.orderBy('num').map(slot => (
     <PokedexListSlot slot={slot} key={slot.pk} />)
   ) : null}
   </ul>
-)};
+);
 
 const PokedexApp = () => (
   <div className="pokedex-app">
