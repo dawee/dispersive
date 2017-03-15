@@ -48,24 +48,28 @@ const createPokedex = createAction(({limit}) => {
 }, [Pokedex, PokedexSlot]);
 
 
-const setSlotActive = createAction((slot) => {
-  const current = slot.pokedex.slots.filter({active: true});
+const setSlotActive = createAction(({pk}) => {
+  const current = PokedexSlot.objects.get(pk).pokedex.slots.filter({active: true});
 
   current.update({active: false});
-  slot.update({active: true});
+  PokedexSlot.objects.get(pk).update({active: true});
 }, [PokedexSlot]);
 
 
-const setSlotSeen = async (slot) => {
-  const setSeen = createAction(() => slot.update({seen: true}), [PokedexSlot])
-  const setPokemon = createAction(({name, sprites}) => slot.update({
-    pokemon: Pokemon.objects.create({ name, sprite: sprites.front_default }),
-  }), [PokedexSlot, Pokemon]);
+const setSlotSeen = async ({pk}) => {
+  const setSeen = createAction(() => (
+    PokedexSlot.objects.get(pk).update({seen: true})
+  ), [PokedexSlot]);
+
+  const setPokemon = createAction(({name, sprites}) => {
+    const pokemon = Pokemon.objects.create({ name, sprite: sprites.front_default });
+    PokedexSlot.objects.get(pk).update({ pokemon });
+  }, [PokedexSlot, Pokemon]);
 
   await setSeen();
 
-  if (!slot.pokemon) {
-    const feed = await request.get(`${BASE_URL}/${slot.num}`);
+  if (!PokedexSlot.objects.get(pk).pokemon) {
+    const feed = await request.get(`${BASE_URL}/${PokedexSlot.objects.get(pk).num}`);
 
     await setPokemon(feed);
   }
