@@ -36,7 +36,7 @@ const Pokedex = createModel([
  * Actions
  */
 
-const createPokedex = createAction(({limit}) => {
+const createPokedex = createAction(() => {
   const pokedex = Pokedex.objects.create();
   const slots = [...Array(MAX_NUM).keys()].map(
     index => PokedexSlot.objects.create({ num: index + 1 })
@@ -49,10 +49,12 @@ const createPokedex = createAction(({limit}) => {
 
 
 const setSlotActive = createAction(({pk}) => {
-  const current = PokedexSlot.objects.get(pk).pokedex.slots.filter({active: true});
+  const slot = PokedexSlot.objects.get(pk);
+  const pokedex = slot.pokedex;
+  const activated = pokedex.slots.filter({active: true});
 
-  current.update({active: false});
-  PokedexSlot.objects.get(pk).update({active: true});
+  activated.update({active: false});
+  slot.update({active: true});
 }, [PokedexSlot]);
 
 
