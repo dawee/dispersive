@@ -8,7 +8,7 @@ const {createChangesEmitter} = require('./emitter');
  * Default setup
  */
 
-const PRIMARY_KEY_NAME = '_pk';
+const PRIMARY_KEY_NAME = 'key';
 
 
 class Entry {
@@ -21,11 +21,6 @@ class Entry {
 
   assign(rawValues = {}) {
     Object.assign(this, rawValues);
-  }
-
-  get pk() {
-    const pkName = this.setup.get('primaryKeyName');
-    return this.values.get(pkName);
   }
 
   save() {
@@ -105,6 +100,28 @@ const createObjectManagerMixin = mixin => (
   }
 );
 
+const withKeyField = () => (
+  createEntryMixin(({Base, setup}) => {
+    const keyName = setup.get('primaryKeyName');
+
+    return class extends Base {
+      get [keyName]() {
+        return this.getKey();
+      }
+
+      getKey() {
+        return this.values.get(keyName);
+      }
+    };
+  })
+);
+
+const normalizeComposers = (composers = []) => (
+  Immutable.List(Array.isArray(composers) ? composers : [composers]).concat([
+    withKeyField(),
+  ])
+);
+
 const createModel = (composers) => {
   const emitter = createChangesEmitter();
   const model = {emitter, id: ulid()};
@@ -113,14 +130,14 @@ const createModel = (composers) => {
   let setup = composeSetup({
     model,
     setup: Immutable.Map(defaultSetup),
-    composers: Array.isArray(composers) ? composers : [composers],
+    composers: normalizeComposers(composers),
   });
 
   model.inject = (injected) => {
     setup = composeSetup({
       model,
       setup,
-      composers: Array.isArray(injected) ? injected : [injected],
+      composers: normalizeComposers(injected),
     });
   };
 

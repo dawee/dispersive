@@ -128,7 +128,10 @@ const createManyQuerysetConstructor = QuerySetConstructor => (
   class extends QuerySetConstructor {
 
     constructor({association, entry}) {
-      super({parent: association.model.objects.filter({[association.src.pkField]: entry.pk})});
+      super({parent: association.model.objects.filter({
+        [association.src.pkField]: entry.getKey(),
+      })});
+
       this.association = association;
       this.originEntry = entry;
     }
@@ -143,8 +146,8 @@ const createManyQuerysetConstructor = QuerySetConstructor => (
       this.association.model.objects.createTransaction();
 
       this.association.model.objects.getOrCreate({
-        [this.association.src.pkField]: this.originEntry.pk,
-        [this.association.dest.pkField]: entry.pk,
+        [this.association.src.pkField]: this.originEntry.getKey(),
+        [this.association.dest.pkField]: entry.getKey(),
       });
 
       this.association.model.objects.commitTransaction();
@@ -154,8 +157,8 @@ const createManyQuerysetConstructor = QuerySetConstructor => (
       this.association.model.objects.createTransaction();
 
       const associatedEntry = this.association.model.objects.get({
-        [this.association.src.pkField]: this.originEntry.pk,
-        [this.association.dest.pkField]: entry.pk,
+        [this.association.src.pkField]: this.originEntry.getKey(),
+        [this.association.dest.pkField]: entry.getKey(),
       });
 
       if (associatedEntry) associatedEntry.delete();
@@ -187,7 +190,9 @@ const createWithOneAccessor = ({fieldName, association}) => (
   createEntryMixin(({Base}) => class extends Base {
 
     get [fieldName]() {
-      const associatedEntry = association.model.objects.get({[association.src.pkField]: this.pk});
+      const associatedEntry = association.model.objects.get({
+        [association.src.pkField]: this.getKey(),
+      });
 
       return associatedEntry
         ? association.dest.model.objects.get(associatedEntry[association.dest.pkField])
@@ -198,8 +203,8 @@ const createWithOneAccessor = ({fieldName, association}) => (
       association.model.objects.createTransaction();
 
       association.model.objects.getOrCreate({
-        [association.src.pkField]: this.pk,
-      }).update({[association.dest.pkField]: entry.pk});
+        [association.src.pkField]: this.getKey(),
+      }).update({[association.dest.pkField]: entry.getKey()});
 
       association.model.objects.commitTransaction();
     }

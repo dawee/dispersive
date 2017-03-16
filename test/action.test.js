@@ -40,8 +40,8 @@ describe('action', () => {
     ]);
 
     const emptyBook = await createAction(() => Book.objects.create(), [Book])();
-    const peterPan = await createAction(({pk}) => {
-      const book = Book.objects.get(pk);
+    const peterPan = await createAction(({key}) => {
+      const book = Book.objects.get(key);
 
       return book.update({title: 'Peter Pan'})
     }, [Book])(emptyBook);
