@@ -4,12 +4,10 @@ const {Transaction} = require('./transaction');
 
 const createObjectManagerConstructor = QuerySetConstructor => class extends QuerySetConstructor {
 
-  constructor({model, emitter, setup, values, transaction = null}) {
+  constructor({setup, values, transaction = null}) {
     super({QuerySetConstructor});
 
-    this.model = model;
     this.values = values;
-    this.emitter = emitter;
     this.transaction = transaction;
     this.setup = setup;
   }
@@ -38,7 +36,7 @@ const createObjectManagerConstructor = QuerySetConstructor => class extends Quer
 
   build(values = Immutable.Map()) {
     const EntryConstructor = this.setup.get('EntryConstructor');
-    return new EntryConstructor({values, model: this.model, setup: this.setup});
+    return new EntryConstructor({values, manager: this, setup: this.setup});
   }
 
   get(expression) {

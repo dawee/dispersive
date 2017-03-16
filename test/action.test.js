@@ -40,7 +40,11 @@ describe('action', () => {
     ]);
 
     const emptyBook = await createAction(() => Book.objects.create(), [Book])();
-    const peterPan = await createAction(book => book.update({title: 'Peter Pan'}), [Book])(emptyBook);
+    const peterPan = await createAction(({pk}) => {
+      const book = Book.objects.get(pk);
+
+      return book.update({title: 'Peter Pan'})
+    }, [Book])(emptyBook);
 
     expect(Book.objects.get().title).to.equal('Peter Pan');
   });

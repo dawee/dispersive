@@ -13,14 +13,10 @@ const PRIMARY_KEY_NAME = '_pk';
 
 class Entry {
 
-  constructor({values, setup, model}) {
+  constructor({values, setup, manager}) {
     this.values = values;
     this.setup = setup;
-    this.model = model;
-  }
-
-  get manager() {
-    return this.model.objects;
+    this.manager = manager;
   }
 
   assign(rawValues = {}) {
@@ -130,7 +126,7 @@ const createModel = (composers) => {
 
   Object.defineProperty(model, 'objects', {
     get() {
-      const opts = objects || {model, setup, emitter, values: Immutable.Map()};
+      const opts = objects || {setup, emitter, values: Immutable.Map()};
 
       const objectsConstructorFactory = setup.get('objectsConstructorFactory');
       const ObjectManagerConstructor = objectsConstructorFactory({setup, model});
