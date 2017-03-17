@@ -94,19 +94,6 @@ describe('manager', () => {
     expect(model.objects.last().text).to.equal('bar');
   });
 
-  it('should export to JSON', () => {
-    const model = createModel([
-      withField('text'),
-    ]);
-
-    model.createTransaction();
-    model.objects.create({text: 'foo'});
-    model.objects.create({text: 'bar'});
-    model.commitTransaction();
-
-    expect(model.objects.toJSON()).to.deep.equal([{text: 'foo'}, {text: 'bar'}]);
-  });
-
   it('should delete filtered entries', () => {
     const model = createModel([
       withField('text'),

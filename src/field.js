@@ -1,53 +1,44 @@
-const extendWithField = ({EntryConstructor, field}) => (
-  class extends EntryConstructor {
+const {createEntryMixin, mix} = require('./model');
+
+const usingFieldAccessors = (name, spec) => (
+  createEntryMixin(({Base}) => {
+    const EntryMixin = class extends Base {};
+
+    Object.defineProperty(EntryMixin.prototype, name, Object.assign({
+      enumerable: true,
+    }, spec));
+
+    return EntryMixin;
+  })
+);
+
+const usingFieldInitial = (name, initial) => (
+  createEntryMixin(({Base}) => class extends Base {
     constructor(...args) {
       super(...args);
 
-      if (!this.values.has(field.name) && field.init) {
-        this[field.name] = field.init ? field.init({entry: this, args}) : null;
-      }
+      if (!this.values.has(name)) this[name] = initial;
     }
-
-    set [field.name](value) {
-      this.values = field.set ? field.set({entry: this, set: super.set, value}) : null;
-    }
-
-    get [field.name]() {
-      return field.get ? field.get({entry: this, get: super.get}) : null;
-    }
-
-    toJSON() {
-      const base = super.toJSON();
-
-      return field.serialize ? Object.assign(base, {
-        [field.name]: field.serialize({entry: this}),
-      }) : base;
-    }
-  }
-);
-
-const createWithField = (name, proto) => (
-  ({setup}) => (
-    setup.set('EntryConstructor', extendWithField({
-      EntryConstructor: setup.get('EntryConstructor'),
-      field: Object.assign({name}, proto),
-    }))
-  )
-);
-
-const withInitializedField = (name, {initial = null}) => (
-  createWithField(name, {
-    init: () => initial,
-    set: ({entry, value}) => entry.values.set(name, value),
-    get: ({entry}) => entry.values.get(name),
-    serialize: ({entry}) => entry.values.get(name),
   })
 );
+
+const usingDefaultFieldAccessors = name => usingFieldAccessors(name, {
+  get() {
+    return this.values.get(name);
+  },
+
+  set(value) {
+    this.values = this.values.set(name, value);
+  },
+});
+
+const withInitializedField = (name, {initial = null}) => mix([
+  usingFieldInitial(name, initial),
+  usingDefaultFieldAccessors(name),
+]);
 
 const withField = (name, options = {}) => withInitializedField(name, options);
 
 module.exports = {
-  extendWithField,
-  createWithField,
   withField,
 };
