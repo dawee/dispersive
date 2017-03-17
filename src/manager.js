@@ -1,6 +1,6 @@
 const Immutable = require('immutable');
 const assert = require('./assert');
-const {Transaction} = require('./transaction');
+
 
 const createObjectManagerConstructor = QuerySetConstructor => class extends QuerySetConstructor {
 
@@ -16,22 +16,6 @@ const createObjectManagerConstructor = QuerySetConstructor => class extends Quer
     for (const [, values] of this.values.entries()) {
       yield this.build(values);
     }
-  }
-
-  createTransaction() {
-    assert.hasNoTransaction(this);
-    this.transaction = new Transaction({values: this.values, setup: this.setup});
-
-    return this.transaction;
-  }
-
-  commitTransaction() {
-    this.values = this.transaction.values;
-    this.transaction = null;
-  }
-
-  abortTransaction() {
-    this.transaction = null;
   }
 
   build(values = Immutable.Map()) {

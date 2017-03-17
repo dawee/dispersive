@@ -32,9 +32,9 @@ describe('model', () => {
       withField('bar', {initial: 42}),
     ]);
 
-    Foo.objects.createTransaction();
+    Foo.createTransaction();
     Foo.objects.create();
-    Foo.objects.commitTransaction();
+    Foo.commitTransaction();
 
     expect(Foo.objects.first().bar).to.equal(42);
   });
@@ -44,9 +44,9 @@ describe('model', () => {
 
     Foo.inject(withEntryBar());
 
-    Foo.objects.createTransaction();
+    Foo.createTransaction();
     Foo.objects.create();
-    Foo.objects.commitTransaction();
+    Foo.commitTransaction();
 
     expect(Foo.objects.first().bar).to.equal(42);
   });

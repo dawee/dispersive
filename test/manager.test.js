@@ -16,9 +16,9 @@ describe('manager', () => {
   it('should throw an error if trying to create a transaction if one already exists', () => {
     const model = createModel();
 
-    model.objects.createTransaction();
+    model.createTransaction();
 
-    expect(() => model.objects.createTransaction()).to.throw(error.TransactionAlreadyExists);
+    expect(() => model.createTransaction()).to.throw(error.TransactionAlreadyExists);
   });
 
   it('should not create an entry if transaction is aborted', () => {
@@ -26,9 +26,9 @@ describe('manager', () => {
     const render = spy();
 
     model.emitter.changed(render);
-    model.objects.createTransaction();
+    model.createTransaction();
     model.objects.create({foo: 42});
-    model.objects.abortTransaction();
+    model.abortTransaction();
 
     assert(!render.called);
     expect(model.objects.length).to.equal(0);
@@ -37,9 +37,9 @@ describe('manager', () => {
   it('should create an entry if transaction is commited', () => {
     const model = createModel();
 
-    model.objects.createTransaction();
+    model.createTransaction();
     model.objects.create({foo: 42});
-    model.objects.commitTransaction();
+    model.commitTransaction();
 
     expect(model.objects.length).to.equal(1);
   });
@@ -47,11 +47,11 @@ describe('manager', () => {
   it('should return a updatable entry', () => {
     const model = createModel();
 
-    model.objects.createTransaction();
+    model.createTransaction();
     const entry = model.objects.create({foo: 42});
     entry.values = entry.values.set('foo', 0);
     entry.save();
-    model.objects.commitTransaction();
+    model.commitTransaction();
 
     expect(model.objects.values.first().get('foo')).to.equal(0);
   });
@@ -59,9 +59,9 @@ describe('manager', () => {
   it('should map entries', () => {
     const model = createModel();
 
-    model.objects.createTransaction();
+    model.createTransaction();
     model.objects.create({foo: 42});
-    model.objects.commitTransaction();
+    model.commitTransaction();
 
     const foos = model.objects.map(entry => 42);
 
@@ -73,10 +73,10 @@ describe('manager', () => {
       withField('text'),
     ]);
 
-    model.objects.createTransaction();
+    model.createTransaction();
     model.objects.create({text: 'foo'});
     model.objects.create({text: 'bar'});
-    model.objects.commitTransaction();
+    model.commitTransaction();
 
     expect(model.objects.first().text).to.equal('foo');
   });
@@ -86,10 +86,10 @@ describe('manager', () => {
       withField('text'),
     ]);
 
-    model.objects.createTransaction();
+    model.createTransaction();
     model.objects.create({text: 'foo'});
     model.objects.create({text: 'bar'});
-    model.objects.commitTransaction();
+    model.commitTransaction();
 
     expect(model.objects.last().text).to.equal('bar');
   });
@@ -99,10 +99,10 @@ describe('manager', () => {
       withField('text'),
     ]);
 
-    model.objects.createTransaction();
+    model.createTransaction();
     model.objects.create({text: 'foo'});
     model.objects.create({text: 'bar'});
-    model.objects.commitTransaction();
+    model.commitTransaction();
 
     expect(model.objects.toJSON()).to.deep.equal([{text: 'foo'}, {text: 'bar'}]);
   });
@@ -112,15 +112,15 @@ describe('manager', () => {
       withField('text'),
     ]);
 
-    model.objects.createTransaction();
+    model.createTransaction();
     model.objects.create({text: 'foo'});
     model.objects.create({text: 'bar'});
     model.objects.create({text: 'foobar'});
-    model.objects.commitTransaction();
+    model.commitTransaction();
 
-    model.objects.createTransaction();
+    model.createTransaction();
     model.objects.filter(entry => entry.text.length <= 3).delete();
-    model.objects.commitTransaction();
+    model.commitTransaction();
 
 
     expect(model.objects.length).to.equal(1);
@@ -132,15 +132,15 @@ describe('manager', () => {
       withField('text'),
     ]);
 
-    model.objects.createTransaction();
+    model.createTransaction();
     model.objects.create({text: 'foo'});
     model.objects.create({text: 'bar'});
     model.objects.create({text: 'foobar'});
-    model.objects.commitTransaction();
+    model.commitTransaction();
 
-    model.objects.createTransaction();
+    model.createTransaction();
     model.objects.update({text: 'baz'});
-    model.objects.commitTransaction();
+    model.commitTransaction();
 
     expect(model.objects.map(entry => entry.text)).to.deep.equal(['baz', 'baz', 'baz']);
   });

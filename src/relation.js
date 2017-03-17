@@ -143,18 +143,18 @@ const createManyQuerysetConstructor = QuerySetConstructor => (
     }
 
     add(entry) {
-      this.association.model.objects.createTransaction();
+      this.association.model.createTransaction();
 
       this.association.model.objects.getOrCreate({
         [this.association.src.pkField]: this.originEntry.getKey(),
         [this.association.dest.pkField]: entry.getKey(),
       });
 
-      this.association.model.objects.commitTransaction();
+      this.association.model.commitTransaction();
     }
 
     remove(entry) {
-      this.association.model.objects.createTransaction();
+      this.association.model.createTransaction();
 
       const associatedEntry = this.association.model.objects.get({
         [this.association.src.pkField]: this.originEntry.getKey(),
@@ -163,7 +163,7 @@ const createManyQuerysetConstructor = QuerySetConstructor => (
 
       if (associatedEntry) associatedEntry.delete();
 
-      this.association.model.objects.commitTransaction();
+      this.association.model.commitTransaction();
     }
 
   }
@@ -200,13 +200,13 @@ const createWithOneAccessor = ({fieldName, association}) => (
     }
 
     set [fieldName](entry) {
-      association.model.objects.createTransaction();
+      association.model.createTransaction();
 
       association.model.objects.getOrCreate({
         [association.src.pkField]: this.getKey(),
       }).update({[association.dest.pkField]: entry.getKey()});
 
-      association.model.objects.commitTransaction();
+      association.model.commitTransaction();
     }
 
   })

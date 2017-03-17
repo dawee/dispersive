@@ -5,8 +5,8 @@ const readHandlerResult = async res => res;
 
 const callHandler = async (handler, args) => readHandlerResult(handler(...args));
 
-const createTransactions = sources => sources.map(source => source.objects.createTransaction());
-const commitTransactions = sources => sources.map(source => source.objects.commitTransaction());
+const createTransactions = sources => sources.map(source => source.createTransaction());
+const commitTransactions = sources => sources.map(source => source.commitTransaction());
 const emitChanges = sources => createChangesFunnelEmitter({sources}).emitChange();
 
 const callHandlerAndCommit = async (handler, sources, args) => {

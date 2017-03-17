@@ -1,8 +1,10 @@
 const Immutable = require('immutable');
 const ulid = require('ulid');
+const assert = require('./assert');
 const {QuerySet} = require('./queryset');
 const {createObjectManagerConstructor} = require('./manager');
 const {createChangesEmitter} = require('./emitter');
+const {Transaction} = require('./transaction');
 
 /*
  * Default setup
@@ -126,7 +128,8 @@ const createModel = (composers) => {
   const emitter = createChangesEmitter();
   const model = {emitter, id: ulid()};
 
-  let objects = null;
+  let transaction = null;
+  let values = Immutable.Map();
   let setup = composeSetup({
     model,
     setup: Immutable.Map(defaultSetup),
@@ -141,16 +144,29 @@ const createModel = (composers) => {
     });
   };
 
+  model.createTransaction = () => {
+    assert.hasNoTransaction({transaction});
+
+    transaction = new Transaction({values, setup});
+  };
+
+  model.commitTransaction = () => {
+    assert.hasTransaction({transaction});
+
+    values = transaction.values;
+    transaction = null;
+  };
+
+  model.abortTransaction = () => {
+    transaction = null;
+  };
+
   Object.defineProperty(model, 'objects', {
     get() {
-      const opts = objects || {setup, emitter, values: Immutable.Map()};
-
       const objectsConstructorFactory = setup.get('objectsConstructorFactory');
       const ObjectManagerConstructor = objectsConstructorFactory({setup, model});
 
-      objects = new ObjectManagerConstructor(opts);
-
-      return objects;
+      return new ObjectManagerConstructor({setup, values, transaction});
     },
   });
 
