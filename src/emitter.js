@@ -38,13 +38,13 @@ class FunnelSubscription {
 
 }
 
-const getEmitters = ({sources = [], emitters = []}) => (
-  sources.map(({emitter}) => emitter).concat(emitters)
+const getEmitters = ({models = [], emitters = []}) => (
+  models.map(({emitter}) => emitter).concat(emitters)
 );
 
 class ChangesFunnelEmitter {
 
-  constructor(opts = {sources: [], emitters: []}) {
+  constructor(opts = {models: [], emitters: []}) {
     this.mainSubscriptions = [];
     this.mainEmitter = new ChangesEmitter();
     this.emitters = getEmitters(opts);

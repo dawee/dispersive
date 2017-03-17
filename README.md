@@ -20,12 +20,21 @@ const User = createModel([
 Create **actions**:
 
 ```js
-const fetchTweets = createAction(async name => {
-  const tweets = await request.get(`http://twitter...${userName}`);
-  const user = User.objects.getOrCreate({name});
+const addTweets = createAction((name, feed) => {
+  const user =  User.objects.getOrCreate({name});
 
-  tweets.forEach(tweet => user.tweets.add(tweet));
+  feed.forEach(({text}) => {
+    const tweet = Tweet.objects.create({text});
+
+    user.tweets.add(tweet);
+  })
 }, [User, Tweet]);
+
+const getLastTweets = async (userName) => {
+  const feed = await request.get(`http://twitter...${userName}`);
+
+  return addTweets(userName, feed);
+};
 ```
 
 Then update **render after each change**:
@@ -38,5 +47,5 @@ Tweet.emitter.changed(() => {
   console.log(hopefulcyborg.tweets.map(({text}) => text));
 })
 
-fetchTweets('hopefulcyborg');
+getLastTweets('hopefulcyborg');
 ```

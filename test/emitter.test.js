@@ -47,7 +47,7 @@ describe('funnel', () => {
     assert(listener2.calledOnce);
   });
 
-  it('should emit change on each sources', () => {
+  it('should emit change on each models', () => {
     const source1 = {emitter: createChangesEmitter()};
     const source2 = {emitter: createChangesEmitter()};
     const listener1 = spy();
@@ -56,7 +56,7 @@ describe('funnel', () => {
     source1.emitter.changed(listener1);
     source2.emitter.changed(listener2);
 
-    createChangesFunnelEmitter({sources: [source1, source2]}).emitChange();
+    createChangesFunnelEmitter({models: [source1, source2]}).emitChange();
 
     assert(listener1.calledOnce);
     assert(listener2.calledOnce);
@@ -65,48 +65,48 @@ describe('funnel', () => {
   it('should receive changes once', () => {
     const source1 = {emitter: createChangesEmitter()};
     const source2 = {emitter: createChangesEmitter()};
-    const funnel = createChangesFunnelEmitter({sources: [source1, source2]});
+    const funnel = createChangesFunnelEmitter({models: [source1, source2]});
     const listener1 = spy();
     const listener2 = spy();
 
     funnel.changed(listener1);
     funnel.changed(listener2);
 
-    createChangesFunnelEmitter({sources: [source1, source2]}).emitChange();
+    createChangesFunnelEmitter({models: [source1, source2]}).emitChange();
 
     assert(listener1.calledOnce);
     assert(listener2.calledOnce);
   });
 
-  it('should work with different set of sources (3 for 2)', () => {
+  it('should work with different set of models (3 for 2)', () => {
     const source1 = {emitter: createChangesEmitter()};
     const source2 = {emitter: createChangesEmitter()};
     const source3 = {emitter: createChangesEmitter()};
-    const funnel = createChangesFunnelEmitter({sources: [source1, source2, source3]});
+    const funnel = createChangesFunnelEmitter({models: [source1, source2, source3]});
     const listener1 = spy();
     const listener2 = spy();
 
     funnel.changed(listener1);
     funnel.changed(listener2);
 
-    createChangesFunnelEmitter({sources: [source1, source2]}).emitChange();
+    createChangesFunnelEmitter({models: [source1, source2]}).emitChange();
 
     assert(listener1.calledOnce);
     assert(listener2.calledOnce);
   });
 
-  it('should work with different set of sources (2 for 3)', () => {
+  it('should work with different set of models (2 for 3)', () => {
     const source1 = {emitter: createChangesEmitter()};
     const source2 = {emitter: createChangesEmitter()};
     const source3 = {emitter: createChangesEmitter()};
-    const funnel = createChangesFunnelEmitter({sources: [source1, source2]});
+    const funnel = createChangesFunnelEmitter({models: [source1, source2]});
     const listener1 = spy();
     const listener2 = spy();
 
     funnel.changed(listener1);
     funnel.changed(listener2);
 
-    createChangesFunnelEmitter({sources: [source1, source2, source3]}).emitChange();
+    createChangesFunnelEmitter({models: [source1, source2, source3]}).emitChange();
 
     assert(listener1.calledOnce);
     assert(listener2.calledOnce);
@@ -115,7 +115,7 @@ describe('funnel', () => {
   it('should be able to remove subscription', () => {
     const source1 = {emitter: createChangesEmitter()};
     const source2 = {emitter: createChangesEmitter()};
-    const funnel = createChangesFunnelEmitter({sources: [source1, source2]});
+    const funnel = createChangesFunnelEmitter({models: [source1, source2]});
     const listener1 = spy();
     const listener2 = spy();
 
@@ -125,7 +125,7 @@ describe('funnel', () => {
     subscription1.remove();
     subscription2.remove();
 
-    createChangesFunnelEmitter({sources: [source1, source2]}).emitChange();
+    createChangesFunnelEmitter({models: [source1, source2]}).emitChange();
 
     assert(!listener1.called);
     assert(!listener2.called);

@@ -1,44 +1,30 @@
-const {dispatch} = require('./dispatcher');
 const {createChangesFunnelEmitter} = require('./emitter');
 
-const readHandlerResult = async res => res;
+const createTransactions = models => models.map(model => model.createTransaction());
+const commitTransactions = models => models.map(model => model.commitTransaction());
+const abortTransactions = models => models.map(model => model.abortTransaction());
+const emitChanges = models => createChangesFunnelEmitter({models}).emitChange();
 
-const callHandler = async (handler, args) => readHandlerResult(handler(...args));
+const createAction = (handler, models = []) => (
+  (...args) => {
+    let res = null;
 
-const createTransactions = sources => sources.map(source => source.createTransaction());
-const commitTransactions = sources => sources.map(source => source.commitTransaction());
-const emitChanges = sources => createChangesFunnelEmitter({sources}).emitChange();
+    createTransactions(models);
 
-const callHandlerAndCommit = async (handler, sources, args) => {
-  const res = await callHandler(handler, args);
+    try {
+      res = handler(...args);
+      commitTransactions(models);
+      emitChanges(models);
+    } catch (error) {
+      abortTransactions(models);
+      throw error;
+    }
 
-  commitTransactions(sources);
-  emitChanges(sources);
-
-  return res;
-};
-
-const packAction = (handler, args = [], sources = []) => (
-  async () => {
-    createTransactions(sources);
-    return callHandlerAndCommit(handler, sources, args);
-  }
-);
-
-const createAction = (handler, sources = []) => (
-  async (...args) => {
-    const action = packAction(handler, args, sources);
-    return dispatch(action, sources);
+    return res;
   }
 );
 
 
 module.exports = {
-  readHandlerResult,
-  callHandler,
-  createTransactions,
-  commitTransactions,
-  callHandlerAndCommit,
   createAction,
-  packAction,
 };

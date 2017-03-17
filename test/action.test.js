@@ -10,53 +10,38 @@ const error = require('../src/error');
 
 describe('action', () => {
 
-  it('should always be asynchronous', async () => {
-    const greet = createAction(name => `Hello ${name}`);
-    const res = await greet('Paul');
-
-    expect(res).to.equal('Hello Paul');
-  });
-
-  it('should wait for async handler', async () => {
-    const asyncAdd = async (a, b) => a + b;
-    const add = createAction(async (a, b) => await asyncAdd(a, b));
-    const res = await add(20, 22);
-
-    expect(res).to.equal(42);
-  });
-
-  it('should commit change to models', async () => {
+  it('should commit change to models', () => {
     const Book = createModel();
     const createBook = createAction(() => Book.objects.create(), [Book]);
 
-    await createBook();
+    createBook();
 
     expect(Book.objects.length).to.equal(1);
   });
 
-  it('should update a given entry', async () => {
+  it('should update a given entry', () => {
     const Book = createModel([
       withField('title'),
     ]);
 
-    const emptyBook = await createAction(() => Book.objects.create(), [Book])();
-    const peterPan = await createAction(({key}) => {
+    const emptyBook = createAction(() => Book.objects.create(), [Book])();
+    const peterPan = createAction(({key}) => {
       const book = Book.objects.get(key);
 
-      return book.update({title: 'Peter Pan'})
+      return book.update({title: 'Peter Pan'});
     }, [Book])(emptyBook);
 
     expect(Book.objects.get().title).to.equal('Peter Pan');
   });
 
-  it('should emit events before resolving the promise', async () => {
+  it('should emit events before resolving the promise', () => {
     const Book = createModel();
     const renderer = spy();
     const createBook = createAction(() => Book.objects.create(), [Book]);
 
     const subscription = Book.emitter.changed(() => renderer(Book.objects.length));
 
-    await createBook();
+    createBook();
 
     subscription.remove();
 
@@ -65,7 +50,7 @@ describe('action', () => {
   });
 
 
-  it('should trig a funnel just once', async () => {
+  it('should trig a funnel just once', () => {
     const Book = createModel([
       withField('title'),
     ]);
@@ -77,11 +62,11 @@ describe('action', () => {
     const store = [Book, Author];
     const render = spy();
 
-    createChangesFunnelEmitter({sources: store}).changed(() => (
+    createChangesFunnelEmitter({models: store}).changed(() => (
       render(Book.objects.length, Author.objects.length)
     ));
 
-    await createAction(() => {
+    createAction(() => {
       const jmBarrie = Author.objects.getOrCreate({name: 'J.M. Barrie'});
       const peterPan = Book.objects.create({author: jmBarrie, title: 'Peter Pan'});
     }, store)();
