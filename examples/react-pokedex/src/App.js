@@ -6,7 +6,7 @@ import { withOne, withMany } from 'dispersive/relation';
 import { Watcher } from 'react-dispersive';
 import request from 'request-promise-json';
 
-const MAX_NUM = 151;  // limiting to first generation
+const MAX_NUM = 300;  // limiting to first generation
 const BASE_URL = 'http://pokeapi.co/api/v2/pokemon';
 
 /*
@@ -48,8 +48,8 @@ const createPokedex = createAction(() => {
 }, [Pokedex, PokedexSlot]);
 
 
-const setSlotActive = createAction(({pk}) => {
-  const slot = PokedexSlot.objects.get(pk);
+const setSlotActive = createAction(({key}) => {
+  const slot = PokedexSlot.objects.get(key);
   const pokedex = slot.pokedex;
   const activated = pokedex.slots.filter({active: true});
 
@@ -58,22 +58,22 @@ const setSlotActive = createAction(({pk}) => {
 }, [PokedexSlot]);
 
 
-const setSlotSeen = async ({pk}) => {
+const setSlotSeen = async ({key}) => {
   const setSeen = createAction(() => (
-    PokedexSlot.objects.get(pk).update({seen: true})
+    PokedexSlot.objects.get(key).update({seen: true})
   ), [PokedexSlot]);
 
   const setPokemon = createAction(({name, sprites}) => {
     const pokemon = Pokemon.objects.create({ name, sprite: sprites.front_default });
-    PokedexSlot.objects.get(pk).update({ pokemon });
+    PokedexSlot.objects.get(key).update({ pokemon });
   }, [PokedexSlot, Pokemon]);
 
-  await setSeen();
+  setSeen();
 
-  if (!PokedexSlot.objects.get(pk).pokemon) {
-    const feed = await request.get(`${BASE_URL}/${PokedexSlot.objects.get(pk).num}`);
+  if (!PokedexSlot.objects.get(key).pokemon) {
+    const feed = await request.get(`${BASE_URL}/${PokedexSlot.objects.get(key).num}`);
 
-    await setPokemon(feed);
+    setPokemon(feed);
   }
 };
 
@@ -81,24 +81,38 @@ const setSlotSeen = async ({pk}) => {
  * Components
  */
 
-const PokedexListSlot = ({slot}) => (
-  <li>
-    <div>{`#${slot.num}`}</div>
-    <div>
-      Details :
-      <input onMouseDown={() => setSlotActive(slot)} type="checkbox" checked={slot.active} />
-    </div>
-    <div>
-      Seen :
-      <input onMouseDown={() => setSlotSeen(slot)} type="checkbox" checked={slot.seen} />
-    </div>
-  </li>
-);
+class PokedexListSlot extends Component {
+  shouldComponentUpdate({slot}) {
+    const differentSlot = !this.props.slot.equals(slot);
+    const addedPokemon = !this.props.slot.pokemon && !!slot.pokemon;
+
+    return differentSlot || addedPokemon;
+  }
+
+  render() {
+    const {slot} = this.props;
+
+    return (
+      <li>
+        <div>{`#${slot.num}`} <span>{slot.pokemon ? `(${slot.pokemon.name})` : null}</span></div>
+        <div>
+          Details :
+          <input onMouseDown={() => setSlotActive(slot)} type="checkbox" checked={slot.active} />
+        </div>
+        <div>
+          Seen :
+          <input onMouseDown={() => setSlotSeen(slot)} type="checkbox" checked={slot.seen} />
+        </div>
+      </li>
+    );
+  }
+}
+
 
 const PokedexList = ({pokedex}) => (
   <ul>
     {pokedex ? pokedex.slots.orderBy('num').map(slot => (
-      <PokedexListSlot slot={slot} key={slot.pk} />)
+      <PokedexListSlot slot={slot} key={slot.key} />)
     ) : null}
   </ul>
 );
@@ -112,16 +126,18 @@ const PokemonInfos = ({pokemon}) => (
   </div>
 );
 
+const ActiveSlotInfos = ({slot}) => (
+  <div>
+    <span>{`#${slot.num}`}</span>
+    {slot.seen ? (
+      <PokemonInfos pokemon={slot.pokemon} />
+    ) : <div>This pokemon has never been seen</div>}
+  </div>
+);
+
 const PokedexActiveSlotPanel = ({slot}) => (
   <div className="active-slot-panel">
-    {slot ? (
-      <div>
-        <span>{`#${slot.num}`}</span>
-        {slot.seen ? (
-          <PokemonInfos pokemon={slot.pokemon} />
-        ) : <div>This pokemon has never been seen</div>}
-      </div>
-    ) : <span>No pokemon selected</span>}
+    {slot ? <ActiveSlotInfos slot={slot} /> : <span>No pokemon selected</span>}
   </div>
 );
 
@@ -141,7 +157,7 @@ class App extends Component {
 
   render() {
     return (
-      <Watcher sources={[Pokemon, Pokedex, PokedexSlot]}>
+      <Watcher models={[Pokemon, Pokedex, PokedexSlot]}>
         <PokedexApp />
       </Watcher>
     );
