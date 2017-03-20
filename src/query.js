@@ -1,7 +1,5 @@
 const sortBy = require('sort-by');
 
-const REVERSED = 1;
-
 /*
  * Filter
  */
@@ -30,57 +28,38 @@ const getExcludePredicate = expression => (
  * Mixin
  */
 
-const withSortedEntries = ({ Base, sortComparator }) => class extends Base {
-
-  * entries() {
-    for (const [, entry] of this.parent.toArray().sort(sortComparator).entries()) {
-      yield entry;
-    }
-  }
-
-};
-
-const withFilteredEntries = ({ Base, predicate }) => class extends Base {
-
-  * entries() {
-    for (const entry of this.parent.entries()) {
-      if (predicate(entry)) yield entry;
-    }
-  }
-
-};
-
 const withQueries = QuerySetBase => class extends QuerySetBase {
 
   filter(expression) {
-    const Base = this.QuerySetConstructor;
     const predicate = getFilterPredicate(expression);
-    const QuerySetConstructor = withFilteredEntries({ Base, predicate });
 
-    return this.clone({ QuerySetConstructor });
+    return this.subset({
+      values: this.values.filter(
+        (values, index) => predicate(this.manager.build(values), index)
+      ),
+    });
   }
 
   exclude(expression) {
-    const Base = this.QuerySetConstructor;
     const predicate = getExcludePredicate(expression);
-    const QuerySetConstructor = withFilteredEntries({ Base, predicate });
 
-    return this.clone({ QuerySetConstructor });
+    return this.subset({
+      values: this.values.filter(
+        (values, index) => predicate(this.manager.build(values), index)
+      ),
+    });
   }
 
-  sort(sortComparator) {
-    const Base = this.QuerySetConstructor;
-    const QuerySetConstructor = withSortedEntries({ Base, sortComparator });
-
-    return this.clone({ QuerySetConstructor });
+  sort(predicate) {
+    return this.subset({
+      values: this.values.sort(
+        (values1, values2) => predicate(this.manager.build(values1), this.manager.build(values2))
+      )
+    });
   }
 
   reverse() {
-    const Base = this.QuerySetConstructor;
-    const sortComparator = () => REVERSED;
-    const QuerySetConstructor = withSortedEntries({ Base, sortComparator });
-
-    return this.clone({ QuerySetConstructor });
+    return this.subset({ values: this.values.reverse() });
   }
 
   orderBy(...fields) {
@@ -90,7 +69,7 @@ const withQueries = QuerySetBase => class extends QuerySetBase {
   }
 
   all() {
-    return this.clone({ QuerySetConstructor: this.QuerySetConstructor });
+    return this.clone();
   }
 
 };

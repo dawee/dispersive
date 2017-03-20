@@ -3,15 +3,6 @@ const { getFilterPredicate } = require('./query');
 
 const withExporters = Base => class extends Base {
 
-  * entriesWithIndex() {
-    let index = 0;
-
-    for (const entry of this.entries()) {
-      yield [entry, index];
-      index += 1;
-    }
-  }
-
   get(expression) {
     if (typeof expression === 'string') this.parent.get(expression);
 
@@ -29,9 +20,7 @@ const withExporters = Base => class extends Base {
   map(predicate) {
     const res = [];
 
-    for (const [entry, index] of this.entriesWithIndex()) {
-      res.push(predicate(entry, index));
-    }
+    this.forEach((entry, index) => res.push(predicate(entry, index)));
 
     return res;
   }
@@ -40,12 +29,7 @@ const withExporters = Base => class extends Base {
     const predicate = getFilterPredicate(expression);
     let res = true;
 
-    for (const [entry, index] of this.entriesWithIndex()) {
-      if (!predicate(entry, index)) {
-        res = false;
-        break;
-      }
-    }
+    this.forEach((entry, index) => res = res && predicate(entry, index));
 
     return res;
   }
@@ -54,12 +38,7 @@ const withExporters = Base => class extends Base {
     const predicate = getFilterPredicate(expression);
     let res = false;
 
-    for (const [entry, index] of this.entriesWithIndex()) {
-      if (predicate(entry, index)) {
-        res = true;
-        break;
-      }
-    }
+    this.forEach((entry, index) => res = res || predicate(entry, index));
 
     return res;
   }
@@ -73,7 +52,9 @@ const withExporters = Base => class extends Base {
   }
 
   first() {
-    return this.entries().next().value;
+    const values = this.values.first();
+
+    return values ? this.manager.build(values) : null;
   }
 
   last() {

@@ -5,17 +5,11 @@ const assert = require('./assert');
 const createObjectManagerConstructor = QuerySetConstructor => class extends QuerySetConstructor {
 
   constructor({ setup, values, transaction = null }) {
-    super({ QuerySetConstructor });
+    super({ QuerySetConstructor, values });
 
-    this.values = values;
+    this.manager = this;
     this.transaction = transaction;
     this.setup = setup;
-  }
-
-  * entries() {
-    for (const [, values] of this.values.entries()) {
-      yield this.build(values);
-    }
   }
 
   build(values = Immutable.Map()) {
