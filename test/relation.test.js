@@ -5,12 +5,12 @@ const {createModel, createAction} = require('../src');
 const {withOne, withMany} = require('../src/relation');
 const {withField} = require('../src/field');
 const error = require('../src/error');
-
+const {runAsAction} = require('../src/action');
 
 
 describe('relation', () => {
 
-  it('should connect a one-to-many relation (related model declaration + field.add)', async () => {
+  it('should connect a one-to-many relation (related model declaration + field.add)', () => {
     const Book = createModel([
       withField('title'),
     ]);
@@ -20,7 +20,7 @@ describe('relation', () => {
       withMany('books', Book),
     ]);
 
-    const diana = await createAction(() => {
+    const diana = createAction(() => {
       const author = Author.objects.create({name: 'Diana Wynne Jones'});
       const howlsMovingCastle = Book.objects.create({title: 'Howl\'s Moving Castle'});
 
@@ -32,7 +32,7 @@ describe('relation', () => {
     expect(diana.books.first().title).to.equal('Howl\'s Moving Castle');
   });
 
-  it('should remove a one-to-many relation', async () => {
+  it('should remove a one-to-many relation', () => {
     const Book = createModel([
       withField('title'),
     ]);
@@ -42,7 +42,7 @@ describe('relation', () => {
       withMany('books', Book),
     ]);
 
-    const [diana, howlsMovingCastle]  = await createAction(() => {
+    const [diana, howlsMovingCastle]  = createAction(() => {
       const author = Author.objects.create({name: 'Diana Wynne Jones'});
       const book = Book.objects.create({title: 'Howl\'s Moving Castle'});
 
@@ -51,12 +51,12 @@ describe('relation', () => {
       return [author, book];
     }, [Author, Book])();
 
-    await createAction(() => diana.books.remove(howlsMovingCastle), [Author, Book])();
+    createAction(() => diana.books.remove(howlsMovingCastle), [Author, Book])();
 
     expect(diana.books.count()).to.equal(0);
   });
 
-  it('should connect a one-to-many relation (relation declaration + related setter)', async () => {
+  it('should connect a one-to-many relation (relation declaration + related setter)', () => {
     const Book = createModel([
       withField('title'),
     ]);
@@ -66,7 +66,7 @@ describe('relation', () => {
       withMany('books', {model: Book, relatedName: 'author'}),
     ]);
 
-    const diana = await createAction(() => {
+    const diana = createAction(() => {
       const author = Author.objects.create({name: 'Diana Wynne Jones'});
 
       const howlsMovingCastle = Book.objects.create({author, title: 'Howl\'s Moving Castle'});
@@ -77,7 +77,7 @@ describe('relation', () => {
     expect(diana.books.first().title).to.equal('Howl\'s Moving Castle');
   });
 
-  it('should connect a many-to-many relation (adding from root model)', async () => {
+  it('should connect a many-to-many relation (adding from root model)', () => {
     const Book = createModel([
       withField('title'),
     ]);
@@ -87,7 +87,7 @@ describe('relation', () => {
       withMany('books', {model: Book, relatedName: 'libraries', hasMany: true}),
     ]);
 
-    const [harryPotter, neverendingStory] = await createAction(() => {
+    const [harryPotter, neverendingStory] = createAction(() => {
       const harryPotter = Book.objects.create({title: 'Harry Potter'});
       const neverendingStory = Book.objects.create({title: 'Neverending Story'});
       const hogwarts = Library.objects.create({name: 'Hogwarts Library'});
@@ -104,7 +104,7 @@ describe('relation', () => {
     expect(neverendingStory.libraries.count()).to.equal(2);
   });
 
-  it('should connect a many-to-many relation (adding from related model)', async () => {
+  it('should connect a many-to-many relation (adding from related model)', () => {
     const Book = createModel([
       withField('title'),
     ]);
@@ -114,7 +114,7 @@ describe('relation', () => {
       withMany('books', {model: Book, relatedName: 'libraries', hasMany: true}),
     ]);
 
-    const [harryPotter, neverendingStory] = await createAction(() => {
+    const [harryPotter, neverendingStory] = createAction(() => {
       const harryPotter = Book.objects.create({title: 'Harry Potter'});
       const neverendingStory = Book.objects.create({title: 'Neverending Story'});
       const hogwarts = Library.objects.create({name: 'Hogwarts Library'});
@@ -131,7 +131,7 @@ describe('relation', () => {
     expect(neverendingStory.libraries.count()).to.equal(2);
   });
 
-  it('should connect a one-to-one relation', async () => {
+  it('should connect a one-to-one relation', () => {
     const Book = createModel([
       withField('title'),
     ]);
@@ -141,7 +141,7 @@ describe('relation', () => {
       withOne('book', {model: Book, relatedName: 'movie'}),
     ]);
 
-    const [peterPan, hook] = await createAction(() => {
+    const [peterPan, hook] = createAction(() => {
       const peterPan = Book.objects.create({title: 'Peter Pan'});
       const hook = Movie.objects.create({title: 'Hook', book: peterPan});
 
@@ -152,4 +152,124 @@ describe('relation', () => {
     expect(hook.book.title).to.equal('Peter Pan');
   });
 
+  it('should update a one-to-many relation using setter', () => {
+    const Reader = createModel([
+      withField('name'),
+    ]);
+
+    const Book = createModel([
+      withField('title'),
+      withOne('owner', {model: Reader, relatedName: 'books', hasMany: true}),
+    ]);
+
+    runAsAction(() => {
+      Reader.objects.create({name: 'John'});
+      Book.objects.create({ title: 'Peter Pan', owner: Reader.objects.create({name: 'Bob'}) });
+    }, [Book, Reader]);
+
+    expect(Book.objects.get().owner.name).to.equal('Bob');
+    expect(Reader.objects.get({name: 'Bob'}).books.length).to.equal(1);
+    expect(Reader.objects.get({name: 'John'}).books.length).to.equal(0);
+
+    runAsAction(
+      () => Book.objects.get().update({ owner: Reader.objects.get({name: 'John'}) }),
+      [Book, Reader]
+    );
+
+    expect(Book.objects.get().owner.name).to.equal('John');
+    expect(Reader.objects.get({name: 'Bob'}).books.length).to.equal(0);
+    expect(Reader.objects.get({name: 'John'}).books.length).to.equal(1);
+  });
+
+  it('should update a one-to-many relation using add()/remove()', () => {
+    const Reader = createModel([
+      withField('name'),
+    ]);
+
+    const Book = createModel([
+      withField('title'),
+      withOne('owner', {model: Reader, relatedName: 'books', hasMany: true}),
+    ]);
+
+    runAsAction(() => {
+      Reader.objects.create({name: 'John'});
+      Reader.objects.create({name: 'Bob'}).books.add(
+        Book.objects.create({ title: 'Peter Pan'})
+      );
+    }, [Book, Reader]);
+
+    expect(Book.objects.get().owner.name).to.equal('Bob');
+    expect(Reader.objects.get({name: 'Bob'}).books.length).to.equal(1);
+    expect(Reader.objects.get({name: 'John'}).books.length).to.equal(0);
+
+    runAsAction(() => {
+      const peterPan = Book.objects.get();
+
+      Reader.objects.get({name: 'Bob'}).books.remove(peterPan);
+      Reader.objects.get({name: 'John'}).books.add(peterPan);
+    }, [Book, Reader]);
+
+    expect(Book.objects.get().owner.name).to.equal('John');
+    expect(Reader.objects.get({name: 'Bob'}).books.length).to.equal(0);
+    expect(Reader.objects.get({name: 'John'}).books.length).to.equal(1);
+  });
+
+  it('should update a one-to-one relation from source', () => {
+    const Reader = createModel([
+      withField('name'),
+    ]);
+
+    const Book = createModel([
+      withField('title'),
+      withOne('owner', {model: Reader, relatedName: 'currentBook'}),
+    ]);
+
+    runAsAction(() => {
+      Reader.objects.create({name: 'John'});
+      Book.objects.create({ title: 'Peter Pan', owner: Reader.objects.create({name: 'Bob'}) });
+    }, [Book, Reader]);
+
+    expect(Book.objects.get().owner.name).to.equal('Bob');
+    expect(Reader.objects.get({name: 'Bob'}).currentBook).to.not.equal(null);
+    expect(Reader.objects.get({name: 'John'}).currentBook).to.equal(null);
+
+    runAsAction(() => {
+      Book.objects.get().update({ owner: Reader.objects.get({name: 'John'}) });
+    }, [Book, Reader]);
+
+    expect(Book.objects.get().owner.name).to.equal('John');
+    expect(Reader.objects.get({name: 'Bob'}).currentBook).to.equal(null);
+    expect(Reader.objects.get({name: 'John'}).currentBook).to.not.equal(null);
+  });
+
+  it('should update a one-to-one relation from destination', () => {
+    const Reader = createModel([
+      withField('name'),
+    ]);
+
+    const Book = createModel([
+      withField('title'),
+      withOne('owner', {model: Reader, relatedName: 'currentBook'}),
+    ]);
+
+    runAsAction(() => {
+      Reader.objects.create({name: 'John'});
+      Reader.objects.create({
+        name: 'Bob',
+        currentBook: Book.objects.create({ title: 'Peter Pan' })
+      });
+    }, [Book, Reader]);
+
+    expect(Book.objects.get().owner.name).to.equal('Bob');
+    expect(Reader.objects.get({name: 'Bob'}).currentBook).to.not.equal(null);
+    expect(Reader.objects.get({name: 'John'}).currentBook).to.equal(null);
+
+    runAsAction(() => {
+      Reader.objects.get({name: 'John'}).update({ currentBook: Book.objects.get() });
+    }, [Book, Reader]);
+
+    expect(Book.objects.get().owner.name).to.equal('John');
+    expect(Reader.objects.get({name: 'Bob'}).currentBook).to.equal(null);
+    expect(Reader.objects.get({name: 'John'}).currentBook).to.not.equal(null);
+  });
 });

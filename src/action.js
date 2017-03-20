@@ -24,7 +24,9 @@ const createAction = (handler, models = []) => (
   }
 );
 
+const runAsAction = (handler, models) => createAction(handler, models)();
 
 module.exports = {
   createAction,
+  runAsAction,
 };

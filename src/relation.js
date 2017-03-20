@@ -186,7 +186,7 @@ const createWithManyAccessor = ({fieldName, association, setup}) => {
  * One relation
  */
 
-const createWithOneAccessor = ({fieldName, association}) => (
+const createWithOneAccessor = ({fieldName, association, hasMany}) => (
   createEntryMixin(({Base}) => class extends Base {
 
     get [fieldName]() {
@@ -200,11 +200,24 @@ const createWithOneAccessor = ({fieldName, association}) => (
     }
 
     set [fieldName](entry) {
+      let relationEntry = null;
+
       association.model.createTransaction();
 
-      association.model.objects.getOrCreate({
+      if (hasMany) {
+        relationEntry = association.model.objects.getOrCreate({
+          [association.src.pkField]: this.getKey(),
+        });
+      } else {
+        relationEntry = association.model.objects.get({[association.src.pkField]: this.getKey()})
+         || association.model.objects.get({[association.dest.pkField]: entry.getKey()})
+         || association.model.objects.create();
+      }
+
+      relationEntry.update({
+        [association.dest.pkField]: entry.getKey(),
         [association.src.pkField]: this.getKey(),
-      }).update({[association.dest.pkField]: entry.getKey()});
+      });
 
       association.model.commitTransaction();
     }
@@ -223,6 +236,7 @@ const createRelationComposer = (name, opts = {}, rootAccessor) => (
     const association = createAssociation({root: model, target: relation.model});
     const relationOpts = {
       setup,
+      hasMany: relation.hasMany,
       fieldName: relation.relatedName,
       association: reverseAssociation(association),
     };
