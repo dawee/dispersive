@@ -50,12 +50,6 @@ const withFilteredEntries = ({ Base, predicate }) => class extends Base {
 
 };
 
-const withEmptyGenerator = ({ Base }) => class extends Base {
-
-  * entries() {}
-
-};
-
 const withQueries = QuerySetBase => class extends QuerySetBase {
 
   filter(expression) {
@@ -85,13 +79,6 @@ const withQueries = QuerySetBase => class extends QuerySetBase {
     const Base = this.QuerySetConstructor;
     const sortComparator = () => REVERSED;
     const QuerySetConstructor = withSortedEntries({ Base, sortComparator });
-
-    return this.clone({ QuerySetConstructor });
-  }
-
-  none() {
-    const Base = this.QuerySetConstructor;
-    const QuerySetConstructor = withEmptyGenerator({ Base });
 
     return this.clone({ QuerySetConstructor });
   }

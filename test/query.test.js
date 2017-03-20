@@ -28,16 +28,6 @@ describe('queryset with queries', () => {
     expect(Book.objects.filter({title: 'Peter Pan'}).get().pk).to.equal(peterPan.pk);
   });
 
-  it('should force an empty queryset', async () => {
-    const Book = createModel([
-      withField('title'),
-    ]);
-
-    const peterPan = await createAction(() => Book.objects.create({title: 'Peter Pan'}), [Book])();
-
-    expect(Book.objects.none().count()).to.equal(0);
-  });
-
   it('should filter using predicate', async () => {
     const Book = createModel([
       withField('title'),
