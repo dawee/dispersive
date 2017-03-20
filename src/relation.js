@@ -25,8 +25,14 @@ const parseRelation = (name, opts = {}) => (
 
 const withPkSetEntries = ({ Base, pkSet, manager }) => class extends Base {
 
-  * entries() {
+  static* pkSetEntries() {
     for (const [, entry] of pkSet.entries()) {
+      yield entry;
+    }
+  }
+
+  * entries() {
+    for (const entry of this.constructor.pkSetEntries()) {
       yield manager.build(entry);
     }
   }
@@ -37,10 +43,10 @@ const withAssociationIndex = (pk1, pk2) => (
   createObjectManagerMixin(({ Base }) => class extends Base {
     constructor(opts) {
       super(opts);
-      this.indexes = this.getIndexes(opts);
+      this.indexes = this.constructor.getIndexes(opts);
     }
 
-    getIndexes({ indexes = { [pk1]: {}, [pk2]: {} } }) {
+    static getIndexes({ indexes = { [pk1]: {}, [pk2]: {} } }) {
       return indexes;
     }
 

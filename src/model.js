@@ -40,10 +40,6 @@ class Entry {
     return this;
   }
 
-  toJSON() {
-    return {};
-  }
-
   equals({ values }) {
     return this.values === values;
   }
