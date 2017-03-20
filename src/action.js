@@ -1,9 +1,9 @@
-const {createChangesFunnelEmitter} = require('./emitter');
+const { createChangesFunnelEmitter } = require('./emitter');
 
 const createTransactions = models => models.map(model => model.createTransaction());
 const commitTransactions = models => models.map(model => model.commitTransaction());
 const abortTransactions = models => models.map(model => model.abortTransaction());
-const emitChanges = models => createChangesFunnelEmitter({models}).emitChange();
+const emitChanges = models => createChangesFunnelEmitter({ models }).emitChange();
 
 const createAction = (handler, models = []) => (
   (...args) => {

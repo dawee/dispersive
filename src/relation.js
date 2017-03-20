@@ -1,5 +1,5 @@
-const {createModel, createEntryMixin, createObjectManagerMixin} = require('./model');
-const {withField} = require('./field');
+const { createModel, createEntryMixin, createObjectManagerMixin } = require('./model');
+const { withField } = require('./field');
 
 
 const TARGET_PK_FIELD = 'targetPk';
@@ -10,12 +10,12 @@ const ROOT_PK_FIELD = 'rootPk';
  * Generate relation data
  */
 
-const assignRelation = (name, {model, relatedName = null, hasMany = false}) => (
-  {model, hasMany, relatedName}
+const assignRelation = (name, { model, relatedName = null, hasMany = false }) => (
+  { model, hasMany, relatedName }
 );
 
 const parseRelation = (name, opts = {}) => (
-  opts.model ? assignRelation(name, opts) : assignRelation(name, {model: opts})
+  opts.model ? assignRelation(name, opts) : assignRelation(name, { model: opts })
 );
 
 
@@ -23,7 +23,7 @@ const parseRelation = (name, opts = {}) => (
  * Association
  */
 
-const withPkSetEntries = ({Base, pkSet, manager}) => class extends Base {
+const withPkSetEntries = ({ Base, pkSet, manager }) => class extends Base {
 
   * entries() {
     for (const [, entry] of pkSet.entries()) {
@@ -34,13 +34,13 @@ const withPkSetEntries = ({Base, pkSet, manager}) => class extends Base {
 };
 
 const withAssociationIndex = (pk1, pk2) => (
-  createObjectManagerMixin(({Base}) => class extends Base {
+  createObjectManagerMixin(({ Base }) => class extends Base {
     constructor(opts) {
       super(opts);
       this.indexes = this.getIndexes(opts);
     }
 
-    getIndexes({indexes = {[pk1]: {}, [pk2]: {}}}) {
+    getIndexes({ indexes = { [pk1]: {}, [pk2]: {} } }) {
       return indexes;
     }
 
@@ -101,7 +101,7 @@ const withAssociationIndex = (pk1, pk2) => (
   })
 );
 
-const createAssociation = ({root, target}) => ({
+const createAssociation = ({ root, target }) => ({
   src: {
     model: root,
     pkField: ROOT_PK_FIELD,
@@ -117,7 +117,7 @@ const createAssociation = ({root, target}) => ({
   ]),
 });
 
-const reverseAssociation = ({src, dest, model}) => ({src: dest, dest: src, model});
+const reverseAssociation = ({ src, dest, model }) => ({ src: dest, dest: src, model });
 
 
 /*
@@ -127,10 +127,10 @@ const reverseAssociation = ({src, dest, model}) => ({src: dest, dest: src, model
 const createManyQuerysetConstructor = QuerySetConstructor => (
   class extends QuerySetConstructor {
 
-    constructor({association, entry}) {
-      super({parent: association.model.objects.filter({
+    constructor({ association, entry }) {
+      super({ parent: association.model.objects.filter({
         [association.src.pkField]: entry.getKey(),
-      })});
+      }) });
 
       this.association = association;
       this.originEntry = entry;
@@ -169,13 +169,13 @@ const createManyQuerysetConstructor = QuerySetConstructor => (
   }
 );
 
-const createWithManyAccessor = ({fieldName, association, setup}) => {
+const createWithManyAccessor = ({ fieldName, association, setup }) => {
   const QuerySetConstructor = createManyQuerysetConstructor(setup.get('QuerySetConstructor'));
 
-  return createEntryMixin(({Base}) => class extends Base {
+  return createEntryMixin(({ Base }) => class extends Base {
 
     get [fieldName]() {
-      return new QuerySetConstructor({association, entry: this});
+      return new QuerySetConstructor({ association, entry: this });
     }
 
   });
@@ -186,8 +186,8 @@ const createWithManyAccessor = ({fieldName, association, setup}) => {
  * One relation
  */
 
-const createWithOneAccessor = ({fieldName, association, hasMany}) => (
-  createEntryMixin(({Base}) => class extends Base {
+const createWithOneAccessor = ({ fieldName, association, hasMany }) => (
+  createEntryMixin(({ Base }) => class extends Base {
 
     get [fieldName]() {
       const associatedEntry = association.model.objects.get({
@@ -207,8 +207,8 @@ const createWithOneAccessor = ({fieldName, association, hasMany}) => (
           [association.src.pkField]: this.getKey(),
         });
       } else {
-        relationEntry = association.model.objects.get({[association.src.pkField]: this.getKey()})
-         || association.model.objects.get({[association.dest.pkField]: entry.getKey()})
+        relationEntry = association.model.objects.get({ [association.src.pkField]: this.getKey() })
+         || association.model.objects.get({ [association.dest.pkField]: entry.getKey() })
          || association.model.objects.create();
       }
 
@@ -224,7 +224,7 @@ const createWithOneAccessor = ({fieldName, association, hasMany}) => (
           [association.src.pkField]: this.getKey(),
         });
       } else {
-        association.model.objects.filter({[association.src.pkField]: this.getKey()}).delete();
+        association.model.objects.filter({ [association.src.pkField]: this.getKey() }).delete();
       }
 
       association.model.commitTransaction();
@@ -239,9 +239,9 @@ const createWithOneAccessor = ({fieldName, association, hasMany}) => (
  */
 
 const createRelationComposer = (name, opts = {}, rootAccessor) => (
-  ({model, setup}) => {
+  ({ model, setup }) => {
     const relation = parseRelation(name, opts);
-    const association = createAssociation({root: model, target: relation.model});
+    const association = createAssociation({ root: model, target: relation.model });
     const relationOpts = {
       setup,
       hasMany: relation.hasMany,
@@ -255,7 +255,7 @@ const createRelationComposer = (name, opts = {}, rootAccessor) => (
       relation.model.inject(createWithManyAccessor(relationOpts));
     }
 
-    return rootAccessor({association, setup, fieldName: name})({model, setup});
+    return rootAccessor({ association, setup, fieldName: name })({ model, setup });
   }
 );
 

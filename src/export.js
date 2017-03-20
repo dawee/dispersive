@@ -1,4 +1,4 @@
-const {getFilterPredicate} = require('./query');
+const { getFilterPredicate } = require('./query');
 
 
 const withExporters = Base => class extends Base {

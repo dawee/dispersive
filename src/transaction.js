@@ -4,7 +4,7 @@ const assert = require('./assert');
 
 class Transaction {
 
-  constructor({values, setup}) {
+  constructor({ values, setup }) {
     this.values = values;
     this.idKey = setup.get('primaryKeyName');
   }

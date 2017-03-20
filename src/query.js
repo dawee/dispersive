@@ -30,7 +30,7 @@ const getExcludePredicate = expression => (
  * Mixin
  */
 
-const withSortedEntries = ({Base, sortComparator}) => class extends Base {
+const withSortedEntries = ({ Base, sortComparator }) => class extends Base {
 
   * entries() {
     for (const [, entry] of this.parent.toArray().sort(sortComparator).entries()) {
@@ -40,7 +40,7 @@ const withSortedEntries = ({Base, sortComparator}) => class extends Base {
 
 };
 
-const withFilteredEntries = ({Base, predicate}) => class extends Base {
+const withFilteredEntries = ({ Base, predicate }) => class extends Base {
 
   * entries() {
     for (const entry of this.parent.entries()) {
@@ -50,7 +50,7 @@ const withFilteredEntries = ({Base, predicate}) => class extends Base {
 
 };
 
-const withEmptyGenerator = ({Base}) => class extends Base {
+const withEmptyGenerator = ({ Base }) => class extends Base {
 
   * entries() {}
 
@@ -61,39 +61,39 @@ const withQueries = QuerySetBase => class extends QuerySetBase {
   filter(expression) {
     const Base = this.QuerySetConstructor;
     const predicate = getFilterPredicate(expression);
-    const QuerySetConstructor = withFilteredEntries({Base, predicate});
+    const QuerySetConstructor = withFilteredEntries({ Base, predicate });
 
-    return this.clone({QuerySetConstructor});
+    return this.clone({ QuerySetConstructor });
   }
 
   exclude(expression) {
     const Base = this.QuerySetConstructor;
     const predicate = getExcludePredicate(expression);
-    const QuerySetConstructor = withFilteredEntries({Base, predicate});
+    const QuerySetConstructor = withFilteredEntries({ Base, predicate });
 
-    return this.clone({QuerySetConstructor});
+    return this.clone({ QuerySetConstructor });
   }
 
   sort(sortComparator) {
     const Base = this.QuerySetConstructor;
-    const QuerySetConstructor = withSortedEntries({Base, sortComparator});
+    const QuerySetConstructor = withSortedEntries({ Base, sortComparator });
 
-    return this.clone({QuerySetConstructor});
+    return this.clone({ QuerySetConstructor });
   }
 
   reverse() {
     const Base = this.QuerySetConstructor;
     const sortComparator = () => REVERSED;
-    const QuerySetConstructor = withSortedEntries({Base, sortComparator});
+    const QuerySetConstructor = withSortedEntries({ Base, sortComparator });
 
-    return this.clone({QuerySetConstructor});
+    return this.clone({ QuerySetConstructor });
   }
 
   none() {
     const Base = this.QuerySetConstructor;
-    const QuerySetConstructor = withEmptyGenerator({Base});
+    const QuerySetConstructor = withEmptyGenerator({ Base });
 
-    return this.clone({QuerySetConstructor});
+    return this.clone({ QuerySetConstructor });
   }
 
   orderBy(...fields) {
@@ -103,7 +103,7 @@ const withQueries = QuerySetBase => class extends QuerySetBase {
   }
 
   all() {
-    return this.clone({QuerySetConstructor: this.QuerySetConstructor});
+    return this.clone({ QuerySetConstructor: this.QuerySetConstructor });
   }
 
 };

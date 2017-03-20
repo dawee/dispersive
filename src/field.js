@@ -1,7 +1,7 @@
-const {createEntryMixin, mix} = require('./model');
+const { createEntryMixin, mix } = require('./model');
 
 const usingFieldAccessors = (name, spec) => (
-  createEntryMixin(({Base}) => {
+  createEntryMixin(({ Base }) => {
     const EntryMixin = class extends Base {};
 
     Object.defineProperty(EntryMixin.prototype, name, Object.assign({
@@ -13,7 +13,7 @@ const usingFieldAccessors = (name, spec) => (
 );
 
 const usingFieldInitial = (name, initial) => (
-  createEntryMixin(({Base}) => class extends Base {
+  createEntryMixin(({ Base }) => class extends Base {
     constructor(...args) {
       super(...args);
 
@@ -32,7 +32,7 @@ const usingDefaultFieldAccessors = name => usingFieldAccessors(name, {
   },
 });
 
-const withInitializedField = (name, {initial = null}) => mix([
+const withInitializedField = (name, { initial = null }) => mix([
   usingFieldInitial(name, initial),
   usingDefaultFieldAccessors(name),
 ]);

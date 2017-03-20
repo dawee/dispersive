@@ -1,10 +1,10 @@
-const {withQueries} = require('./query');
-const {withExporters} = require('./export');
+const { withQueries } = require('./query');
+const { withExporters } = require('./export');
 
 
 class QuerySetBase {
 
-  constructor({QuerySetConstructor, parent = null}) {
+  constructor({ QuerySetConstructor, parent = null }) {
     this.parent = parent;
     this.QuerySetConstructor = QuerySetConstructor;
   }
@@ -27,8 +27,8 @@ class QuerySetBase {
     }
   }
 
-  clone({QuerySetConstructor = this.QuerySetConstructor}) {
-    return new QuerySetConstructor({parent: this, QuerySetConstructor: this.QuerySetConstructor});
+  clone({ QuerySetConstructor = this.QuerySetConstructor }) {
+    return new QuerySetConstructor({ parent: this, QuerySetConstructor: this.QuerySetConstructor });
   }
 
 }
@@ -40,7 +40,7 @@ const QuerySetWithExporters = withExporters(QuerySetWithQueries);
 class QuerySet extends QuerySetWithExporters {
 
   constructor(opts = {}) {
-    super(Object.assign({QuerySetConstructor: QuerySet}, opts));
+    super(Object.assign({ QuerySetConstructor: QuerySet }, opts));
   }
 
 }

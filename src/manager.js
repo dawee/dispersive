@@ -4,8 +4,8 @@ const assert = require('./assert');
 
 const createObjectManagerConstructor = QuerySetConstructor => class extends QuerySetConstructor {
 
-  constructor({setup, values, transaction = null}) {
-    super({QuerySetConstructor});
+  constructor({ setup, values, transaction = null }) {
+    super({ QuerySetConstructor });
 
     this.values = values;
     this.transaction = transaction;
@@ -20,7 +20,7 @@ const createObjectManagerConstructor = QuerySetConstructor => class extends Quer
 
   build(values = Immutable.Map()) {
     const EntryConstructor = this.setup.get('EntryConstructor');
-    return new EntryConstructor({values, manager: this, setup: this.setup});
+    return new EntryConstructor({ values, manager: this, setup: this.setup });
   }
 
   get(expression) {
