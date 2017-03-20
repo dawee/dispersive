@@ -199,10 +199,8 @@ const createWithOneAccessor = ({fieldName, association, hasMany}) => (
         : null;
     }
 
-    set [fieldName](entry) {
+    getRelationEntry(entry) {
       let relationEntry = null;
-
-      association.model.createTransaction();
 
       if (hasMany) {
         relationEntry = association.model.objects.getOrCreate({
@@ -214,10 +212,20 @@ const createWithOneAccessor = ({fieldName, association, hasMany}) => (
          || association.model.objects.create();
       }
 
-      relationEntry.update({
-        [association.dest.pkField]: entry.getKey(),
-        [association.src.pkField]: this.getKey(),
-      });
+      return relationEntry;
+    }
+
+    set [fieldName](entry) {
+      association.model.createTransaction();
+
+      if (entry) {
+        this.getRelationEntry(entry).update({
+          [association.dest.pkField]: entry.getKey(),
+          [association.src.pkField]: this.getKey(),
+        });
+      } else {
+        association.model.objects.filter({[association.src.pkField]: this.getKey()}).delete();
+      }
 
       association.model.commitTransaction();
     }

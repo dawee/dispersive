@@ -272,4 +272,48 @@ describe('relation', () => {
     expect(Reader.objects.get({name: 'Bob'}).currentBook).to.equal(null);
     expect(Reader.objects.get({name: 'John'}).currentBook).to.not.equal(null);
   });
+
+  it('should remove connection if setting to null (from src)', () => {
+    const Reader = createModel([
+      withField('name'),
+    ]);
+
+    const Book = createModel([
+      withField('title'),
+      withOne('owner', {model: Reader, relatedName: 'currentBook'}),
+    ]);
+
+    runAsAction(() => Book.objects.create({
+      name: 'John',
+      owner: Reader.objects.create({ name: 'John' }),
+    }), [Book, Reader]);
+
+    expect(Reader.objects.get({name: 'John'}).currentBook).to.not.equal(null);
+
+    runAsAction(() => Book.objects.get().update({ owner: null }), [Book, Reader]);
+
+    expect(Reader.objects.get({name: 'John'}).currentBook).to.equal(null);
+  });
+
+  it('should remove connection if setting to null (from dest)', () => {
+    const Reader = createModel([
+      withField('name'),
+    ]);
+
+    const Book = createModel([
+      withField('title'),
+      withOne('owner', {model: Reader, relatedName: 'currentBook'}),
+    ]);
+
+    runAsAction(() => Reader.objects.create({
+      name: 'John',
+      currentBook: Book.objects.create({ title: 'Peter Pan' })
+    }), [Book, Reader]);
+
+    expect(Reader.objects.get({name: 'John'}).currentBook).to.not.equal(null);
+
+    runAsAction(() => Reader.objects.get({ name: 'John'}).update({ currentBook: null }), [Book, Reader]);
+
+    expect(Reader.objects.get({name: 'John'}).currentBook).to.equal(null);
+  });
 });
