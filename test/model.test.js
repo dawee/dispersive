@@ -3,7 +3,6 @@ const {createModel, createAction} = require('../src');
 const {withOne, withMany} = require('../src/relation');
 const {createEntryMixin, createObjectManagerMixin, mix} = require('../src/model');
 const {withField} = require('../src/field');
-const error = require('../src/error');
 
 
 const withEntryBar = () => createEntryMixin(

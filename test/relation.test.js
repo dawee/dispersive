@@ -4,7 +4,6 @@ const {expect, assert} = require('chai');
 const {createModel, createAction} = require('../src');
 const {withOne, withMany} = require('../src/relation');
 const {withField} = require('../src/field');
-const error = require('../src/error');
 const {runAsAction} = require('../src/action');
 
 

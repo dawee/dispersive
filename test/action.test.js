@@ -4,7 +4,6 @@ const {createModel, createAction} = require('../src');
 const {withOne, withMany} = require('../src/relation');
 const {withField} = require('../src/field');
 const {createChangesFunnelEmitter} = require('../src/emitter');
-const error = require('../src/error');
 
 
 

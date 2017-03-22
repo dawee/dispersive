@@ -3,7 +3,7 @@ const {spy} = require('sinon');
 const {createModel} = require('../src/model');
 const {withField} = require('../src/field');
 const {createAction} = require('../src/action');
-const error = require('../src/error');
+
 
 describe('manager', () => {
 
@@ -18,7 +18,7 @@ describe('manager', () => {
 
     model.createTransaction();
 
-    expect(() => model.createTransaction()).to.throw(error.TransactionAlreadyExists);
+    expect(() => model.createTransaction()).to.throw(assert.AssertionError);
   });
 
   it('should not create an entry if transaction is aborted', () => {

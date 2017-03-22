@@ -1,6 +1,6 @@
 const Immutable = require('immutable');
 const ulid = require('ulid');
-const assert = require('./assert');
+const assert = require('assert');
 const { QuerySet } = require('./queryset');
 const { createObjectManagerConstructor } = require('./manager');
 const { createChangesEmitter } = require('./emitter');
@@ -141,13 +141,13 @@ const createModel = (composers) => {
   };
 
   model.createTransaction = () => {
-    assert.hasNoTransaction({ transaction });
+    assert.ok(!transaction);
 
     transaction = new Transaction({ values, setup });
   };
 
   model.commitTransaction = () => {
-    assert.hasTransaction({ transaction });
+    assert.ok(transaction);
 
     values = transaction.values;
     transaction = null;

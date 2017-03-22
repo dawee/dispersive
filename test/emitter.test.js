@@ -1,7 +1,6 @@
 const {assert, expect} = require('chai');
 const {spy} = require('sinon');
 const {createChangesEmitter, createChangesFunnelEmitter} = require('../src/emitter');
-const error = require('../src/error');
 
 
 describe('emitter', () => {
