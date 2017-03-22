@@ -1,5 +1,6 @@
 const { createModel, createEntryMixin, createObjectManagerMixin } = require('./model');
 const { withField } = require('./field');
+const Immutable = require('immutable');
 
 
 const TARGET_PK_FIELD = 'targetPk';
@@ -23,86 +24,105 @@ const parseRelation = (name, opts = {}) => (
  * Association
  */
 
-const withPkSetEntries = ({ Base, pkSet, manager }) => class extends Base {
 
-  static* pkSetEntries() {
-    for (const [, entry] of pkSet.entries()) {
-      yield entry;
-    }
+class FieldIndex {
+
+  constructor(fieldName, keyName) {
+    this.index = {};
+    this.fieldName = fieldName;
+    this.keyName = keyName;
+    this.pointers = {};
   }
 
-  * entries() {
-    for (const entry of this.constructor.pkSetEntries()) {
-      yield manager.build(entry);
-    }
+  add({ key, fieldValue, values }) {
+    if (!key || !fieldValue || !values) return;
+
+    this.index[fieldValue] = this.index[fieldValue]
+      ? this.index[fieldValue].set(key, values)
+      : Immutable.OrderedMap({ [key]: values });
+
+    this.pointers[key] = fieldValue;
   }
 
-};
+  remove({ key, fieldValue, values }) {
+    if (!key || !fieldValue || !values) return;
 
-const withAssociationIndex = (pk1, pk2) => (
-  createObjectManagerMixin(({ Base }) => class extends Base {
-    constructor(opts) {
-      super(opts);
-      this.indexes = this.constructor.getIndexes(opts);
-    }
+    this.index[fieldValue] = this.index[fieldValue].remove(key);
+    delete this.pointers[key];
+  }
 
-    static getIndexes({ indexes = { [pk1]: {}, [pk2]: {} } }) {
-      return indexes;
+  link(values) {
+    const key = values.get(this.keyName);
+    const fieldValue = values.get(this.fieldName);
+
+    this.unlink(values);
+    this.add({ key, fieldValue, values });
+  }
+
+  unlink(values) {
+    const key = values.get(this.keyName);
+    const fieldValue = this.pointers[key];
+
+    this.remove({ key, fieldValue, values });
+  }
+
+  filterByValue(fieldValue) {
+    const index = this.index[fieldValue];
+
+    return (index && index.size > 0) ? index : null;
+  }
+
+  filter(expression = {}) {
+    const fieldValue = expression[this.fieldName];
+
+    return fieldValue ? this.filterByValue(fieldValue) : null;
+  }
+
+}
+
+const withAssociationIndex = (...fieldNames) => (
+  createObjectManagerMixin(({ Base, setup, model }) => class extends Base {
+    constructor(...args) {
+      super(...args);
+
+      this.indexes = model.indexes || fieldNames.map(fieldName => (
+        new FieldIndex(fieldName, setup.get('keyName'))
+      ));
+
+      model.indexes = this.indexes;
     }
 
     unlink(values) {
-      const pk1Value = values.get(pk1);
-      const pk2Value = values.get(pk2);
+      this.indexes.forEach(index => index.unlink(values));
 
-      if (pk1Value in this.indexes[pk1]) this.indexes[pk1][pk1Value].delete(values);
-      if (pk2Value in this.indexes[pk2]) this.indexes[pk2][pk2Value].delete(values);
+      return values;
     }
 
     link(values) {
-      const pk1Value = values.get(pk1);
-      const pk2Value = values.get(pk2);
+      this.indexes.forEach(index => index.link(values));
 
-      if (!(pk1Value in this.indexes[pk1])) this.indexes[pk1][pk1Value] = new Set();
-      if (!(pk2Value in this.indexes[pk2])) this.indexes[pk2][pk2Value] = new Set();
-
-      if (pk1Value && pk2Value) {
-        this.indexes[pk1][pk1Value].add(values);
-        this.indexes[pk2][pk2Value].add(values);
-      }
+      return values;
     }
 
     unsync(values) {
-      this.unlink(values);
-      return super.unsync(values);
+      return super.unsync(this.unlink(values));
     }
 
     sync(values) {
-      this.unlink(values);
-
-      const newValues = super.sync(values);
-
-      this.link(newValues);
-      return newValues;
-    }
-
-    filterPkSet(expression = {}, pk) {
-      const pkValue = expression[pk];
-
-      return pkValue ? this.indexes[pk][pkValue] : null;
+      return this.link(super.sync(values));
     }
 
     filter(expression) {
-      const pk1Set = this.filterPkSet(expression, pk1);
-      const pk2Set = this.filterPkSet(expression, pk2);
-      const pkSet = (pk1Set && (!pk2Set || pk2Set.size > pk1Set.size)) ? pk1Set : pk2Set;
+      const values = this.indexes
+        .map(index => index.filter(expression))
+        .reduce((res, map) => {
+          const hasMapNoRes = map && !res;
+          const mapSizeIsLess = res && map && map.size < res.size;
 
-      return pkSet ? this.clone({
-        QuerySetConstructor: withPkSetEntries({
-          pkSet,
-          Base: this.QuerySetConstructor,
-          manager: this,
-        }),
-      }).filter(expression) : super.filter(expression);
+          return hasMapNoRes || mapSizeIsLess ? map : res;
+        }, null);
+
+      return values ? this.subset({ values }).filter(expression) : super.filter(expression);
     }
   })
 );
@@ -134,18 +154,22 @@ const createManyQuerysetConstructor = QuerySetConstructor => (
   class extends QuerySetConstructor {
 
     constructor({ association, entry }) {
-      super({ parent: association.model.objects.filter({
-        [association.src.pkField]: entry.getKey(),
-      }) });
+      super({
+        values: association.model.objects.filter({
+          [association.src.pkField]: entry.getKey(),
+        }).values,
+        manager: association.model.objects,
+      });
 
       this.association = association;
       this.originEntry = entry;
     }
 
-    * entries() {
-      for (const entry of super.entries()) {
-        yield this.association.dest.model.objects.get(entry[this.association.dest.pkField]);
-      }
+    nextEntry(iterator) {
+      const entry = super.nextEntry(iterator);
+      const keyValue = entry && entry[this.association.dest.pkField];
+
+      return keyValue ? this.association.dest.model.objects.get(keyValue) : null;
     }
 
     add(entry) {

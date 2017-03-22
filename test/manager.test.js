@@ -10,7 +10,7 @@ describe('manager', () => {
   it('should throw an error if trying to create without a transaction', () => {
     const model = createModel();
 
-    expect(() => model.objects.create()).to.throw(error.TransactionDoesNotExist);
+    expect(() => model.objects.create()).to.throw(assert.AssertionError);
   });
 
   it('should throw an error if trying to create a transaction if one already exists', () => {

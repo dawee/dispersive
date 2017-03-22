@@ -1,17 +1,29 @@
 const ulid = require('ulid');
-const assert = require('./assert');
+const assert = require('assert');
+const Immutable = require('immutable');
+
+
+const ENTRY_DOES_NOT_EXIST = id => `
+  Entry with id '${id}' does not exist.
+`.trim();
+
+const SYNC_NO_MAP = `
+  Trying to sync values with invalid type.
+`.trim();
 
 
 class Transaction {
 
   constructor({ values, setup }) {
     this.values = values;
-    this.idKey = setup.get('primaryKeyName');
+    this.idKey = setup.get('keyName');
   }
 
   syncNew(values) {
     const id = ulid();
     const newValues = values.set(this.idKey, id);
+
+    assert.ok(newValues instanceof Immutable.Map, SYNC_NO_MAP);
 
     this.values = this.values.set(id, newValues);
 
@@ -21,7 +33,8 @@ class Transaction {
   syncExisting(values) {
     const id = values.get(this.idKey);
 
-    assert.entryExists(this, id);
+    assert.ok(this.values.has(id), ENTRY_DOES_NOT_EXIST(id));
+    assert.ok(values instanceof Immutable.Map, SYNC_NO_MAP);
 
     if (values !== this.values.get(id)) {
       this.values = this.values.set(id, values);

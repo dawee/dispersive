@@ -1,16 +1,8 @@
+const Immutable = require('immutable');
 const { getFilterPredicate } = require('./query');
 
 
 const withExporters = Base => class extends Base {
-
-  * entriesWithIndex() {
-    let index = 0;
-
-    for (const entry of this.entries()) {
-      yield [entry, index];
-      index += 1;
-    }
-  }
 
   get(expression) {
     if (typeof expression === 'string') this.parent.get(expression);
@@ -26,42 +18,33 @@ const withExporters = Base => class extends Base {
     return this.count();
   }
 
+  reduce(predicate, initial = null) {
+    const entries = this.values.entries();
+    const runNext = (memo, index = 0) => {
+      const entry = this.nextEntry(entries);
+
+      return entry ? runNext(predicate(memo, entry, index + 1)) : memo;
+    };
+
+    return runNext(initial);
+  }
+
   map(predicate) {
-    const res = [];
-
-    for (const [entry, index] of this.entriesWithIndex()) {
-      res.push(predicate(entry, index));
-    }
-
-    return res;
+    return this.reduce((list, entry, index) => (
+      list.push(predicate(entry, index))
+    ), Immutable.List()).toJS();
   }
 
   every(expression) {
     const predicate = getFilterPredicate(expression);
-    let res = true;
 
-    for (const [entry, index] of this.entriesWithIndex()) {
-      if (!predicate(entry, index)) {
-        res = false;
-        break;
-      }
-    }
-
-    return res;
+    return this.reduce((result, entry, index) => result && predicate(entry, index), true);
   }
 
   some(expression) {
     const predicate = getFilterPredicate(expression);
-    let res = false;
 
-    for (const [entry, index] of this.entriesWithIndex()) {
-      if (predicate(entry, index)) {
-        res = true;
-        break;
-      }
-    }
-
-    return res;
+    return this.reduce((result, entry, index) => result || predicate(entry, index), false);
   }
 
   any(expression) {
@@ -73,7 +56,7 @@ const withExporters = Base => class extends Base {
   }
 
   first() {
-    return this.entries().next().value;
+    return this.nextEntry(this.values.entries());
   }
 
   last() {

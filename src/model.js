@@ -56,7 +56,7 @@ const defaultSetup = {
   EntryConstructor: Entry,
   QuerySetConstructor: QuerySet,
   objectsConstructorFactory: createObjectsConstructor,
-  primaryKeyName: PRIMARY_KEY_NAME,
+  keyName: PRIMARY_KEY_NAME,
 };
 
 
@@ -100,7 +100,7 @@ const createObjectManagerMixin = mixin => (
 
 const withKeyField = () => (
   createEntryMixin(({ Base, setup }) => {
-    const keyName = setup.get('primaryKeyName');
+    const keyName = setup.get('keyName');
 
     return class extends Base {
       get [keyName]() {
@@ -125,7 +125,7 @@ const createModel = (composers) => {
   const model = { emitter, id: ulid() };
 
   let transaction = null;
-  let values = Immutable.Map();
+  let values = Immutable.OrderedMap();
   let setup = composeSetup({
     model,
     setup: Immutable.Map(defaultSetup),
@@ -174,6 +174,7 @@ const mix = (composers = []) => (
 );
 
 module.exports = {
+  Entry,
   createEntryMixin,
   createQuerySetMixin,
   createObjectManagerMixin,
