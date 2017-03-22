@@ -1,6 +1,3 @@
 {
-  "extends": "airbnb",
-  "rules": {
-    "no-restricted-syntax": "off"
-  }
+  "extends": "airbnb"
 }

@@ -1,4 +1,4 @@
-const { createModel, createEntryMixin, createObjectManagerMixin } = require('./model');
+const { createModel, createEntryMixin, createObjectManagerMixin, mix } = require('./model');
 const { withField } = require('./field');
 const Immutable = require('immutable');
 
@@ -80,40 +80,40 @@ class FieldIndex {
 
 }
 
-const withAssociationIndex = (...fieldNames) => (
-  createObjectManagerMixin(({ Base, setup, model }) => class extends Base {
-    constructor(...args) {
-      super(...args);
+const withAssociationIndex = (...fieldNames) => {
+  const indexes = [];
 
-      this.indexes = model.indexes || fieldNames.map(fieldName => (
-        new FieldIndex(fieldName, setup.get('keyName'))
-      ));
+  const init = ({ setup }) => {
+    indexes.concat(fieldNames.map(fieldName => (
+      new FieldIndex(fieldName, setup.get('keyName'))
+    )));
 
-      model.indexes = this.indexes;
-    }
+    return setup;
+  };
 
-    unlink(values) {
-      this.indexes.forEach(index => index.unlink(values));
+  const mixin = createObjectManagerMixin(({ Base }) => class extends Base {
+    static unlink(values) {
+      indexes.forEach(index => index.unlink(values));
 
       return values;
     }
 
-    link(values) {
-      this.indexes.forEach(index => index.link(values));
+    static link(values) {
+      indexes.forEach(index => index.link(values));
 
       return values;
     }
 
     unsync(values) {
-      return super.unsync(this.unlink(values));
+      return super.unsync(this.constructor.unlink(values));
     }
 
     sync(values) {
-      return this.link(super.sync(values));
+      return this.constructor.link(super.sync(values));
     }
 
     filter(expression) {
-      const values = this.indexes
+      const values = indexes
         .map(index => index.filter(expression))
         .reduce((res, map) => {
           const hasMapNoRes = map && !res;
@@ -124,8 +124,10 @@ const withAssociationIndex = (...fieldNames) => (
 
       return values ? this.subset({ values }).filter(expression) : super.filter(expression);
     }
-  })
-);
+  });
+
+  return mix([init, mixin]);
+};
 
 const createAssociation = ({ root, target }) => ({
   src: {
