@@ -3,8 +3,8 @@ const { withField } = require('./field');
 const Immutable = require('immutable');
 
 
-const TARGET_PK_FIELD = 'targetPk';
-const ROOT_PK_FIELD = 'rootPk';
+const TARGET_KEY_NAME = 'targetKey';
+const ROOT_KEY_NAME = 'rootKey';
 
 
 /*
@@ -132,16 +132,16 @@ const withAssociationIndex = (...fieldNames) => {
 const createAssociation = ({ root, target }) => ({
   src: {
     model: root,
-    pkField: ROOT_PK_FIELD,
+    keyName: ROOT_KEY_NAME,
   },
   dest: {
     model: target,
-    pkField: TARGET_PK_FIELD,
+    keyName: TARGET_KEY_NAME,
   },
   model: createModel([
-    withField(ROOT_PK_FIELD),
-    withField(TARGET_PK_FIELD),
-    withAssociationIndex(ROOT_PK_FIELD, TARGET_PK_FIELD),
+    withField(ROOT_KEY_NAME),
+    withField(TARGET_KEY_NAME),
+    withAssociationIndex(ROOT_KEY_NAME, TARGET_KEY_NAME),
   ]),
 });
 
@@ -158,7 +158,7 @@ const createManyQuerysetConstructor = QuerySetConstructor => (
     constructor({ association, entry }) {
       super({
         values: association.model.objects.filter({
-          [association.src.pkField]: entry.getKey(),
+          [association.src.keyName]: entry.getKey(),
         }).values,
         manager: association.model.objects,
       });
@@ -169,7 +169,7 @@ const createManyQuerysetConstructor = QuerySetConstructor => (
 
     nextEntry(iterator) {
       const entry = super.nextEntry(iterator);
-      const keyValue = entry && entry[this.association.dest.pkField];
+      const keyValue = entry && entry[this.association.dest.keyName];
 
       return keyValue ? this.association.dest.model.objects.get(keyValue) : null;
     }
@@ -178,8 +178,8 @@ const createManyQuerysetConstructor = QuerySetConstructor => (
       this.association.model.createTransaction();
 
       this.association.model.objects.getOrCreate({
-        [this.association.src.pkField]: this.originEntry.getKey(),
-        [this.association.dest.pkField]: entry.getKey(),
+        [this.association.src.keyName]: this.originEntry.getKey(),
+        [this.association.dest.keyName]: entry.getKey(),
       });
 
       this.association.model.commitTransaction();
@@ -189,8 +189,8 @@ const createManyQuerysetConstructor = QuerySetConstructor => (
       this.association.model.createTransaction();
 
       const associatedEntry = this.association.model.objects.get({
-        [this.association.src.pkField]: this.originEntry.getKey(),
-        [this.association.dest.pkField]: entry.getKey(),
+        [this.association.src.keyName]: this.originEntry.getKey(),
+        [this.association.dest.keyName]: entry.getKey(),
       });
 
       if (associatedEntry) associatedEntry.delete();
@@ -223,11 +223,11 @@ const createWithOneAccessor = ({ fieldName, association, hasMany }) => (
 
     get [fieldName]() {
       const associatedEntry = association.model.objects.get({
-        [association.src.pkField]: this.getKey(),
+        [association.src.keyName]: this.getKey(),
       });
 
       return associatedEntry
-        ? association.dest.model.objects.get(associatedEntry[association.dest.pkField])
+        ? association.dest.model.objects.get(associatedEntry[association.dest.keyName])
         : null;
     }
 
@@ -236,11 +236,11 @@ const createWithOneAccessor = ({ fieldName, association, hasMany }) => (
 
       if (hasMany) {
         relationEntry = association.model.objects.getOrCreate({
-          [association.src.pkField]: this.getKey(),
+          [association.src.keyName]: this.getKey(),
         });
       } else {
-        relationEntry = association.model.objects.get({ [association.src.pkField]: this.getKey() })
-         || association.model.objects.get({ [association.dest.pkField]: entry.getKey() })
+        relationEntry = association.model.objects.get({ [association.src.keyName]: this.getKey() })
+         || association.model.objects.get({ [association.dest.keyName]: entry.getKey() })
          || association.model.objects.create();
       }
 
@@ -252,11 +252,11 @@ const createWithOneAccessor = ({ fieldName, association, hasMany }) => (
 
       if (entry) {
         this.getRelationEntry(entry).update({
-          [association.dest.pkField]: entry.getKey(),
-          [association.src.pkField]: this.getKey(),
+          [association.dest.keyName]: entry.getKey(),
+          [association.src.keyName]: this.getKey(),
         });
       } else {
-        association.model.objects.filter({ [association.src.pkField]: this.getKey() }).delete();
+        association.model.objects.filter({ [association.src.keyName]: this.getKey() }).delete();
       }
 
       association.model.commitTransaction();
