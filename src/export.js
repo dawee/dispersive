@@ -22,12 +22,17 @@ const withExporters = Base => class extends Base {
   }
 
   first() {
-    return this.nextEntry(this.values.entries());
+    const values = this.values.first();
+    return values ? this.manager.build(values) : null;
   }
 
   last() {
     const array = this.toArray();
     return array[array.length - 1];
+  }
+
+  map(predicate) {
+    return this.reduce((array, entry, index) => (array.concat([predicate(entry, index)])), []);
   }
 
   every(expression) {

@@ -1,5 +1,4 @@
 const assert = require('assert');
-const Immutable = require('immutable');
 const { withQueries } = require('./query');
 const { withExporters } = require('./export');
 
@@ -17,48 +16,24 @@ class QuerySetBase {
     this.values = values;
   }
 
-  nextEntry(iterator) {
-    const next = iterator.next();
-
-    return next.done ? null : this.manager.build(this.constructor.extractValues(next.value));
-  }
-
-  runForEach(iterator, predicate, index = 0) {
-    const entry = this.nextEntry(iterator);
-
-    if (entry) {
-      predicate(entry, index);
-      this.runForEach(iterator, predicate, index + 1);
-    }
-  }
-
   forEach(predicate) {
-    return this.runForEach(this.values.entries(), predicate);
+    this.values.forEach((values, index) => predicate(this.manager.build(values), index));
   }
 
   reduce(predicate, initial = null) {
-    const entries = this.values.entries();
-    const runNext = (memo, index = 0) => {
-      const entry = this.nextEntry(entries);
+    return this.values.reduce((memo, values, index) => {
+      const entry = this.manager.build(values);
 
-      return entry ? runNext(predicate(memo, entry, index + 1)) : memo;
-    };
-
-    return runNext(initial);
-  }
-
-  map(predicate) {
-    return this.reduce((list, entry, index) => (
-      list.push(predicate(entry, index))
-    ), Immutable.List()).toJS();
+      return predicate(memo, entry, index);
+    }, initial);
   }
 
   update(rawValues) {
-    this.forEach(entry => entry.update(rawValues));
+    return this.reduce((res, entry) => res && entry.update(rawValues), true);
   }
 
   delete() {
-    this.forEach(entry => entry.delete());
+    return this.reduce((res, entry) => res && entry.delete(), true);
   }
 
   clone() {
