@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { createAction } from 'dispersive/action';
-import { createModel } from 'dispersive/model';
+import { createModel, createAction } from 'dispersive';
+import { runAsAction } from 'dispersive/action';
 import { withField } from 'dispersive/field';
 import { withOne, withMany } from 'dispersive/relation';
 import { Watcher } from 'react-dispersive';
@@ -32,6 +32,8 @@ const Pokedex = createModel([
 ]);
 
 
+const store = [Pokedex, PokedexSlot, Pokemon];
+
 /*
  * Actions
  */
@@ -45,7 +47,7 @@ const createPokedex = createAction(() => {
   slots.forEach(slot => pokedex.slots.add(slot));
 
   return pokedex;
-}, [Pokedex, PokedexSlot]);
+}, store);
 
 
 const setSlotActive = createAction(({key}) => {
@@ -55,25 +57,26 @@ const setSlotActive = createAction(({key}) => {
 
   activated.update({active: false});
   slot.update({active: true});
-}, [PokedexSlot]);
+}, store);
+
+const updateSlotValues = createAction(
+  ({key, ...values}) => PokedexSlot.objects.get({key}).update(values)
+, store);
+
+const setSlotPokemon = createAction(
+  ({key, ...values}) => PokedexSlot.objects.get({key}).update({
+    pokemon: Pokemon.objects.create(values),
+  })
+, store);
 
 
 const setSlotSeen = async ({key}) => {
-  const setSeen = createAction(() => (
-    PokedexSlot.objects.get(key).update({seen: true})
-  ), [PokedexSlot]);
-
-  const setPokemon = createAction(({name, sprites}) => {
-    const pokemon = Pokemon.objects.create({ name, sprite: sprites.front_default });
-    PokedexSlot.objects.get(key).update({ pokemon });
-  }, [PokedexSlot, Pokemon]);
-
-  setSeen();
+  updateSlotValues({key, seen: true});
 
   if (!PokedexSlot.objects.get(key).pokemon) {
-    const feed = await request.get(`${BASE_URL}/${PokedexSlot.objects.get(key).num}`);
+    const { name, sprites } = await request.get(`${BASE_URL}/${PokedexSlot.objects.get(key).num}`);
 
-    setPokemon(feed);
+    setSlotPokemon({ key, name, sprite: sprites.front_default });
   }
 };
 
