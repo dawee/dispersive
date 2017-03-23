@@ -159,19 +159,17 @@ const createManyQuerysetConstructor = QuerySetConstructor => (
       super({
         values: association.model.objects.filter({
           [association.src.keyName]: entry.getKey(),
-        }).values,
-        manager: association.model.objects,
+        }).reduce((values, associationEntry) => {
+          const keyValue = associationEntry && associationEntry[association.dest.keyName];
+          const destEntry = keyValue ? association.dest.model.objects.get(keyValue) : null;
+
+          return destEntry ? values.set(destEntry.getKey(), destEntry.values) : values;
+        }, Immutable.OrderedMap()),
+        manager: association.dest.model.objects,
       });
 
       this.association = association;
       this.originEntry = entry;
-    }
-
-    nextEntry(iterator) {
-      const entry = super.nextEntry(iterator);
-      const keyValue = entry && entry[this.association.dest.keyName];
-
-      return keyValue ? this.association.dest.model.objects.get(keyValue) : null;
     }
 
     add(entry) {

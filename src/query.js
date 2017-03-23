@@ -1,4 +1,3 @@
-const Immutable = require('immutable');
 const sortBy = require('sort-by');
 
 /*
@@ -33,11 +32,12 @@ const withQueries = QuerySetBase => class extends QuerySetBase {
 
   filter(expression) {
     const predicate = getFilterPredicate(expression);
-    const subsetArray = this.reduce((values, entry) => (
-      predicate(entry) ? values.set(entry.getKey(), entry.values) : values
-    ), Immutable.OrderedMap());
 
-    return this.subsetFromArray(subsetArray);
+    return this.subset({
+      values: this.values.filter((values, index) => (
+        predicate(this.manager.build(values), index)
+      )),
+    });
   }
 
   exclude(expression) {

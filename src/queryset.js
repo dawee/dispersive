@@ -73,10 +73,6 @@ class QuerySetBase {
     });
   }
 
-  subsetFromArray(valuesArray) {
-    return this.subset({ values: Immutable.OrderedMap(valuesArray) });
-  }
-
 }
 
 const QuerySetWithQueries = withQueries(QuerySetBase);
