@@ -315,4 +315,39 @@ describe('relation', () => {
 
     expect(Reader.objects.get({name: 'John'}).currentBook).to.equal(null);
   });
+
+  it('should filter within a relation', () => {
+    const Book = createModel([
+      withField('title'),
+      withField('genre'),
+    ]);
+
+    const Library = createModel([
+      withMany('books', { model: Book, relatedName: 'library' }),
+    ]);
+
+    const [library, books] = runAsAction(() => {
+      const library = Library.objects.create();
+      const books = [
+        {
+          title: 'The Curious Incident of the Dog in the Night-Time',
+          genre: 'Mystery'
+        },
+        {
+          title: 'Peter Pan',
+          genre: 'Fantasy'
+        },
+      ].map(({title, genre}) => Book.objects.create({library, title, genre}));
+
+      return [library, books];
+    }, [Book, Library]);
+
+    expect(library.books.values.count()).to.equal(2);
+    expect(library.books.filter({genre: 'Fantasy'}).values.count()).to.equal(1);
+
+
+
+    expect(library.books.get({genre: 'Fantasy'}).title).to.equal('Peter Pan');
+    expect(library.books.get({genre: 'Mystery'}).title).to.equal('The Curious Incident of the Dog in the Night-Time');
+  });
 });

@@ -198,6 +198,14 @@ const createManyQuerysetConstructor = QuerySetConstructor => (
       this.association.model.commitTransaction();
     }
 
+    subset({ values }) {
+      return new this.QuerySetConstructor({
+        values,
+        manager: this.association.dest.model.objects,
+        QuerySetConstructor: this.QuerySetConstructor,
+      });
+    }
+
   }
 );
 
@@ -236,6 +244,7 @@ const createWithOneAccessor = ({ fieldName, association, hasMany }) => (
 
       if (hasMany) {
         relationEntry = association.model.objects.getOrCreate({
+          [association.dest.keyName]: entry.getKey(),
           [association.src.keyName]: this.getKey(),
         });
       } else {
@@ -270,19 +279,20 @@ const createWithOneAccessor = ({ fieldName, association, hasMany }) => (
  * API
  */
 
-const createRelationComposer = (name, opts = {}, rootAccessor) => (
+const createRelationComposer = (name, opts = {}, rootAccessor, fromMany = false) => (
   ({ model, setup }) => {
     const relation = parseRelation(name, opts);
     const association = createAssociation({ root: model, target: relation.model });
     const relationOpts = {
       setup,
-      hasMany: relation.hasMany,
       fieldName: relation.relatedName,
       association: reverseAssociation(association),
     };
 
     if (relation.relatedName && !relation.hasMany) {
-      relation.model.inject(createWithOneAccessor(relationOpts));
+      relation.model.inject(createWithOneAccessor(Object.assign({
+        hasMany: fromMany,
+      }, relationOpts)));
     } else if (relation.relatedName && relation.hasMany) {
       relation.model.inject(createWithManyAccessor(relationOpts));
     }
@@ -291,8 +301,13 @@ const createRelationComposer = (name, opts = {}, rootAccessor) => (
   }
 );
 
-const withMany = (name, opts = {}) => createRelationComposer(name, opts, createWithManyAccessor);
-const withOne = (name, opts = {}) => createRelationComposer(name, opts, createWithOneAccessor);
+const withMany = (name, opts = {}) => (
+  createRelationComposer(name, opts, createWithManyAccessor, true)
+);
+
+const withOne = (name, opts = {}) => (
+  createRelationComposer(name, opts, createWithOneAccessor)
+);
 
 
 module.exports = {

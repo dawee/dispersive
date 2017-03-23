@@ -1,11 +1,10 @@
-const Immutable = require('immutable');
 const { getFilterPredicate } = require('./query');
 
 
 const withExporters = Base => class extends Base {
 
   get(expression) {
-    if (typeof expression === 'string') this.parent.get(expression);
+    if (typeof expression === 'string') this.manager.get(expression);
 
     return expression ? this.filter(expression).first() : this.first();
   }
@@ -18,21 +17,17 @@ const withExporters = Base => class extends Base {
     return this.count();
   }
 
-  reduce(predicate, initial = null) {
-    const entries = this.values.entries();
-    const runNext = (memo, index = 0) => {
-      const entry = this.nextEntry(entries);
-
-      return entry ? runNext(predicate(memo, entry, index + 1)) : memo;
-    };
-
-    return runNext(initial);
+  toArray() {
+    return this.map(entry => entry);
   }
 
-  map(predicate) {
-    return this.reduce((list, entry, index) => (
-      list.push(predicate(entry, index))
-    ), Immutable.List()).toJS();
+  first() {
+    return this.nextEntry(this.values.entries());
+  }
+
+  last() {
+    const array = this.toArray();
+    return array[array.length - 1];
   }
 
   every(expression) {
@@ -49,19 +44,6 @@ const withExporters = Base => class extends Base {
 
   any(expression) {
     return this.some(expression);
-  }
-
-  toArray() {
-    return this.map(entry => entry);
-  }
-
-  first() {
-    return this.nextEntry(this.values.entries());
-  }
-
-  last() {
-    const array = this.toArray();
-    return array[array.length - 1];
   }
 
 };

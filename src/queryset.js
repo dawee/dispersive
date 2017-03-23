@@ -1,4 +1,5 @@
 const assert = require('assert');
+const Immutable = require('immutable');
 const { withQueries } = require('./query');
 const { withExporters } = require('./export');
 
@@ -35,6 +36,23 @@ class QuerySetBase {
     return this.runForEach(this.values.entries(), predicate);
   }
 
+  reduce(predicate, initial = null) {
+    const entries = this.values.entries();
+    const runNext = (memo, index = 0) => {
+      const entry = this.nextEntry(entries);
+
+      return entry ? runNext(predicate(memo, entry, index + 1)) : memo;
+    };
+
+    return runNext(initial);
+  }
+
+  map(predicate) {
+    return this.reduce((list, entry, index) => (
+      list.push(predicate(entry, index))
+    ), Immutable.List()).toJS();
+  }
+
   update(rawValues) {
     this.forEach(entry => entry.update(rawValues));
   }
@@ -53,6 +71,10 @@ class QuerySetBase {
       manager,
       QuerySetConstructor: this.QuerySetConstructor,
     });
+  }
+
+  subsetFromArray(valuesArray) {
+    return this.subset({ values: Immutable.OrderedMap(valuesArray) });
   }
 
 }
