@@ -65,10 +65,10 @@ const defaultSetup = {
  */
 
 
-const applyMixin = ({ name, setup, mixin }) => mixin({ Base: setup.get(name), setup }, { setup });
+const applyMixin = ({ name, setup, model, mixin }) => mixin({ Base: setup.get(name), setup, model });
 
 const createMixin = ({ name, mixin }) => (
-  ({ setup }) => setup.set(name, applyMixin({ name, setup, mixin }))
+  ({ setup, model }) => setup.set(name, applyMixin({ name, setup, model, mixin }))
 );
 
 const composeSetup = ({ model, setup = Immutable.Map(defaultSetup), composers = [] }) => {
