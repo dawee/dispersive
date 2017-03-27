@@ -124,6 +124,7 @@ const createModel = (composers) => {
   const emitter = createChangesEmitter();
   const model = { emitter, id: ulid() };
 
+  let ObjectManagerConstructor = null;
   let transaction = null;
   let values = Immutable.OrderedMap();
   let setup = composeSetup({
@@ -132,12 +133,18 @@ const createModel = (composers) => {
     composers: normalizeComposers(composers),
   });
 
+  const resetObjectsConstructor = () => setup.get('objectsConstructorFactory')({ setup, model });
+
+  ObjectManagerConstructor = resetObjectsConstructor();
+
   model.inject = (injected) => {
     setup = composeSetup({
       model,
       setup,
       composers: normalizeComposers(injected),
     });
+
+    ObjectManagerConstructor = resetObjectsConstructor();
   };
 
   model.createTransaction = () => {
@@ -159,8 +166,6 @@ const createModel = (composers) => {
 
   Object.defineProperty(model, 'objects', {
     get() {
-      const objectsConstructorFactory = setup.get('objectsConstructorFactory');
-      const ObjectManagerConstructor = objectsConstructorFactory({ setup, model });
 
       return new ObjectManagerConstructor({ setup, values, transaction });
     },
