@@ -11,9 +11,12 @@ const normalize = ({
 const parse = opts => normalize(opts.model ? opts : {model: opts});
 
 
+/*
+ * One to one relation
+ */
 
-const withOne = (name, opts) => {
-  const { relatedName, model: relatedModel } = parse(opts);
+
+const createOneToOneRelation = ({ name, relatedName, relatedModel }) => {
   const indexes = { direct: {}, related: {} };
 
   const update = ({directEntry, relatedEntry}) => {
@@ -63,6 +66,13 @@ const withOne = (name, opts) => {
 
     };
   });
+};
+
+
+const withOne = (name, opts) => {
+  const { relatedName, model: relatedModel } = parse(opts);
+
+  return createOneToOneRelation({ name, relatedName, relatedModel });
 };
 
 
