@@ -1,5 +1,7 @@
 const ulid = require('ulid');
+const Immutable = require('immutable');
 const { createEntryMixin } = require('./model');
+
 
 
 const normalize = ({
@@ -19,15 +21,23 @@ const parse = opts => normalize(opts.model ? opts : {model: opts});
 const createOneToOneRelation = ({ name, relatedName, relatedModel }) => {
   const indexes = { direct: {}, related: {} };
 
-  const update = ({directEntry, relatedEntry}) => {
+  const attach = ({directEntry, relatedEntry}) => {
     const directKey = directEntry.getKey();
     const relatedKey = relatedEntry.getKey();
+
+    /*
+     * Remove old links
+     */
 
     const lastRelatedKey = indexes.direct[directKey];
     const lastDirectKey = indexes.related[relatedKey];
 
     delete indexes.direct[lastDirectKey];
     delete indexes.related[lastRelatedKey];
+
+    /*
+     * Attach new links
+     */
 
     indexes.direct[directKey] = relatedKey;
     indexes.related[relatedKey] = directKey;
@@ -40,7 +50,7 @@ const createOneToOneRelation = ({ name, relatedName, relatedModel }) => {
       relatedModel.inject(createEntryMixin(({ Base: RelatedBase }) => class extends RelatedBase {
 
         set [relatedName](directEntry) {
-          return directEntry && update({directEntry, relatedEntry: this});
+          return directEntry && attach({directEntry, relatedEntry: this});
         }
 
         get [relatedName]() {
@@ -55,7 +65,76 @@ const createOneToOneRelation = ({ name, relatedName, relatedModel }) => {
     return class extends Base {
 
       set [name](relatedEntry) {
-        return relatedEntry && update({directEntry: this, relatedEntry});
+        return relatedEntry && attach({directEntry: this, relatedEntry});
+      }
+
+      get [name]() {
+        const key = indexes.direct[this.getKey()];
+
+        return key ? relatedModel.objects.get(key) : null;
+      }
+
+    };
+  });
+};
+
+
+const createOneToManyRelation = ({ name, relatedName, relatedModel }) => {
+  const indexes = { direct: {}, related: {} };
+
+  const attach = ({directEntry, relatedEntry}) => {
+    const directKey = directEntry.getKey();
+    const relatedKey = relatedEntry.getKey();
+
+    /*
+     * Remove old links
+     */
+
+    const lastRelatedKey = indexes.direct[directKey];
+    const lastDirectKey = indexes.related[relatedKey];
+
+    delete indexes.direct[lastDirectKey];
+
+    if (indexes.related[lastRelatedKey]) {
+      delete indexes.related[lastRelatedKey][directKey];
+    }
+
+    /*
+     * Attach new links
+     */
+
+    if (!indexes.related[relatedKey]) {
+      indexes.related[relatedKey] = {[directKey]: directKey};
+    } else {
+      indexes.related[relatedKey][directKey] = directKey;
+    }
+
+    indexes.direct[directKey] = relatedKey;
+  };
+
+  return createEntryMixin(({ Base, model }) => {
+
+    if (relatedName) {
+      relatedModel.inject(createEntryMixin(({ Base: RelatedBase }) => class extends RelatedBase {
+
+        get [relatedName]() {
+          const objects = model.objects;
+          const keys = indexes.related[this.getKey()] || {};
+
+          return objects.subset({
+            values: Immutable.OrderedMap(Object.keys(keys).map(key => (
+              objects.values.get(key)
+            ))),
+          });
+        }
+
+      }));
+    }
+
+    return class extends Base {
+
+      set [name](relatedEntry) {
+        return relatedEntry && attach({directEntry: this, relatedEntry});
       }
 
       get [name]() {
@@ -70,9 +149,11 @@ const createOneToOneRelation = ({ name, relatedName, relatedModel }) => {
 
 
 const withOne = (name, opts) => {
-  const { relatedName, model: relatedModel } = parse(opts);
+  const { hasMany, relatedName, model: relatedModel } = parse(opts);
 
-  return createOneToOneRelation({ name, relatedName, relatedModel });
+  return hasMany
+    ? createOneToManyRelation({ name, relatedName, relatedModel })
+    : createOneToOneRelation({ name, relatedName, relatedModel });
 };
 
 
