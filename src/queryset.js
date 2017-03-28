@@ -40,11 +40,15 @@ class QuerySetBase {
     return this.subset({});
   }
 
-  subset({ values = this.values, manager = this.manager }) {
-    return new this.QuerySetConstructor({
+  subset({
+    values = this.values,
+    manager = this.manager,
+    QuerySetConstructor = this.QuerySetConstructor,
+  }) {
+    return new QuerySetConstructor({
       values,
       manager,
-      QuerySetConstructor: this.QuerySetConstructor,
+      QuerySetConstructor: QuerySetConstructor,
     });
   }
 

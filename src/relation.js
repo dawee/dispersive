@@ -1,7 +1,7 @@
 const ulid = require('ulid');
 const Immutable = require('immutable');
 const { createEntryMixin } = require('./model');
-
+const { QuerySet } = require('./queryset');
 
 
 const normalize = ({
@@ -82,14 +82,7 @@ const createOneToOneRelation = ({ name, relatedName, relatedModel }) => {
 const createOneToManyRelation = ({ name, relatedName, relatedModel }) => {
   const indexes = { direct: {}, related: {} };
 
-  const attach = ({directEntry, relatedEntry}) => {
-    const directKey = directEntry.getKey();
-    const relatedKey = relatedEntry.getKey();
-
-    /*
-     * Remove old links
-     */
-
+  const detachKeys = ({directKey, relatedKey}) => {
     const lastRelatedKey = indexes.direct[directKey];
     const lastDirectKey = indexes.related[relatedKey];
 
@@ -98,6 +91,24 @@ const createOneToManyRelation = ({ name, relatedName, relatedModel }) => {
     if (indexes.related[lastRelatedKey]) {
       delete indexes.related[lastRelatedKey][directKey];
     }
+  };
+
+  const detach = ({directEntry, relatedEntry}) => {
+    const directKey = directEntry.getKey();
+    const relatedKey = relatedEntry.getKey();
+
+     detachKeys({ directKey, relatedKey });
+  };
+
+  const attach = ({directEntry, relatedEntry}) => {
+    const directKey = directEntry.getKey();
+    const relatedKey = relatedEntry.getKey();
+
+    /*
+     * Remove old links
+     */
+
+     detachKeys({ directKey, relatedKey });
 
     /*
      * Attach new links
@@ -110,6 +121,18 @@ const createOneToManyRelation = ({ name, relatedName, relatedModel }) => {
     }
 
     indexes.direct[directKey] = relatedKey;
+  };
+
+  const createRelationQuerySetConstructor = (relatedEntry) => class extends QuerySet {
+
+    add(directEntry) {
+      return directEntry && attach({directEntry, relatedEntry});
+    }
+
+    remove(directEntry) {
+      return directEntry && detach({directEntry, relatedEntry});
+    }
+
   };
 
   return createEntryMixin(({ Base, model }) => {
@@ -125,6 +148,7 @@ const createOneToManyRelation = ({ name, relatedName, relatedModel }) => {
             values: Immutable.OrderedMap(Object.keys(keys).map(key => (
               objects.values.get(key)
             ))),
+            QuerySetConstructor: createRelationQuerySetConstructor(this),
           });
         }
 
