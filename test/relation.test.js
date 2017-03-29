@@ -9,7 +9,7 @@ const {runAsAction} = require('../src/action');
 
 describe('relation', () => {
 
-  it('should connect a one-to-many relation (related model declaration + field.add)', () => {
+  it('should connect a many-to-one relation (related model declaration + field.add)', () => {
     const Book = createModel([
       withField('title'),
     ]);
@@ -31,7 +31,7 @@ describe('relation', () => {
     expect(diana.books.first().title).to.equal('Howl\'s Moving Castle');
   });
 
-  it('should remove a one-to-many relation', () => {
+  it('should remove a many-to-one relation', () => {
     const Book = createModel([
       withField('title'),
     ]);
@@ -55,7 +55,7 @@ describe('relation', () => {
     expect(diana.books.count()).to.equal(0);
   });
 
-  it('should connect a one-to-many relation (relation declaration + related setter)', () => {
+  it('should connect a many-to-one relation (relation declaration + related setter)', () => {
     const Book = createModel([
       withField('title'),
     ]);
