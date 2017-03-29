@@ -21,26 +21,32 @@ const parse = opts => normalize(opts.model ? opts : {model: opts});
 const createOneToOneRelation = ({ name, relatedName, relatedModel }) => {
   const indexes = { direct: {}, related: {} };
 
-  const attach = ({directEntry, relatedEntry}) => {
-    const directKey = directEntry.getKey();
-    const relatedKey = relatedEntry.getKey();
-
-    /*
-     * Remove old links
-     */
-
+  const detachKeys = ({directKey, relatedKey}) => {
     const lastRelatedKey = indexes.direct[directKey];
     const lastDirectKey = indexes.related[relatedKey];
 
     delete indexes.direct[lastDirectKey];
     delete indexes.related[lastRelatedKey];
+  };
 
-    /*
-     * Attach new links
-     */
-
+  const attachKeys = ({directKey, relatedKey}) => {
     indexes.direct[directKey] = relatedKey;
     indexes.related[relatedKey] = directKey;
+  };
+
+  const detach = ({directEntry, relatedEntry}) => {
+    const directKey = directEntry && directEntry.getKey();
+    const relatedKey = relatedEntry && relatedEntry.getKey();
+
+    detachKeys({directKey, relatedKey});
+  };
+
+  const attach = ({directEntry, relatedEntry}) => {
+    const directKey = directEntry.getKey();
+    const relatedKey = relatedEntry.getKey();
+
+    detachKeys({directKey, relatedKey});
+    attachKeys({directKey, relatedKey});
   };
 
 
@@ -50,7 +56,7 @@ const createOneToOneRelation = ({ name, relatedName, relatedModel }) => {
       relatedModel.inject(createEntryMixin(({ Base: RelatedBase }) => class extends RelatedBase {
 
         set [relatedName](directEntry) {
-          return directEntry && attach({directEntry, relatedEntry: this});
+          return directEntry ? attach({directEntry, relatedEntry: this}): detach({ relatedEntry: this });
         }
 
         get [relatedName]() {
@@ -65,7 +71,7 @@ const createOneToOneRelation = ({ name, relatedName, relatedModel }) => {
     return class extends Base {
 
       set [name](relatedEntry) {
-        return relatedEntry && attach({directEntry: this, relatedEntry});
+        return relatedEntry ? attach({directEntry: this, relatedEntry}) : detach({ directEntry: this });
       }
 
       get [name]() {
@@ -93,9 +99,19 @@ const createOneToManyRelation = ({ name, relatedName, relatedModel }) => {
     }
   };
 
+  const attachKeys = ({ directKey, relatedKey }) => {
+    if (!indexes.related[relatedKey]) {
+      indexes.related[relatedKey] = {[directKey]: directKey};
+    } else {
+      indexes.related[relatedKey][directKey] = directKey;
+    }
+
+    indexes.direct[directKey] = relatedKey;
+  };
+
   const detach = ({directEntry, relatedEntry}) => {
-    const directKey = directEntry.getKey();
-    const relatedKey = relatedEntry.getKey();
+    const directKey = directEntry && directEntry.getKey();
+    const relatedKey = relatedEntry && relatedEntry.getKey();
 
      detachKeys({ directKey, relatedKey });
   };
@@ -104,23 +120,8 @@ const createOneToManyRelation = ({ name, relatedName, relatedModel }) => {
     const directKey = directEntry.getKey();
     const relatedKey = relatedEntry.getKey();
 
-    /*
-     * Remove old links
-     */
-
-     detachKeys({ directKey, relatedKey });
-
-    /*
-     * Attach new links
-     */
-
-    if (!indexes.related[relatedKey]) {
-      indexes.related[relatedKey] = {[directKey]: directKey};
-    } else {
-      indexes.related[relatedKey][directKey] = directKey;
-    }
-
-    indexes.direct[directKey] = relatedKey;
+    detachKeys({ directKey, relatedKey });
+    attachKeys({ directKey, relatedKey });
   };
 
   const createRelationQuerySetConstructor = (relatedEntry) => class extends QuerySet {
@@ -158,7 +159,7 @@ const createOneToManyRelation = ({ name, relatedName, relatedModel }) => {
     return class extends Base {
 
       set [name](relatedEntry) {
-        return relatedEntry && attach({directEntry: this, relatedEntry});
+        return relatedEntry ? attach({directEntry: this, relatedEntry}) : detach({ directEntry: this });
       }
 
       get [name]() {
