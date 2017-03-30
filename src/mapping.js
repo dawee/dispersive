@@ -39,7 +39,7 @@ class Mapping {
   }
 
   get(srcKey) {
-    return this.getFromSrc(srcKey);
+    return this.maps.src.get(srcKey);
   }
 
   reverse() {
@@ -59,9 +59,13 @@ class OneToOneMapping extends Mapping {
     this.maps.dest = this.maps.dest.remove(lastPointedDestKey).set(destKey, srcKey);
   }
 
-  detach(srcKey, destKey) {
+  normalizedDetach(srcKey, destKey) {
     this.maps.src = this.maps.src.remove(srcKey);
     this.maps.dest = this.maps.dest.remove(destKey);
+  }
+
+  detach(srcKey, destKey) {
+    this.normalizedDetach(srcKey || this.maps.dest.get(destKey), destKey || this.maps.src.get(srcKey));
   }
 
 }
