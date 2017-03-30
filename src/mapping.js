@@ -70,7 +70,34 @@ class OneToOneMapping extends Mapping {
 
 }
 
+class OneToManyMapping extends Mapping {
+
+  attach(srcKey, destKey) {
+    const lastPointedDestKey = this.maps.src.get(srcKey);
+
+    if (!this.maps.dest.has(destKey)) {
+      this.maps.dest = this.maps.dest.set(destKey, Immutable.Set());
+    }
+
+    this.maps.src = this.maps.src.set(srcKey, destKey);
+
+    if (lastPointedDestKey) {
+      this.maps.dest = this.maps.dest.set(
+        lastPointedDestKey,
+        this.maps.dest.get(lastPointedDestKey).remove(srcKey)
+      )
+    }
+
+    this.maps.dest = this.maps.dest.set(
+      destKey,
+      this.maps.dest.get(destKey).add(srcKey)
+    );
+  }
+
+}
+
 
 module.exports = {
   OneToOneMapping,
+  OneToManyMapping,
 };

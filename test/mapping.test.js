@@ -1,5 +1,5 @@
 const { expect, assert } = require('chai');
-const { OneToOneMapping } = require('../src/mapping');
+const { OneToOneMapping, OneToManyMapping } = require('../src/mapping');
 
 
 
@@ -57,5 +57,19 @@ describe('mapping', () => {
 
   });
 
+  describe('one-to-many', () => {
+
+    it('should attach keys', () => {
+      const mapping = new OneToManyMapping();
+
+      mapping.reverse().attach('foo', 'bar');
+      mapping.reverse().attach('foo', 'baz');
+
+      expect(mapping.get('bar')).to.equals('foo');
+      expect(mapping.get('baz')).to.equals('foo');
+      expect(mapping.reverse().get('foo').toJS()).to.deep.equals(['bar', 'baz']);
+    });
+
+  });
 
 })
