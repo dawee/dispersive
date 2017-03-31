@@ -94,7 +94,7 @@ const PokedexListSlot = ({slot}) => (
 
 const PokedexList = ({pokedex}) => (
   <ul>
-    {pokedex ? pokedex.slots.orderBy('num').map(slot => (
+    {pokedex ? pokedex.slots.map(slot => (
       <PokedexListSlot slot={slot} key={slot.key} />)
     ) : null}
   </ul>
