@@ -13,11 +13,11 @@ const computeTime = (task) => {
 };
 
 const RANGE_LEN = 1000;
-const ACCEPTANCE = 10;
+const ACCEPTANCE = 5;
 
 describe('perfs', () => {
 
-  it(`should fit [build time] acceptance (< ${ACCEPTANCE}x pure immutable time)`, () => {
+  it(`should fit [build time] acceptance (<= ${ACCEPTANCE}x pure immutable time)`, () => {
     const range = [...Array(RANGE_LEN).keys()];
 
     const Slot = createModel([
@@ -41,7 +41,7 @@ describe('perfs', () => {
       range.forEach(num => pokedex.slots.add(Slot.objects.create({num})));
     }, [Slot, Pokedex]));
 
-    expect(dispersiveDuration).to.be.below(pureDuration * ACCEPTANCE);
+    expect(dispersiveDuration).to.be.below(pureDuration * (ACCEPTANCE + 1));
 
   });
 
