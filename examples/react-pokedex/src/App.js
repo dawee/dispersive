@@ -8,6 +8,8 @@ import request from 'request-promise-json';
 
 const MAX_NUM = 300;  // limiting to first generation
 const BASE_URL = 'http://pokeapi.co/api/v2/pokemon';
+const range = n => [...Array(n).keys()];
+
 
 /*
  * Models
@@ -38,17 +40,9 @@ const store = [Pokedex, PokedexSlot, Pokemon];
  * Actions
  */
 
-const createPokedex = createAction(() => {
-  const pokedex = Pokedex.objects.create();
-  const slots = [...Array(MAX_NUM).keys()].map(
-    index => PokedexSlot.objects.create({ num: index + 1 })
-  );
-
-  slots.forEach(slot => pokedex.slots.add(slot));
-
-  return pokedex;
-}, store);
-
+const createPokedex = createAction(() => (
+  Pokedex.objects.create().slots.add(range(MAX_NUM).map(i => ({ num: i + 1 })))
+), store);
 
 const setSlotActive = createAction(({key}) => {
   const slot = PokedexSlot.objects.get(key);
@@ -69,7 +63,6 @@ const setSlotPokemon = createAction(
   })
 , store);
 
-
 const setSlotSeen = async ({key}) => {
   updateSlotValues({key, seen: true});
 
@@ -84,32 +77,19 @@ const setSlotSeen = async ({key}) => {
  * Components
  */
 
-class PokedexListSlot extends Component {
-  shouldComponentUpdate({slot}) {
-    const differentSlot = !this.props.slot.equals(slot);
-    const addedPokemon = !this.props.slot.pokemon && !!slot.pokemon;
-
-    return differentSlot || addedPokemon;
-  }
-
-  render() {
-    const {slot} = this.props;
-
-    return (
-      <li>
-        <div>{`#${slot.num}`} <span>{slot.pokemon ? `(${slot.pokemon.name})` : null}</span></div>
-        <div>
-          Details :
-          <input onMouseDown={() => setSlotActive(slot)} type="checkbox" checked={slot.active} />
-        </div>
-        <div>
-          Seen :
-          <input onMouseDown={() => setSlotSeen(slot)} type="checkbox" checked={slot.seen} />
-        </div>
-      </li>
-    );
-  }
-}
+const PokedexListSlot = ({slot}) => (
+  <li>
+    <div>{`#${slot.num}`} <span>{slot.pokemon ? `(${slot.pokemon.name})` : null}</span></div>
+    <div>
+      Details :
+      <input onMouseDown={() => setSlotActive(slot)} type="checkbox" checked={slot.active} />
+    </div>
+    <div>
+      Seen :
+      <input onMouseDown={() => setSlotSeen(slot)} type="checkbox" checked={slot.seen} />
+    </div>
+  </li>
+);
 
 
 const PokedexList = ({pokedex}) => (
