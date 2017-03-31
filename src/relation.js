@@ -2,6 +2,12 @@ const ulid = require('ulid');
 const Immutable = require('immutable');
 const { createEntryMixin } = require('./model');
 const { QuerySet } = require('./queryset');
+const {
+  OneToOneMapping,
+  OneToManyMapping,
+  ManyToOneMapping,
+  ManyToManyMapping,
+} = require('./mapping');
 
 
 const normalize = ({
@@ -13,165 +19,111 @@ const normalize = ({
 const parse = opts => normalize(opts.model ? opts : {model: opts});
 
 
-/*
- * One to one relation
- */
+const createOneAccessor = ({ Base, name, mapping, model }) => (
+  class extends Base {
 
+    get [name]() {
+      const key = mapping.get(this.getKey());
 
-const createOneToOneRelation = ({ name, relatedName, relatedModel }) => {
-  const indexes = { direct: {}, related: {} };
-
-  const detachKeys = ({directKey, relatedKey}) => {
-    const lastRelatedKey = indexes.direct[directKey];
-    const lastDirectKey = indexes.related[relatedKey];
-
-    delete indexes.direct[lastDirectKey];
-    delete indexes.related[lastRelatedKey];
-  };
-
-  const attachKeys = ({directKey, relatedKey}) => {
-    indexes.direct[directKey] = relatedKey;
-    indexes.related[relatedKey] = directKey;
-  };
-
-  const detach = ({directEntry, relatedEntry}) => {
-    const directKey = directEntry && directEntry.getKey();
-    const relatedKey = relatedEntry && relatedEntry.getKey();
-
-    detachKeys({directKey, relatedKey});
-  };
-
-  const attach = ({directEntry, relatedEntry}) => {
-    const directKey = directEntry.getKey();
-    const relatedKey = relatedEntry.getKey();
-
-    detachKeys({directKey, relatedKey});
-    attachKeys({directKey, relatedKey});
-  };
-
-
-  return createEntryMixin(({ Base, model }) => {
-
-    if (relatedName) {
-      relatedModel.inject(createEntryMixin(({ Base: RelatedBase }) => class extends RelatedBase {
-
-        set [relatedName](directEntry) {
-          return directEntry ? attach({directEntry, relatedEntry: this}): detach({ relatedEntry: this });
-        }
-
-        get [relatedName]() {
-          const key = indexes.related[this.getKey()];
-
-          return key ? model.objects.get(key) : null;
-        }
-
-      }));
+      return key ? model.objects.get(key) : null;
     }
 
-    return class extends Base {
+    set [name](other) {
+      return other ? mapping.attach(this.getKey(), other.getKey()) : mapping.detach(this.getKey());
+    }
 
-      set [name](relatedEntry) {
-        return relatedEntry ? attach({directEntry: this, relatedEntry}) : detach({ directEntry: this });
+  }
+);
+
+const createManyAccessor = ({ Base, name, mapping, model }) => {
+  const createRelationQuerySetConstructor = entry => (
+    class extends QuerySet {
+
+      add(other) {
+        return mapping.attach(entry.getKey(), other.getKey());
       }
 
-      get [name]() {
-        const key = indexes.direct[this.getKey()];
-
-        return key ? relatedModel.objects.get(key) : null;
+      remove(other) {
+        return mapping.detach(entry.getKey(), other.getKey());
       }
 
-    };
-  });
+    }
+  );
+
+  return class extends Base {
+
+    get [name]() {
+      const objects = model.objects;
+      const keyset = mapping.get(this.getKey());
+
+      return objects.subset({
+        values: Immutable.OrderedMap(keyset ? keyset.map(key => objects.values.get(key)) : null),
+        QuerySetConstructor: createRelationQuerySetConstructor(this),
+      });
+    }
+
+  };
 };
 
-
-const createOneToManyRelation = ({ name, relatedName, relatedModel }) => {
-  const indexes = { direct: {}, related: {} };
-
-  const detachKeys = ({directKey, relatedKey}) => {
-    const lastRelatedKey = indexes.direct[directKey];
-    const lastDirectKey = indexes.related[relatedKey];
-
-    delete indexes.direct[lastDirectKey];
-
-    if (indexes.related[lastRelatedKey]) {
-      delete indexes.related[lastRelatedKey][directKey];
-    }
-  };
-
-  const attachKeys = ({ directKey, relatedKey }) => {
-    if (!indexes.related[relatedKey]) {
-      indexes.related[relatedKey] = {[directKey]: directKey};
-    } else {
-      indexes.related[relatedKey][directKey] = directKey;
-    }
-
-    indexes.direct[directKey] = relatedKey;
-  };
-
-  const detach = ({directEntry, relatedEntry}) => {
-    const directKey = directEntry && directEntry.getKey();
-    const relatedKey = relatedEntry && relatedEntry.getKey();
-
-     detachKeys({ directKey, relatedKey });
-  };
-
-  const attach = ({directEntry, relatedEntry}) => {
-    const directKey = directEntry.getKey();
-    const relatedKey = relatedEntry.getKey();
-
-    detachKeys({ directKey, relatedKey });
-    attachKeys({ directKey, relatedKey });
-  };
-
-  const createRelationQuerySetConstructor = (relatedEntry) => class extends QuerySet {
-
-    add(directEntry) {
-      return directEntry && attach({directEntry, relatedEntry});
-    }
-
-    remove(directEntry) {
-      return directEntry && detach({directEntry, relatedEntry});
-    }
-
-  };
-
-  return createEntryMixin(({ Base, model }) => {
-
+const createRelation = ({
+  name,
+  relatedName,
+  relatedModel,
+  mapping,
+  accessorFactory,
+  relatedAccessorFactory,
+}) => (
+  createEntryMixin(({ Base, model }) => {
     if (relatedName) {
-      relatedModel.inject(createEntryMixin(({ Base: RelatedBase }) => class extends RelatedBase {
-
-        get [relatedName]() {
-          const objects = model.objects;
-          const keys = indexes.related[this.getKey()] || {};
-
-          return objects.subset({
-            values: Immutable.OrderedMap(Object.keys(keys).map(key => (
-              objects.values.get(key)
-            ))),
-            QuerySetConstructor: createRelationQuerySetConstructor(this),
-          });
-        }
-
-      }));
+      relatedModel.inject(createEntryMixin(({ Base: RelatedBase }) => (
+        relatedAccessorFactory({
+          Base: RelatedBase,
+          name: relatedName,
+          mapping: mapping.reversed,
+          model
+        })
+      )));
     }
 
-    return class extends Base {
+    return accessorFactory({ Base, name, mapping, model: relatedModel });
+  })
+);
 
-      set [name](relatedEntry) {
-        return relatedEntry ? attach({directEntry: this, relatedEntry}) : detach({ directEntry: this });
-      }
+const createOneToOneRelation = ({ name, relatedName, relatedModel }) => createRelation({
+  name,
+  relatedName,
+  relatedModel,
+  mapping: new OneToOneMapping(),
+  accessorFactory: createOneAccessor,
+  relatedAccessorFactory: createOneAccessor,
+});
 
-      get [name]() {
-        const key = indexes.direct[this.getKey()];
+const createOneToManyRelation = ({ name, relatedName, relatedModel }) => createRelation({
+  name,
+  relatedName,
+  relatedModel,
+  mapping: new OneToManyMapping(),
+  accessorFactory: createOneAccessor,
+  relatedAccessorFactory: createManyAccessor,
+});
 
-        return key ? relatedModel.objects.get(key) : null;
-      }
+const createManyToOneRelation = ({ name, relatedName, relatedModel }) => createRelation({
+  name,
+  relatedName,
+  relatedModel,
+  mapping: new ManyToOneMapping(),
+  accessorFactory: createManyAccessor,
+  relatedAccessorFactory: createOneAccessor,
+});
 
-    };
-  });
-};
-
+const createManyToManyRelation = ({ name, relatedName, relatedModel }) => createRelation({
+  name,
+  relatedName,
+  relatedModel,
+  mapping: new ManyToManyMapping(),
+  accessorFactory: createManyAccessor,
+  relatedAccessorFactory: createManyAccessor,
+});
 
 const withOne = (name, opts) => {
   const { hasMany, relatedName, model: relatedModel } = parse(opts);
@@ -182,7 +134,13 @@ const withOne = (name, opts) => {
 };
 
 
-const withMany = () => (({setup}) => setup);
+const withMany = (name, opts) => {
+  const { hasMany, relatedName, model: relatedModel } = parse(opts);
+
+  return hasMany
+    ? createManyToManyRelation({ name, relatedName, relatedModel })
+    : createManyToOneRelation({ name, relatedName, relatedModel });
+};
 
 module.exports = {
   withOne,
