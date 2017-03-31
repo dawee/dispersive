@@ -112,8 +112,27 @@ class ManyToOneMapping extends ReversedMapping {
 
 }
 
+
+class ManyToManyMapping extends Mapping {
+
+  attach(srcKey, destKey) {
+    if (!this.maps.src.has(srcKey)) this.maps.src = this.maps.src.set(srcKey, Immutable.Set());
+    if (!this.maps.dest.has(destKey)) this.maps.dest = this.maps.dest.set(destKey, Immutable.Set());
+
+    this.maps.src = this.maps.src.set(srcKey, this.maps.src.get(srcKey).add(destKey));
+    this.maps.dest = this.maps.dest.set(destKey, this.maps.dest.get(destKey).add(srcKey));
+  }
+
+  detach(srcKey, destKey) {
+    this.maps.src = this.maps.src.set(srcKey, this.maps.src.get(srcKey).remove(destKey));
+    this.maps.dest = this.maps.dest.set(destKey, this.maps.dest.get(destKey).remove(srcKey));
+  }
+
+}
+
 module.exports = {
   OneToOneMapping,
   OneToManyMapping,
   ManyToOneMapping,
+  ManyToManyMapping,
 };
