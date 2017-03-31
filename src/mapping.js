@@ -94,6 +94,15 @@ class OneToManyMapping extends Mapping {
     );
   }
 
+  normalizedDetach(srcKey, destKey) {
+    this.maps.dest = this.maps.dest.set(destKey, this.maps.dest.get(destKey).remove(srcKey));
+    this.maps.src = this.maps.src.remove(srcKey);
+  }
+
+  detach(srcKey, destKey) {
+    this.normalizedDetach(srcKey, destKey || this.maps.src.get(srcKey));
+  }
+
 }
 
 

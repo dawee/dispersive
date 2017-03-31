@@ -62,12 +62,51 @@ describe('mapping', () => {
     it('should attach keys', () => {
       const mapping = new OneToManyMapping();
 
-      mapping.reverse().attach('foo', 'bar');
-      mapping.reverse().attach('foo', 'baz');
+      mapping.attach('bar', 'foo');
+      mapping.attach('baz', 'foo');
 
       expect(mapping.get('bar')).to.equals('foo');
       expect(mapping.get('baz')).to.equals('foo');
       expect(mapping.reverse().get('foo').toJS()).to.deep.equals(['bar', 'baz']);
+    });
+
+    it('should update keyset when changing unique key', () => {
+      const mapping = new OneToManyMapping();
+
+      mapping.attach('bar', 'foo');
+      mapping.attach('baz', 'foo');
+
+      mapping.attach('baz', 'woo');
+
+      expect(mapping.get('bar')).to.equals('foo');
+      expect(mapping.get('baz')).to.equals('woo');
+      expect(mapping.reverse().get('foo').toJS()).to.deep.equals(['bar']);
+    });
+
+    it('should detach from unique key', () => {
+      const mapping = new OneToManyMapping();
+
+      mapping.attach('bar', 'foo');
+      mapping.attach('baz', 'foo');
+
+      mapping.detach('baz');
+
+      assert(!mapping.get('baz'));
+      expect(mapping.get('bar')).to.equals('foo');
+      expect(mapping.reverse().get('foo').toJS()).to.deep.equals(['bar']);
+    });
+
+    it('should detach from reverse set', () => {
+      const mapping = new OneToManyMapping();
+
+      mapping.attach('bar', 'foo');
+      mapping.attach('baz', 'foo');
+
+      mapping.reverse().detach('foo', 'baz');
+
+      assert(!mapping.get('baz'));
+      expect(mapping.get('bar')).to.equals('foo');
+      expect(mapping.reverse().get('foo').toJS()).to.deep.equals(['bar']);
     });
 
   });
