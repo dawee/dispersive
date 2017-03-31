@@ -1,6 +1,6 @@
 const ulid = require('ulid');
 const Immutable = require('immutable');
-const { createEntryMixin } = require('./model');
+const { createEntryMixin, Entry } = require('./model');
 const { QuerySet } = require('./queryset');
 const {
   OneToOneMapping,
@@ -44,8 +44,25 @@ class RelationQuerySet extends QuerySet {
     this.mapping = opts.mapping;
   }
 
-  add(other) {
-    return this.mapping.attach(this.entry.getKey(), other.getKey());
+  addExisting(other) {
+    this.mapping.attach(this.entry.getKey(), other.getKey());
+    return other;
+  }
+
+  createAndAdd(rawValues = {}) {
+    return this.addExisting(this.manager.create(rawValues));
+  }
+
+  addOne(other) {
+    return (other instanceof Entry) ? this.addExisting(other) : this.createAndAdd(other);
+  }
+
+  addMany(others) {
+    return others.map(other => this.addOne(other));
+  }
+
+  add(oneOrMany) {
+    return Array.isArray(oneOrMany) ? this.addMany(oneOrMany) : this.addOne(oneOrMany);
   }
 
   remove(other) {

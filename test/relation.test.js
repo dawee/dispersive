@@ -103,6 +103,60 @@ describe('relation', () => {
     expect(neverendingStory.libraries.count()).to.equal(2);
   });
 
+  it('should add using array', () => {
+    const Book = createModel([
+      withField('title'),
+    ]);
+
+    const Library = createModel([
+      withField('name'),
+      withMany('books', {model: Book, relatedName: 'libraries', hasMany: true}),
+    ]);
+
+    const [harryPotter, neverendingStory] = createAction(() => {
+      const harryPotter = Book.objects.create({title: 'Harry Potter'});
+      const neverendingStory = Book.objects.create({title: 'Neverending Story'});
+      const hogwarts = Library.objects.create({name: 'Hogwarts Library'});
+      const libraryPlanet = Library.objects.create({name: 'The Library Planet (DW)'});
+
+      libraryPlanet.books.add([harryPotter, neverendingStory]);
+      hogwarts.books.add(neverendingStory);
+
+      return [harryPotter, neverendingStory];
+    }, [Book, Library])();
+
+    expect(harryPotter.libraries.count()).to.equal(1);
+    expect(neverendingStory.libraries.count()).to.equal(2);
+  });
+
+  it('should add using raw values', () => {
+    const Book = createModel([
+      withField('title'),
+    ]);
+
+    const Library = createModel([
+      withField('name'),
+      withMany('books', {model: Book, relatedName: 'libraries', hasMany: true}),
+    ]);
+
+    const [harryPotter, neverendingStory] = createAction(() => {
+      const hogwarts = Library.objects.create({name: 'Hogwarts Library'});
+      const libraryPlanet = Library.objects.create({name: 'The Library Planet (DW)'});
+
+      const [harryPotter, neverendingStory] = libraryPlanet.books.add([
+        {title: 'Harry Potter'},
+        {title: 'Neverending Story'},
+      ]);
+
+      hogwarts.books.add(neverendingStory);
+
+      return [harryPotter, neverendingStory];
+    }, [Book, Library])();
+
+    expect(harryPotter.libraries.count()).to.equal(1);
+    expect(neverendingStory.libraries.count()).to.equal(2);
+  });
+
   it('should connect a many-to-many relation (adding from related model)', () => {
     const Book = createModel([
       withField('title'),
