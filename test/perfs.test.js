@@ -12,12 +12,13 @@ const computeTime = (task) => {
   return Date.now() - start;
 };
 
-const ACCEPTANCE = 15;
+const RANGE_LEN = 1000;
+const ACCEPTANCE = 10;
 
 describe('perfs', () => {
 
   it(`should fit [build time] acceptance (< ${ACCEPTANCE}x pure immutable time)`, () => {
-    const range = [...Array(1000).keys()];
+    const range = [...Array(RANGE_LEN).keys()];
 
     const Slot = createModel([
       withField('num'),

@@ -35,35 +35,44 @@ const createOneAccessor = ({ Base, name, mapping, model }) => (
   }
 );
 
-const createManyAccessor = ({ Base, name, mapping, model }) => {
-  const createRelationQuerySetConstructor = entry => (
-    class extends QuerySet {
+class RelationQuerySet extends QuerySet {
 
-      add(other) {
-        return mapping.attach(entry.getKey(), other.getKey());
-      }
+  constructor(opts) {
+    super(opts);
 
-      remove(other) {
-        return mapping.detach(entry.getKey(), other.getKey());
-      }
+    this.entry = opts.entry;
+    this.mapping = opts.mapping;
+  }
 
-    }
-  );
+  add(other) {
+    return this.mapping.attach(this.entry.getKey(), other.getKey());
+  }
 
-  return class extends Base {
+  remove(other) {
+    return this.mapping.detach(this.entry.getKey(), other.getKey());
+  }
+
+}
+
+const createManyAccessor = ({ Base, name, mapping, model }) => (
+  class extends Base {
 
     get [name]() {
       const objects = model.objects;
       const keyset = mapping.get(this.getKey());
 
-      return objects.subset({
+      return new RelationQuerySet({
+        entry: this,
+        mapping,
+        manager: objects,
         values: Immutable.OrderedMap(keyset ? keyset.map(key => objects.values.get(key)) : null),
-        QuerySetConstructor: createRelationQuerySetConstructor(this),
+        QuerySetConstructor: objects.QuerySetConstructor,
       });
+
     }
 
-  };
-};
+  }
+);
 
 const createRelation = ({
   name,
