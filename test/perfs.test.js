@@ -38,7 +38,7 @@ describe('perfs', () => {
     const dispersiveDuration = computeTime(createAction(() => {
       const pokedex = Pokedex.objects.create();
 
-      range.forEach(num => pokedex.slots.add(Slot.objects.create({num})));
+      pokedex.slots.add(range.map(num => ({ num })));
     }, [Slot, Pokedex]));
 
     expect(dispersiveDuration).to.be.below(pureDuration * (ACCEPTANCE + 1));
