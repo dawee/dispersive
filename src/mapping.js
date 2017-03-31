@@ -8,6 +8,7 @@ class ReversedMapping {
 
   constructor({ mapping }) {
     this.mapping = mapping;
+    this.reversed = mapping;
   }
 
   attach(srcKey, destKey) {
@@ -28,6 +29,7 @@ class Mapping {
 
   constructor(opts = {}) {
     this.maps = extractMaps(opts);
+    this.reversed = new ReversedMapping({ mapping: this });
   }
 
   getFromSrc(srcKey) {
@@ -40,10 +42,6 @@ class Mapping {
 
   get(srcKey) {
     return this.maps.src.get(srcKey);
-  }
-
-  reverse() {
-    return new ReversedMapping({ mapping: this });
   }
 
 }
@@ -106,7 +104,16 @@ class OneToManyMapping extends Mapping {
 }
 
 
+class ManyToOneMapping extends ReversedMapping {
+
+  constructor() {
+    super({ mapping: new OneToManyMapping() });
+  }
+
+}
+
 module.exports = {
   OneToOneMapping,
   OneToManyMapping,
+  ManyToOneMapping,
 };

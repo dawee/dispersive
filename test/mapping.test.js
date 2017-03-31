@@ -1,5 +1,5 @@
 const { expect, assert } = require('chai');
-const { OneToOneMapping, OneToManyMapping } = require('../src/mapping');
+const { OneToOneMapping, OneToManyMapping, ManyToOneMapping } = require('../src/mapping');
 
 
 
@@ -13,16 +13,16 @@ describe('mapping', () => {
       mapping.attach('foo', 'bar');
 
       expect(mapping.get('foo')).to.equals('bar');
-      expect(mapping.reverse().get('bar')).to.equals('foo');
+      expect(mapping.reversed.get('bar')).to.equals('foo');
     });
 
     it('should attach keys from reversed', () => {
       const mapping = new OneToOneMapping();
 
-      mapping.reverse().attach('bar', 'foo');
+      mapping.reversed.attach('bar', 'foo');
 
       expect(mapping.get('foo')).to.equals('bar');
-      expect(mapping.reverse().get('bar')).to.equals('foo');
+      expect(mapping.reversed.get('bar')).to.equals('foo');
     });
 
     it('should detach keys', () => {
@@ -32,7 +32,7 @@ describe('mapping', () => {
       mapping.detach('foo', 'bar');
 
       assert(!mapping.get('foo'));
-      assert(!mapping.reverse().get('bar'));
+      assert(!mapping.reversed.get('bar'));
     });
 
     it('should detach using source key only', () => {
@@ -42,17 +42,17 @@ describe('mapping', () => {
       mapping.detach('foo');
 
       assert(!mapping.get('foo'));
-      assert(!mapping.reverse().get('bar'));
+      assert(!mapping.reversed.get('bar'));
     });
 
     it('should detach using dest key only', () => {
       const mapping = new OneToOneMapping();
 
       mapping.attach('foo', 'bar');
-      mapping.reverse().detach('bar');
+      mapping.reversed.detach('bar');
 
       assert(!mapping.get('foo'));
-      assert(!mapping.reverse().get('bar'));
+      assert(!mapping.reversed.get('bar'));
     });
 
   });
@@ -67,7 +67,7 @@ describe('mapping', () => {
 
       expect(mapping.get('bar')).to.equals('foo');
       expect(mapping.get('baz')).to.equals('foo');
-      expect(mapping.reverse().get('foo').toJS()).to.deep.equals(['bar', 'baz']);
+      expect(mapping.reversed.get('foo').toJS()).to.deep.equals(['bar', 'baz']);
     });
 
     it('should update keyset when changing unique key', () => {
@@ -80,7 +80,7 @@ describe('mapping', () => {
 
       expect(mapping.get('bar')).to.equals('foo');
       expect(mapping.get('baz')).to.equals('woo');
-      expect(mapping.reverse().get('foo').toJS()).to.deep.equals(['bar']);
+      expect(mapping.reversed.get('foo').toJS()).to.deep.equals(['bar']);
     });
 
     it('should detach from unique key', () => {
@@ -93,7 +93,7 @@ describe('mapping', () => {
 
       assert(!mapping.get('baz'));
       expect(mapping.get('bar')).to.equals('foo');
-      expect(mapping.reverse().get('foo').toJS()).to.deep.equals(['bar']);
+      expect(mapping.reversed.get('foo').toJS()).to.deep.equals(['bar']);
     });
 
     it('should detach from reverse set', () => {
@@ -102,13 +102,39 @@ describe('mapping', () => {
       mapping.attach('bar', 'foo');
       mapping.attach('baz', 'foo');
 
-      mapping.reverse().detach('foo', 'baz');
+      mapping.reversed.detach('foo', 'baz');
 
       assert(!mapping.get('baz'));
       expect(mapping.get('bar')).to.equals('foo');
-      expect(mapping.reverse().get('foo').toJS()).to.deep.equals(['bar']);
+      expect(mapping.reversed.get('foo').toJS()).to.deep.equals(['bar']);
     });
 
   });
 
+  describe('many-to-one', () => {
+
+    it('should attach keys', () => {
+      const mapping = new ManyToOneMapping();
+
+      mapping.attach('foo', 'bar');
+      mapping.attach('foo', 'baz');
+
+      expect(mapping.get('foo').toJS()).to.deep.equals(['bar', 'baz']);
+      expect(mapping.reversed.get('bar')).to.equals('foo');
+      expect(mapping.reversed.get('baz')).to.equals('foo');
+    });
+
+    it('should detach keys', () => {
+      const mapping = new ManyToOneMapping();
+
+      mapping.attach('foo', 'bar');
+      mapping.attach('foo', 'baz');
+
+      mapping.detach('foo', 'baz');
+
+      expect(mapping.get('foo').toJS()).to.deep.equals(['bar']);
+      expect(mapping.reversed.get('bar')).to.equals('foo');
+      assert(!mapping.reversed.get('baz'));
+    });
+  });
 })
