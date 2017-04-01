@@ -3,6 +3,7 @@ const {createModel, createAction} = require('../src');
 const {withOne, withMany} = require('../src/relation');
 const {createEntryMixin, createObjectManagerMixin, mix} = require('../src/model');
 const {withField} = require('../src/field');
+const {runAsAction} = require('../src/action');
 
 
 const withEntryBar = () => createEntryMixin(
@@ -82,6 +83,16 @@ describe('model', () => {
 
     expect(fooV1.equals(fooV2)).to.equal(false);
     expect(fooV2.equals(Foo.objects.get())).to.equal(true);
+  });
+
+  it('should expose fields as iterable', async () => {
+    const Book = createModel([
+      withField('title'),
+    ]);
+
+    const book = runAsAction(() => Book.objects.create({ title: 'Peter Pan' }), [Book]);
+
+    expect(Object.keys(book)).to.contain('title');
   });
 
 })

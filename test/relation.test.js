@@ -396,12 +396,26 @@ describe('relation', () => {
       return [library, books];
     }, [Book, Library]);
 
-    expect(library.books.values.count()).to.equal(2);
-    expect(library.books.filter({genre: 'Fantasy'}).values.count()).to.equal(1);
-
-
-
     expect(library.books.get({genre: 'Fantasy'}).title).to.equal('Peter Pan');
     expect(library.books.get({genre: 'Mystery'}).title).to.equal('The Curious Incident of the Dog in the Night-Time');
   });
+
+  it('should expose relation as enumerable', () => {
+    const Book = createModel([
+      withField('title'),
+    ]);
+
+    const Library = createModel([
+      withMany('books', { model: Book, relatedName: 'library' }),
+    ]);
+
+    const book = runAsAction(() => Book.objects.create({
+      title: 'Peter Pan',
+      library: Library.objects.create(),
+    }), [Book, Library]);
+
+    expect(Object.keys(book)).to.contain('library');
+    expect(Object.keys(book.library)).to.contain('books');
+  });
+
 });

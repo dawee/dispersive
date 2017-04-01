@@ -19,24 +19,25 @@ const normalize = ({
 const parse = opts => normalize(opts.model ? opts : {model: opts});
 
 
-const createOneAccessor = ({ Base, name, mapping, model }) => {
-  const EntryMixin = class extends Base {};
+const createOneAccessor = ({ Base, name, mapping, model }) => (
+  class extends Base {
+    constructor(...args) {
+      super(...args);
+      Object.defineProperty(this, name, {
+        enumerable: true,
+        get: () => {
+          const key = mapping.get(this.getKey());
 
-  Object.defineProperty(EntryMixin.prototype, name, {
-    enumerable: true,
-    get() {
-      const key = mapping.get(this.getKey());
+          return key ? model.objects.get(key) : null;
+        },
 
-      return key ? model.objects.get(key) : null;
-    },
-
-    set(other) {
-      return other ? mapping.attach(this.getKey(), other.getKey()) : mapping.detach(this.getKey());
-    },
-  });
-
-  return EntryMixin;
-};
+        set: (other) => {
+          return other ? mapping.attach(this.getKey(), other.getKey()) : mapping.detach(this.getKey());
+        },
+      });
+    }
+  }
+);
 
 
 class RelationQuerySet extends QuerySet {
@@ -75,28 +76,31 @@ class RelationQuerySet extends QuerySet {
 
 }
 
-const createManyAccessor = ({ Base, name, mapping, model }) => {
-  const EntryMixin = class extends Base {};
+const createManyAccessor = ({ Base, name, mapping, model }) => (
+  class extends Base {
 
-  Object.defineProperty(EntryMixin.prototype, name, {
-    enumerable: true,
-    get() {
-      const objects = model.objects;
-      const keyName = objects.setup.get('keyName');
-      const keyset = mapping.get(this.getKey());
+    constructor(...args) {
+      super(...args);
+      Object.defineProperty(this, name, {
+        enumerable: true,
+        get: () => {
+          const objects = model.objects;
+          const keyName = objects.setup.get('keyName');
+          const keyset = mapping.get(this.getKey());
 
-      return new RelationQuerySet({
-        entry: this,
-        mapping,
-        manager: objects,
-        values: keyset ? objects.values.filter(values => keyset.has(values.get(keyName))) : [],
-        QuerySetConstructor: objects.QuerySetConstructor,
+          return new RelationQuerySet({
+            entry: this,
+            mapping,
+            manager: objects,
+            values: keyset ? objects.values.filter(values => keyset.has(values.get(keyName))) : [],
+            QuerySetConstructor: objects.QuerySetConstructor,
+          });
+        },
       });
-    },
-  });
+    }
 
-  return EntryMixin;
-};
+  }
+);
 
 const createRelation = ({
   name,
