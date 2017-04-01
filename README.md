@@ -13,22 +13,16 @@ const Tweet = createModel([
 
 const User = createModel([
   withField('name'),
-  withMany('tweets', {model: Tweet, relatedName: 'user'}),
+  withMany('tweets', Tweet),
 ]);
 ```
 
 Create **actions**:
 
 ```js
-const addTweets = createAction((name, feed) => {
-  const user =  User.objects.getOrCreate({name});
-
-  feed.forEach(({text}) => {
-    const tweet = Tweet.objects.create({text});
-
-    user.tweets.add(tweet);
-  })
-}, [User, Tweet]);
+const addTweets = createAction((name, feed) => (
+  User.objects.getOrCreate({ name }).tweets.add(feed.results)
+), [User, Tweet]);
 
 const getLastTweets = async (userName) => {
   const feed = await request.get(`http://twitter...${userName}`);
