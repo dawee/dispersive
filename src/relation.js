@@ -19,21 +19,25 @@ const normalize = ({
 const parse = opts => normalize(opts.model ? opts : {model: opts});
 
 
-const createOneAccessor = ({ Base, name, mapping, model }) => (
-  class extends Base {
+const createOneAccessor = ({ Base, name, mapping, model }) => {
+  const EntryMixin = class extends Base {};
 
-    get [name]() {
+  Object.defineProperty(EntryMixin.prototype, name, {
+    enumerable: true,
+    get() {
       const key = mapping.get(this.getKey());
 
       return key ? model.objects.get(key) : null;
-    }
+    },
 
-    set [name](other) {
+    set(other) {
       return other ? mapping.attach(this.getKey(), other.getKey()) : mapping.detach(this.getKey());
-    }
+    },
+  });
 
-  }
-);
+  return EntryMixin;
+};
+
 
 class RelationQuerySet extends QuerySet {
 
@@ -71,10 +75,12 @@ class RelationQuerySet extends QuerySet {
 
 }
 
-const createManyAccessor = ({ Base, name, mapping, model }) => (
-  class extends Base {
+const createManyAccessor = ({ Base, name, mapping, model }) => {
+  const EntryMixin = class extends Base {};
 
-    get [name]() {
+  Object.defineProperty(EntryMixin.prototype, name, {
+    enumerable: true,
+    get() {
       const objects = model.objects;
       const keyName = objects.setup.get('keyName');
       const keyset = mapping.get(this.getKey());
@@ -86,11 +92,11 @@ const createManyAccessor = ({ Base, name, mapping, model }) => (
         values: keyset ? objects.values.filter(values => keyset.has(values.get(keyName))) : [],
         QuerySetConstructor: objects.QuerySetConstructor,
       });
+    },
+  });
 
-    }
-
-  }
-);
+  return EntryMixin;
+};
 
 const createRelation = ({
   name,
