@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
 import { createModel, createAction } from 'dispersive';
-import { runAsAction } from 'dispersive/action';
 import { withField } from 'dispersive/field';
 import { withOne, withMany } from 'dispersive/relation';
 import { Watcher } from 'react-dispersive';
 import request from 'request-promise-json';
 
-const MAX_NUM = 300;  // limiting to first generation
+const MAX_NUM = 151;  // limiting to first generation
 const BASE_URL = 'http://pokeapi.co/api/v2/pokemon';
 const range = n => [...Array(n).keys()];
 
@@ -34,15 +33,17 @@ const Pokedex = createModel([
 ]);
 
 
-const store = [Pokedex, PokedexSlot, Pokemon];
-
 /*
  * Actions
  */
 
-const createPokedex = createAction(() => (
-  Pokedex.objects.create().slots.add(range(MAX_NUM).map(i => ({ num: i + 1 })))
-), store);
+const createPokedex = createAction(({ limit }) => {
+  const pokedex = Pokedex.objects.create()
+
+  pokedex.slots.add(range(limit).map(i => ({ num: i + 1 })))
+
+  return pokedex;
+}, [Pokedex, PokedexSlot]);
 
 const setSlotActive = createAction(({key}) => {
   const slot = PokedexSlot.objects.get(key);
@@ -51,17 +52,21 @@ const setSlotActive = createAction(({key}) => {
 
   activated.update({active: false});
   slot.update({active: true});
-}, store);
+}, [PokedexSlot]);
 
 const updateSlotValues = createAction(
   ({key, ...values}) => PokedexSlot.objects.get({key}).update(values)
-, store);
+, [PokedexSlot]);
 
 const setSlotPokemon = createAction(
   ({key, ...values}) => PokedexSlot.objects.get({key}).update({
     pokemon: Pokemon.objects.create(values),
   })
-, store);
+, [PokedexSlot, Pokemon]);
+
+/*
+ * Async function calling actions
+ */
 
 const setSlotSeen = async ({key}) => {
   updateSlotValues({key, seen: true});
@@ -77,30 +82,32 @@ const setSlotSeen = async ({key}) => {
  * Components
  */
 
-const PokedexListSlot = ({slot}) => (
+const PokedexListSlot = ({ num, active, seen, pokemon, onActive, onSeen }) => (
   <li>
-    <div>{`#${slot.num}`} <span>{slot.pokemon ? `(${slot.pokemon.name})` : null}</span></div>
+    <div>{`#${num}`} <span>{pokemon ? `(${pokemon.name})` : null}</span></div>
     <div>
-      Details :
-      <input onMouseDown={() => setSlotActive(slot)} type="checkbox" checked={slot.active} />
+      Details : <input type="checkbox" onMouseDown={ onActive } checked={ active } />
     </div>
     <div>
-      Seen :
-      <input onMouseDown={() => setSlotSeen(slot)} type="checkbox" checked={slot.seen} />
+      Seen : <input type="checkbox" onMouseDown={ onSeen } checked={ seen } />
     </div>
   </li>
 );
 
 
-const PokedexList = ({pokedex}) => (
+const PokedexList = ({ slots }) => (
   <ul>
-    {pokedex ? pokedex.slots.map(slot => (
-      <PokedexListSlot slot={slot} key={slot.key} />)
-    ) : null}
+    {slots.map(slot => (
+      <PokedexListSlot
+        { ...slot }
+        onActive={ () => setSlotActive(slot) }
+        onSeen={ () => setSlotSeen(slot) }
+      />
+    ))}
   </ul>
 );
 
-const PokemonInfos = ({pokemon}) => (
+const PokemonInfos = ({ pokemon }) => (
   <div>
     {pokemon ? [
       <div key="name">{pokemon.name}</div>,
@@ -109,7 +116,7 @@ const PokemonInfos = ({pokemon}) => (
   </div>
 );
 
-const ActiveSlotInfos = ({slot}) => (
+const ActiveSlotInfos = ({ slot }) => (
   <div>
     <span>{`#${slot.num}`}</span>
     {slot.seen ? (
@@ -118,30 +125,32 @@ const ActiveSlotInfos = ({slot}) => (
   </div>
 );
 
-const PokedexActiveSlotPanel = ({slot}) => (
+const PokedexActiveSlotPanel = ({ slot }) => (
   <div className="active-slot-panel">
     {slot ? <ActiveSlotInfos slot={slot} /> : <span>No pokemon selected</span>}
   </div>
 );
 
-const PokedexView = ({pokedex}) => pokedex ? (
+const PokedexView = ({ slots }) => (
   <div>
-    <PokedexActiveSlotPanel slot={pokedex.slots.get({active: true})} />
-    <PokedexList pokedex={pokedex} />
+    <PokedexActiveSlotPanel slot={ slots.get({active: true}) } />
+    <PokedexList slots={ slots } />
   </div>
-) : null;
+);
 
-const PokedexApp = () => <PokedexView pokedex={Pokedex.objects.get()} />;
+const PokedexApp = ({ pokedex }) => <PokedexView { ...pokedex } />;
+
 
 class App extends Component {
-  componentDidMount() {
-    createPokedex({limit: MAX_NUM});
+
+  state = {
+    pokedex: createPokedex({limit: MAX_NUM})
   }
 
   render() {
     return (
       <Watcher models={[Pokemon, Pokedex, PokedexSlot]}>
-        <PokedexApp />
+        <PokedexApp pokedex={this.state.pokedex} />
       </Watcher>
     );
   }
