@@ -93,6 +93,7 @@ describe('model', () => {
     const book = runAsAction(() => Book.objects.create({ title: 'Peter Pan' }), [Book]);
 
     expect(Object.keys(book)).to.contain('title');
+    expect(Object.keys(book)).to.contain('key');
   });
 
 })

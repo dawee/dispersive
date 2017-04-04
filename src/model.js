@@ -19,6 +19,15 @@ class Entry {
     this.values = values;
     this.setup = setup;
     this.manager = manager;
+
+    Object.defineProperty(this, setup.get('keyName'), {
+      enumerable: true,
+      get: () => this.getKey(),
+    });
+  }
+
+  getKey() {
+    return this.values.get(this.setup.get('keyName'));
   }
 
   assign(rawValues = {}) {
@@ -98,26 +107,8 @@ const createObjectManagerMixin = mixin => (
   }
 );
 
-const withKeyField = () => (
-  createEntryMixin(({ Base, setup }) => {
-    const keyName = setup.get('keyName');
-
-    return class extends Base {
-      get [keyName]() {
-        return this.getKey();
-      }
-
-      getKey() {
-        return this.values.get(keyName);
-      }
-    };
-  })
-);
-
 const normalizeComposers = (composers = []) => (
-  Immutable.List(Array.isArray(composers) ? composers : [composers]).concat([
-    withKeyField(),
-  ])
+  Immutable.List(Array.isArray(composers) ? composers : [composers])
 );
 
 const createModel = (composers) => {
