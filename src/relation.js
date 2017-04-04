@@ -92,7 +92,9 @@ const createManyAccessor = ({ Base, name, mapping, model }) => (
             entry: this,
             mapping,
             manager: objects,
-            values: keyset ? objects.values.filter(values => keyset.has(values.get(keyName))) : [],
+            values: keyset ? objects.values.filter(
+              values => keyset.has(values.get(keyName))
+            ) : Immutable.OrderedMap(),
             QuerySetConstructor: objects.QuerySetConstructor,
           });
         },

@@ -418,4 +418,19 @@ describe('relation', () => {
     expect(Object.keys(book.library)).to.contain('books');
   });
 
+  it('should first() should not crash if relation is empty (debug)', () => {
+    const Book = createModel([
+      withField('title'),
+    ]);
+
+    const Library = createModel([
+      withMany('books', { model: Book, relatedName: 'library' }),
+    ]);
+
+    const library = runAsAction(() => Library.objects.create(), [Library]);
+
+    expect(library.books.first()).to.equal(null);
+    expect(library.books.count()).to.equal(0);
+  });
+
 });
