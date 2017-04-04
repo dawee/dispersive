@@ -1,4 +1,4 @@
-const { createEntryMixin, mix } = require('./model');
+const { createEntryMixin } = require('./model');
 
 
 const withField = (name, opts = { initial: null }) => (

@@ -74,7 +74,11 @@ const defaultSetup = {
  */
 
 
-const applyMixin = ({ name, setup, model, mixin }) => mixin({ Base: setup.get(name), setup, model });
+const applyMixin = ({ name, setup, model, mixin }) => mixin({
+  Base: setup.get(name),
+  setup,
+  model,
+});
 
 const createMixin = ({ name, mixin }) => (
   ({ setup, model }) => setup.set(name, applyMixin({ name, setup, model, mixin }))
@@ -157,7 +161,6 @@ const createModel = (composers) => {
 
   Object.defineProperty(model, 'objects', {
     get() {
-
       return new ObjectManagerConstructor({ setup, values, transaction });
     },
   });

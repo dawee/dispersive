@@ -48,7 +48,7 @@ class QuerySetBase {
     return new QuerySetConstructor({
       values,
       manager,
-      QuerySetConstructor: QuerySetConstructor,
+      QuerySetConstructor,
     });
   }
 

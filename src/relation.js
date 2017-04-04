@@ -1,4 +1,3 @@
-const ulid = require('ulid');
 const Immutable = require('immutable');
 const { createEntryMixin, Entry } = require('./model');
 const { QuerySet } = require('./queryset');
@@ -16,7 +15,7 @@ const normalize = ({
   relatedName = null,
 }) => ({ model, hasMany, relatedName });
 
-const parse = opts => normalize(opts.model ? opts : {model: opts});
+const parse = opts => normalize(opts.model ? opts : { model: opts });
 
 
 const createOneAccessor = ({ Base, name, mapping, model }) => (
@@ -31,9 +30,9 @@ const createOneAccessor = ({ Base, name, mapping, model }) => (
           return key ? model.objects.get(key) : null;
         },
 
-        set: (other) => {
-          return other ? mapping.attach(this.getKey(), other.getKey()) : mapping.detach(this.getKey());
-        },
+        set: other => (
+          other ? mapping.attach(this.getKey(), other.getKey()) : mapping.detach(this.getKey())
+        ),
       });
     }
   }
@@ -92,8 +91,8 @@ const createManyAccessor = ({ Base, name, mapping, model }) => (
             entry: this,
             mapping,
             manager: objects,
-            values: keyset ? objects.values.filter(
-              values => keyset.has(values.get(keyName))
+            values: keyset ? (
+              objects.values.filter(values => keyset.has(values.get(keyName)))
             ) : Immutable.OrderedMap(),
             QuerySetConstructor: objects.QuerySetConstructor,
           });
@@ -119,7 +118,7 @@ const createRelation = ({
           Base: RelatedBase,
           name: relatedName,
           mapping: mapping.reversed,
-          model
+          model,
         })
       )));
     }

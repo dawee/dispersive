@@ -44,6 +44,14 @@ class Mapping {
     return this.maps.src.get(srcKey);
   }
 
+  setSrc(modifier) {
+    this.maps.src = modifier(this.maps.src);
+  }
+
+  setDest(modifier) {
+    this.maps.dest = modifier(this.maps.dest);
+  }
+
 }
 
 
@@ -57,13 +65,16 @@ class OneToOneMapping extends Mapping {
     this.maps.dest = this.maps.dest.remove(lastPointedDestKey).set(destKey, srcKey);
   }
 
-  normalizedDetach(srcKey, destKey) {
+  normalizedDetach({ srcKey, destKey }) {
     this.maps.src = this.maps.src.remove(srcKey);
     this.maps.dest = this.maps.dest.remove(destKey);
   }
 
   detach(srcKey, destKey) {
-    this.normalizedDetach(srcKey || this.maps.dest.get(destKey), destKey || this.maps.src.get(srcKey));
+    this.normalizedDetach({
+      srcKey: srcKey || this.maps.dest.get(destKey),
+      destKey: destKey || this.maps.src.get(srcKey),
+    });
   }
 
 }
@@ -80,16 +91,12 @@ class OneToManyMapping extends Mapping {
     this.maps.src = this.maps.src.set(srcKey, destKey);
 
     if (lastPointedDestKey) {
-      this.maps.dest = this.maps.dest.set(
-        lastPointedDestKey,
-        this.maps.dest.get(lastPointedDestKey).remove(srcKey)
-      )
+      this.setDest(dest => (
+        dest.set(lastPointedDestKey, dest.get(lastPointedDestKey).remove(srcKey))
+      ));
     }
 
-    this.maps.dest = this.maps.dest.set(
-      destKey,
-      this.maps.dest.get(destKey).add(srcKey)
-    );
+    this.maps.dest = this.maps.dest.set(destKey, this.maps.dest.get(destKey).add(srcKey));
   }
 
   normalizedDetach(srcKey, destKey) {
