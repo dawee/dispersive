@@ -1,45 +1,10 @@
 ![Dispersive](https://raw.githubusercontent.com/dawee/dispersive-logo/master/dispersive-white-bg.png)
 
-Flux with less code.
+one store, several models.
 
-## Usage
+## Development state
 
-Create **models**:
+Dispersive is still in alpha state.
+A documentation is missing to bump to the stable version.
 
-```js
-const Tweet = createModel([
-  withField('text'),
-]);
-
-const User = createModel([
-  withField('name'),
-  withMany('tweets', Tweet),
-]);
-```
-
-Create **actions**:
-
-```js
-const addTweets = createAction((name, feed) => (
-  User.objects.getOrCreate({ name }).tweets.add(feed.results)
-), [User, Tweet]);
-
-const getLastTweets = async (userName) => {
-  const feed = await request.get(`http://twitter...${userName}`);
-
-  return addTweets(userName, feed);
-};
-```
-
-Then update **render after each change**:
-
-```js
-Tweet.emitter.changed(() => {
-  const hopefulcyborg = User.objects.get({name: 'hopefulcyborg'});
-
-  console.log('here are hopefulcyborg tweets :');
-  console.log(hopefulcyborg.tweets.map(({text}) => text));
-})
-
-getLastTweets('hopefulcyborg');
-```
+If you're curious you can still [take a look at the presentation](https://dawee.github.io/dispersive-presentation)
