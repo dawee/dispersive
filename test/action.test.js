@@ -28,7 +28,7 @@ describe('action', () => {
       const book = Book.objects.get(key);
 
       return book.update({title: 'Peter Pan'});
-    }, [Book])(emptyBook);
+    }, Book)(emptyBook);
 
     Book.objects.forEach(a => null)
     expect(Book.objects.get().title).to.equal('Peter Pan');

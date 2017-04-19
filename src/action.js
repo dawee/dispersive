@@ -4,8 +4,9 @@ const createTransactions = models => models.map(model => model.createTransaction
 const commitTransactions = models => models.map(model => model.commitTransaction());
 const abortTransactions = models => models.map(model => model.abortTransaction());
 const emitChanges = models => createChangesFunnelEmitter({ models }).emitChange();
+const normalized = value => (Array.isArray(value) && value) || [value];
 
-const createAction = (handler, models = []) => (
+const createNormalizedAction = (handler, models) => (
   (...args) => {
     let res = null;
 
@@ -24,6 +25,7 @@ const createAction = (handler, models = []) => (
   }
 );
 
+const createAction = (handler, models) => createNormalizedAction(handler, normalized(models));
 const runAsAction = (handler, models) => createAction(handler, models)();
 
 module.exports = {
