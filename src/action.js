@@ -9,16 +9,21 @@ const normalized = value => (Array.isArray(value) && value) || [value];
 const createNormalizedAction = (handler, models) => (
   (...args) => {
     let res = null;
+    let catchedError = null;
 
     createTransactions(models);
 
     try {
       res = handler(...args);
       commitTransactions(models);
-      emitChanges(models);
     } catch (error) {
+      catchedError = error;
       abortTransactions(models);
       throw error;
+    }
+
+    if (!catchedError) {
+      emitChanges(models);
     }
 
     return res;

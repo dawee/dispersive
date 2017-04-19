@@ -59,19 +59,17 @@ describe('action', () => {
       withMany('books', Book),
     ]);
 
-    const store = [Book, Author];
     const render = spy();
 
-    createChangesFunnelEmitter({models: store}).changed(() => (
-      render(Book.objects.length, Author.objects.length)
-    ));
+    createChangesFunnelEmitter({models: [Book, Author]})
+      .changed(() => render(Book.objects.length, Author.objects.length));
 
     createAction(() => {
       const jmBarrie = Author.objects.getOrCreate({name: 'J.M. Barrie'});
       const peterPan = Book.objects.create({author: jmBarrie, title: 'Peter Pan'});
-    }, store)();
+    }, [Book, Author])();
 
-    assert(render.calledOnce);
+    assert.equal(render.callCount, 1);
     assert(render.calledWith(1, 1));
   })
 
