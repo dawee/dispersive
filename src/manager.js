@@ -20,6 +20,10 @@ const createObjectManagerConstructor = QuerySetConstructor => class extends Quer
     this.setup = setup;
   }
 
+  get values() {
+    return this.transaction ? this.transaction.values : this.inputValues;
+  }
+
   build(values = Immutable.Map()) {
     assert.ok(values && values instanceof Immutable.Map, NO_VALUES);
 

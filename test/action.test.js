@@ -4,6 +4,7 @@ const {createModel, createAction} = require('../src');
 const {withOne, withMany} = require('../src/relation');
 const {withField} = require('../src/field');
 const {createChangesFunnelEmitter} = require('../src/emitter');
+const {runAsAction} = require('../src/action');
 
 
 
@@ -71,6 +72,20 @@ describe('action', () => {
 
     assert.equal(render.callCount, 1);
     assert(render.calledWith(1, 1));
-  })
+  });
+
+  it('should allow to read current transaction entries', () => {
+    const Book = createModel([
+      withField('title'),
+    ]);
+
+    const peterPan = runAsAction(() => {
+      Book.objects.create({ title: 'Peter Pan' });
+
+      return Book.objects.get({ title: 'Peter Pan' });
+    }, [Book]);
+
+    assert(peterPan, 'Could not retreived created model');
+  });
 
 })

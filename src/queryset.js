@@ -13,7 +13,11 @@ class QuerySetBase {
 
     this.QuerySetConstructor = QuerySetConstructor;
     this.manager = manager;
-    this.values = values;
+    this.inputValues = values;
+  }
+
+  get values() {
+    return this.inputValues;
   }
 
   forEach(predicate) {
