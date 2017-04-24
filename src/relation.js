@@ -66,7 +66,9 @@ class RelationQuerySet extends QuerySet {
   }
 
   add(oneOrMany) {
-    return Array.isArray(oneOrMany) ? this.addMany(oneOrMany) : this.addOne(oneOrMany);
+    return Array.isArray(oneOrMany) || (oneOrMany instanceof QuerySet)
+      ? this.addMany(oneOrMany)
+      : this.addOne(oneOrMany);
   }
 
   remove(other) {

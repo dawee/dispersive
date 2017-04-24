@@ -88,4 +88,60 @@ describe('action', () => {
     assert(peterPan, 'Could not retreived created model');
   });
 
+  it('should manage crossed relations (album/broadcast bug)', () => {
+    const Track = createModel([
+      withField('title'),
+    ]);
+
+    const Album = createModel([
+      withField('title'),
+      withMany('tracks', {
+        model: Track,
+        relatedName: 'album',
+      }),
+    ]);
+
+    const Artist = createModel([
+      withField('name'),
+      withMany('tracks', {
+        model: Track,
+        relatedName: 'artist',
+      }),
+      withMany('albums', {
+        model: Album,
+        relatedName: 'artist',
+      }),
+    ]);
+
+    const Playlist = createModel([
+      withMany('tracks', Track),
+    ]);
+
+    const Broadcast = createModel([
+      withOne('playlist', Playlist),
+    ]);
+
+    const store = [Broadcast, Playlist, Album, Track, Artist];
+
+    const broadcast = runAsAction(() => {
+      const avantasia = Artist.objects.create({ name: 'Avantasia' });
+      const metalOpera = Album.objects.create({ title: 'Metal Opera', artist: avantasia });
+      const playlist = Playlist.objects.create();
+
+      metalOpera.tracks.add([
+        'Farewell',
+        'Sign Of The Cross'
+      ].map(title => Track.objects.create({ artist: avantasia, title })));
+
+      playlist.tracks.add(metalOpera.tracks);
+
+      return Broadcast.objects.create({ playlist });
+    }, store);
+
+    assert(Album.objects.first().artist.name === 'Avantasia')
+    expect(broadcast.playlist.tracks.length).to.equal(2);
+    assert(broadcast.playlist.tracks.every(track => track.album.title === 'Metal Opera'));
+    assert(broadcast.playlist.tracks.every(track => track.artist.name === 'Avantasia'));
+  });
+
 })
